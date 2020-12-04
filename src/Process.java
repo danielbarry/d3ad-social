@@ -50,9 +50,7 @@ public class Process extends Thread{
     /* Parse the header */
     HashMap<String, String> kv = parseHead(raw);
     /* Authenticate (if required) */
-    if(kv.containsKey("Cookie")){
-      /* TODO: Attempt to authenticate with the key. */
-    }
+    Auth.User user = parseAuth(kv);
     /* Start sending data */
     writeHead(s);
     /* Pass request onto handler */
@@ -60,7 +58,25 @@ public class Process extends Thread{
       /* TODO: Derive handler string. */
       switch(kv.get("location")){
         case "/" :
-          write(s, (new HandlerHome(kv)).process());
+        case "/index" :
+        case "/index.htm" :
+        case "/index.html" :
+          HandlerHome hh = new HandlerHome(kv);
+          write(s, hh.genHead(user));
+          write(s, hh.genBody());
+          write(s, hh.genFoot());
+          break;
+        case "/login" :
+          HandlerLogin hl = new HandlerLogin(kv);
+          write(s, hl.genHead(user));
+          write(s, hl.genBody());
+          write(s, hl.genFoot());
+          break;
+        case "/register" :
+          HandlerRegister hr = new HandlerRegister(kv);
+          write(s, hr.genHead(user));
+          write(s, hr.genBody());
+          write(s, hr.genFoot());
           break;
         default :
           writeBad(s);
@@ -141,7 +157,7 @@ public class Process extends Thread{
       }
       String[] parts = lines[x].split("&");
       for(int i = 0; i < parts.length; i++){
-        int s = parts[i].indexOf('&');
+        int s = parts[i].indexOf('=');
         if(s >= 0){
           kv.put(parts[i].substring(0, s), parts[i].substring(s + 1));
         }else{
@@ -150,6 +166,35 @@ public class Process extends Thread{
       }
     }
     return kv;
+  }
+
+  /**
+   * parseAuth()
+   *
+   * Try to authenticate a user if possible. Reasons for authorizing a user
+   * could be from login, registration or a user which is already logged in.
+   * The purpose is to handle these cases and allow for a logged in user to be
+   * returned if possible.
+   *
+   * @param kv The key value mappings from the header.
+   * @return The logged in user, otherwise NULL.
+   **/
+  private static Auth.User parseAuth(HashMap<String, String> kv){
+    Auth.User user = null;
+    /* Check if login or registration */
+    if(kv.containsKey("username")){
+      /* Is login */
+      if(kv.containsKey("password")){
+        /* TODO: Attempt login. */
+      /* Is registration */
+      }else if(kv.containsKey("passworda") && kv.containsKey("passwordb")){
+        /* TODO: Attempt registration. */
+      }
+    /* Check if already logged in */
+    }else if(kv.containsKey("Cookie")){
+      /* TODO: Attempt to authenticate with the key. */
+    }
+    return null;
   }
 
   /**

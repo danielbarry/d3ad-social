@@ -5,13 +5,52 @@ package b.ds;
  *
  * A basic interface for a specific page or function.
  **/
-public interface Handler{
+public abstract class Handler{
   /**
-   * process()
+   * genHead()
+   *
+   * Generate the page header content.
+   *
+   * @param user The logged in user, otherwise NULL.
+   * @return The bytes to be written to the client.
+   **/
+  public byte[] genHead(Auth.User user){
+    return (
+      "<html>" +
+        "<head>" +
+          "<title>[d3ad]</title>" +
+        "</head>" +
+        "<body>" +
+          "<b><a href=\"/\">[d3ad]</a> social</b>&nbsp;" +
+          "<a href=\"/" +
+            (user == null ? "login\">[login" : "user/" + user.id + "\">[" + user.name) +
+          "]</a>" +
+          "<br>"
+    ).getBytes();
+  }
+
+  /**
+   * genBody()
    *
    * Process the requirements of the handler.
    *
    * @return The bytes to be written to the client.
    **/
-  public byte[] process();
+  public byte[] genBody(){
+    return "<b>Error</b>".getBytes();
+  }
+
+  /**
+   * genFoot()
+   *
+   * Generate the page footer content.
+   *
+   * @return The bytes to be written to the client.
+   **/
+  public byte[] genFoot(){
+    return (
+        "</body>" +
+      "</html>"
+    ).getBytes();
+  }
 }

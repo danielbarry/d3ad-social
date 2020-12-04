@@ -7,7 +7,7 @@ import java.util.HashMap;
  *
  * Generate a generic home page that doesn't require a login.
  **/
-public class HandlerHome implements Handler{
+public class HandlerHome extends Handler{
   /**
    * HandlerHome()
    *
@@ -19,8 +19,11 @@ public class HandlerHome implements Handler{
     /* TODO: Take values from key values of interest. */
   }
 
-  public byte[] process(){
+  @Override
+  public byte[] genBody(){
     /* TODO: Implement this. */
-    return "boo yah".getBytes();
+    return (
+      "Content here"
+    ).getBytes();
   }
 }
