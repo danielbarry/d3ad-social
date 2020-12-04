@@ -1,3 +1,7 @@
 {
-  "active": "true"
+  "active": "true",
+  "port": "8080",
+  "rec-buff-size": "2048",
+  "reuse-addr": "false".
+  "timeout-ms": "10000"
 }
