@@ -110,6 +110,7 @@ public class Process extends Thread{
         Utils.logUnsafe("Unable to process header line", lines[x]);
       }
     }
+    /* TODO: We assume that Content-Type: application/x-www-form-urlencoded. */
     /* Process POST data */
     for(; x < lines.length; x++){
       String[] parts = lines[x].split("&");
