@@ -101,7 +101,7 @@ public class Process extends Thread{
     /* Process the remaining key values */
     int x = 1;
     for(; x < lines.length; x++){
-      if(lines[x].length() > 0 && lines[x].charAt(0) != '\0'){
+      if(lines[x].length() <= 0 || lines[x].charAt(0) == '\0'){
         break;
       }
       int s = lines[x].indexOf(':');
