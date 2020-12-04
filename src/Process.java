@@ -3,6 +3,7 @@ package b.ds;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 /**
@@ -66,7 +67,7 @@ public class Process extends Thread{
       byte[] buff = new byte[n];
       try{
         s.getInputStream().read(buff);
-        r = new String(buff);
+        r = new String(buff, StandardCharsets.UTF_8);
       }catch(IOException e){
         r = null;
       }
