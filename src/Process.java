@@ -9,6 +9,9 @@ import java.net.Socket;
  * should be handled.
  **/
 public class Process extends Thread{
+  private Socket s;
+  private int recBuffSize;
+
   /**
    * Process()
    *
@@ -18,7 +21,8 @@ public class Process extends Thread{
    * @param recBuffSize The receiver buffer size.
    **/
   public Process(Socket socket, int recBuffSize){
-    /* TODO */
+    this.s = socket;
+    this.recBuffSize = recBuffSize;
   }
 
   /**
@@ -28,6 +32,8 @@ public class Process extends Thread{
    **/
   @Override
   public void run(){
-    /* TODO */
+    Utils.log("Process client started");
+    /* TODO: Implement the processor. */
+    Utils.log("Process client ended");
   }
 }
