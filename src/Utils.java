@@ -71,6 +71,7 @@ public class Utils{
       try{
         bw.append(s);
         bw.newLine();
+        bw.flush();
       }catch(IOException e){
         /* Don't log, we could end up in an infinite loop */
       }
