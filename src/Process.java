@@ -113,7 +113,10 @@ public class Process extends Thread{
     }
     /* TODO: We assume that Content-Type: application/x-www-form-urlencoded. */
     /* Process POST data */
-    for(; x < lines.length; x++){
+    for(++x; x < lines.length; x++){
+      if(lines[x].length() <= 0 || lines[x].charAt(0) == '\0'){
+        break;
+      }
       String[] parts = lines[x].split("&");
       for(int i = 0; i < parts.length; i++){
         int s = parts[i].indexOf('&');
