@@ -20,7 +20,7 @@ public class Utils{
   static{
     bw = null;
     try{
-      bw = new BufferedWriter(new FileWriter(new File("fc.log"), true));
+      bw = new BufferedWriter(new FileWriter(new File("d3ad.log"), true));
     }catch(IOException e){
       bw = null;
       warn("Failed to open log file");
