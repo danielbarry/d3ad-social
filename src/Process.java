@@ -158,15 +158,9 @@ public class Process extends Thread{
    * @param s The socket to be write.
    **/
   private static void writeHead(Socket s){
-    if(s != null){
-      try{
-        s.getOutputStream().write(HTTP_HEAD);
-        s.getOutputStream().write(HTTP_LINE);
-        s.getOutputStream().write(HTTP_LINE);
-      }catch(IOException e){
-        /* Do nothing */
-      }
-    }
+    write(s, HTTP_HEAD);
+    write(s, HTTP_LINE);
+    write(s, HTTP_LINE);
   }
 
   /**
@@ -177,9 +171,21 @@ public class Process extends Thread{
    * @param s The socket to be write.
    **/
   private static void writeBad(Socket s){
+    write(s, HTTP_BAD);
+  }
+
+  /**
+   * write()
+   *
+   * Write to the client.
+   *
+   * @param s The socket to be write.
+   * @param b The bytes to be written.
+   **/
+  private static void write(Socket s, byte[] b){
     if(s != null){
       try{
-        s.getOutputStream().write(HTTP_BAD);
+        s.getOutputStream().write(b);
       }catch(IOException e){
         /* Do nothing */
       }
