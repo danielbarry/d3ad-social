@@ -59,7 +59,9 @@ public class Process extends Thread{
     if(kv.containsKey("location")){
       /* TODO: Derive handler string. */
       switch(kv.get("location")){
-        /* TODO: Pass onto handler. */
+        case "/" :
+          write(s, (new HandlerHome(kv)).process());
+          break;
         default :
           writeBad(s);
           break;
