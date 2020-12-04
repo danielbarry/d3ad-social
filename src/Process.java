@@ -45,6 +45,7 @@ public class Process extends Thread{
     /* Parse the header */
     HashMap<String, String> kv = parseHead(raw);
     /* TODO: Authenticate (if required). */
+    /* TODO: Start sending data. */
     /* TODO: Pass request onto handler. */
     /* TODO: Close the socket. */
     Utils.log("Process client ended");
@@ -97,13 +98,27 @@ public class Process extends Thread{
       }
     }
     /* Process the remaining key values */
-    for(int x = 1; x < lines.length; x++){
+    int x = 1;
+    for(; x < lines.length; x++){
       if(lines[x].length() > 0 && lines[x].charAt(0) != '\0'){
-        int s = lines[x].indexOf(':');
+        break;
+      }
+      int s = lines[x].indexOf(':');
+      if(s >= 0){
+        kv.put(lines[x].substring(0, s), lines[x].substring(s + 1));
+      }else{
+        Utils.logUnsafe("Unable to process header line", lines[x]);
+      }
+    }
+    /* Process POST data */
+    for(; x < lines.length; x++){
+      String[] parts = lines[x].split("&");
+      for(int i = 0; i < parts.length; i++){
+        int s = parts[i].indexOf('&');
         if(s >= 0){
-          kv.put(lines[x].substring(0, s), lines[x].substring(s + 1));
+          kv.put(parts[i].substring(0, s), parts[i].substring(s + 1));
         }else{
-          Utils.logUnsafe("Unable to process header line", lines[x]);
+          Utils.logUnsafe("Unable to process form line", parts[i]);
         }
       }
     }
