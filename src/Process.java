@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class Process extends Thread{
   private static final byte[] HTTP_LINE = "\r\n".getBytes();
   private static final byte[] HTTP_HEAD = "HTTP/1.1 200 OK".getBytes();
-  private static final byte[] HTTP_BAD = "<h1>Bad Happened</h1>".getBytes();
+  private static final byte[] HTTP_BAD = "<b>Error</b>".getBytes();
 
   private Socket s;
   private int recBuffSize;
