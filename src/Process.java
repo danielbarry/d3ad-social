@@ -106,7 +106,7 @@ public class Process extends Thread{
       }
       int s = lines[x].indexOf(':');
       if(s >= 0){
-        kv.put(lines[x].substring(0, s), lines[x].substring(s + 1));
+        kv.put(lines[x].substring(0, s).trim(), lines[x].substring(s + 1).trim());
       }else{
         Utils.logUnsafe("Unable to process header line", lines[x]);
       }
