@@ -97,11 +97,11 @@ public class Server extends Thread{
       try{
         /* Inner server main loop */
         for(;;){
-//          try{
-//            (new Client(ss.accept(), recBuffSize)).start();
-//          }catch(SocketTimeoutException ste){
-//            Utils.log("Socket timeout, client may have be disconnected");
-//          }
+          try{
+            (new Process(ss.accept(), recBuffSize)).start();
+          }catch(SocketTimeoutException ste){
+            Utils.log("Socket timeout, client may have be disconnected");
+          }
         }
       }catch(Exception e){
         Utils.warn("Inner main loop crashed, restarting");
