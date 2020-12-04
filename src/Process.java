@@ -13,6 +13,10 @@ import java.util.HashMap;
  * should be handled.
  **/
 public class Process extends Thread{
+  private static final byte[] HTTP_LINE = "\r\n".getBytes();
+  private static final byte[] HTTP_HEAD = "HTTP/1.1 200 OK".getBytes();
+  private static final byte[] HTTP_BAD = "<h1>Bad Happened</h1>".getBytes();
+
   private Socket s;
   private int recBuffSize;
 
@@ -45,10 +49,26 @@ public class Process extends Thread{
     }
     /* Parse the header */
     HashMap<String, String> kv = parseHead(raw);
-    /* TODO: Authenticate (if required). */
-    /* TODO: Start sending data. */
-    /* TODO: Pass request onto handler. */
-    /* TODO: Close the socket. */
+    /* Authenticate (if required) */
+    if(kv.containsKey("Cookie")){
+      /* TODO: Attempt to authenticate with the key. */
+    }
+    /* Start sending data */
+    writeHead(s);
+    /* Pass request onto handler */
+    if(kv.containsKey("location")){
+      /* TODO: Derive handler string. */
+      switch(kv.get("location")){
+        /* TODO: Pass onto handler. */
+        default :
+          writeBad(s);
+          break;
+      }
+    }else{
+      writeBad(s);
+    }
+    /* Close the socket */
+    close(s);
     Utils.log("Process client ended");
   }
 
@@ -128,5 +148,60 @@ public class Process extends Thread{
       }
     }
     return kv;
+  }
+
+  /**
+   * writeHead()
+   *
+   * Pre-write the header for the client.
+   *
+   * @param s The socket to be write.
+   **/
+  private static void writeHead(Socket s){
+    if(s != null){
+      try{
+        s.getOutputStream().write(HTTP_HEAD);
+        s.getOutputStream().write(HTTP_LINE);
+        s.getOutputStream().write(HTTP_LINE);
+      }catch(IOException e){
+        /* Do nothing */
+      }
+    }
+  }
+
+  /**
+   * writeBad()
+   *
+   * Write an error to the client.
+   *
+   * @param s The socket to be write.
+   **/
+  private static void writeBad(Socket s){
+    if(s != null){
+      try{
+        s.getOutputStream().write(HTTP_BAD);
+      }catch(IOException e){
+        /* Do nothing */
+      }
+    }
+  }
+
+  /**
+   * close()
+   *
+   * Write the remaining buffer and close the connection.
+   *
+   * @param s The socket to be write.
+   **/
+  private static void close(Socket s){
+    if(s != null){
+      try{
+        s.getOutputStream().flush();
+        s.getOutputStream().close();
+        s.close();
+      }catch(IOException e){
+        /* Do nothing */
+      }
+    }
   }
 }
