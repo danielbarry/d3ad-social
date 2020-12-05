@@ -5,7 +5,7 @@ import java.util.HashMap;
 /**
  * HandlerHome.java
  *
- * Generate a generic home page that doesn't require a login.
+ * Generate a generic home page.
  **/
 public class HandlerHome extends Handler{
   /**
