@@ -130,8 +130,6 @@ public class Auth{
     if(userMap.containsKey(username)){
       user = userMap.get(username);
       password = Utils.genPassHash(salt, user.usalt, password);
-      Utils.log("pass -> " + password); // TODO
-      Utils.log("user.pass -> " + user.password); // TODO
       /* Make sure for sure it's the right user and password */
       if(user.username.equals(username) && user.password.equals(password)){
         /* Remove existing token if required */
