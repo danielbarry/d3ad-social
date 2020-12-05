@@ -33,6 +33,7 @@ public class Auth{
   private JSON config;
   private byte[] salt;
   private String userDir;
+  private long tokenTimeout;
   private HashMap<String, User> idMap;
   private HashMap<String, User> userMap;
   private HashMap<String, User> tokenMap;
@@ -48,6 +49,7 @@ public class Auth{
     this.config = config;
     salt = Utils.hexToBytes(config.get("security").get("salt").value(""));
     userDir = config.get("data").get("user-dir").value("dat/usr");
+    tokenTimeout = Long.parseLong(config.get("security").get("token-timeout-ms").value("86400000"));
     idMap = new HashMap<String, User>();
     userMap = new HashMap<String, User>();
     tokenMap = new HashMap<String, User>();
@@ -102,7 +104,7 @@ public class Auth{
     user.password = Utils.genPassHash(salt, user.usalt, passwordA);
     /* Generate unique token */
     while(tokenMap.containsKey(user.token = Utils.bytesToHex(Utils.genRandHash())));
-    user.revoke = System.currentTimeMillis() * 2; // TODO
+    user.revoke = System.currentTimeMillis() + tokenTimeout;
     /* Save the user to disk */
     if(writeUser(userDir + "/" + user.id, user) != user){
       Utils.warn("Unable to save new user");
@@ -138,7 +140,7 @@ public class Auth{
         }
         /* Generate a unique token and update revoke deadline */
         while(tokenMap.containsKey(user.token = Utils.bytesToHex(Utils.genRandHash())));
-        user.revoke = System.currentTimeMillis() * 2; // TODO
+        user.revoke = System.currentTimeMillis() + tokenTimeout;
         tokenMap.put(user.token, user);
       }else{
         user = null;
