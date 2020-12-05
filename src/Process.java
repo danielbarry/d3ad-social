@@ -62,11 +62,17 @@ public class Process extends Thread{
     writeHead(s, user);
     /* Pass request onto handler */
     if(kv.containsKey("location")){
-      /* TODO: Derive handler string. */
       String loc = kv.get("location");
       loc = loc.length() < subDirLen ? "" : loc.substring(subDirLen);
+      /* Derive handler string */
+      String hand = loc;
+      int z = hand.indexOf('/');
+      if(z >= 0){
+        hand = hand.substring(0, z);
+        loc = loc.substring(z + 1, loc.length());
+      }
       Handler h = new HandlerHome(kv);
-      switch(loc){
+      switch(hand){
         case "" :
         case "index" :
         case "index.htm" :
