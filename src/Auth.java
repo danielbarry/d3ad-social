@@ -100,8 +100,8 @@ public class Auth{
     user.usalt = Utils.genRandHash();
     user.username = username;
     user.password = Utils.genPassHash(salt, user.usalt, passwordA);
-    /* TODO: Check the token is random. */
-    user.token = Utils.bytesToHex(Utils.genRandHash());
+    /* Generate unique token */
+    while(tokenMap.containsKey(user.token = Utils.bytesToHex(Utils.genRandHash())));
     user.revoke = System.currentTimeMillis() * 2; // TODO
     /* Save the user to disk */
     if(writeUser(userDir + "/" + user.id, user) != user){
@@ -136,8 +136,8 @@ public class Auth{
         if(tokenMap.containsKey(user.token) && tokenMap.get(user.token).token == user.token){
           tokenMap.remove(user.token);
         }
-        /* Generate a new token and update revoke deadline */
-        user.token = Utils.bytesToHex(Utils.genRandHash());
+        /* Generate a unique token and update revoke deadline */
+        while(tokenMap.containsKey(user.token = Utils.bytesToHex(Utils.genRandHash())));
         user.revoke = System.currentTimeMillis() * 2; // TODO
         tokenMap.put(user.token, user);
       }else{
