@@ -55,26 +55,7 @@ public class Auth{
     File[] users = (new File(userDir)).listFiles();
     for(int x = 0; x < users.length; x++){
       if(users[x].isFile() && !users[x].isDirectory() && users[x].length() > 0){
-        try{
-          JSON userData = JSON.build(users[x].getPath());
-          User user = new User();
-          user.id = userData.get("id").value(null);
-          user.usalt = userData.get("usalt").value(null);
-          user.username = userData.get("username").value(null);
-          user.password = userData.get("password").value(null);
-          user.token = null;
-          if(
-            user.id != null       &&
-            user.usalt != null    &&
-            user.username != null &&
-            user.password != null
-          ){
-            idMap.put(user.id, user);
-            userMap.put(user.username, user);
-          }
-        }catch(Exception e){
-          Utils.warn("Failed to read user data");
-        }
+        User user = readUser(users[x].getPath());
       }
     }
   }
@@ -121,15 +102,8 @@ public class Auth{
     user.token = "token"; // TODO
     user.revoke = System.currentTimeMillis() * 2; // TODO
     /* Save the user to disk */
-    String data = "{" +
-      "\"id\":\""       + user.id       + "\"," +
-      "\"usalt\":\""    + user.usalt    + "\"," +
-      "\"username\":\"" + user.username + "\"," +
-      "\"password\":\"" + user.password + "\""  +
-    "}";
-    if(Data.write(userDir + "/" + user.id, data)){
-      tokenMap.put(user.token, user);
-      Utils.logUnsafe("New user registered", username);
+    if(writeUser(userDir + "/" + user.id, user) == null){
+      Utils.warn("Unable to save new user");
     }
     /* Login with user */
     return login(username, passwordA);
@@ -188,5 +162,65 @@ public class Auth{
       }
     }
     return null;
+  }
+
+  /**
+   * readUser()
+   *
+   * Read user data from disk and update the relevant variables. Return NULL if
+   * an issue occurs.
+   *
+   * @param userPath The path for the user configuration.
+   * @return The user object, otherwise NULL.
+   **/
+  private User readUser(String userPath){
+    try{
+      JSON userData = JSON.build(userPath);
+      User user = new User();
+      user.id = userData.get("id").value(null);
+      user.usalt = userData.get("usalt").value(null);
+      user.username = userData.get("username").value(null);
+      user.password = userData.get("password").value(null);
+      user.token = null;
+      if(
+        user.id != null       &&
+        user.usalt != null    &&
+        user.username != null &&
+        user.password != null
+      ){
+        idMap.put(user.id, user);
+        userMap.put(user.username, user);
+      }
+      return user;
+    }catch(Exception e){
+      return null;
+    }
+  }
+
+  /**
+   * writeUser()
+   *
+   * Write the user data to disk and update the relevant variables. Return NULL
+   * if an issue occurs.
+   *
+   * @param path The path for the user configuration.
+   * @param user The user object to be written.
+   * @return The user object, otherwise NULL.
+   **/
+  private User writeUser(String path, User user){
+    /* Save the user to disk */
+    String data = "{" +
+      "\"id\":\""       + user.id       + "\"," +
+      "\"usalt\":\""    + user.usalt    + "\"," +
+      "\"username\":\"" + user.username + "\"," +
+      "\"password\":\"" + user.password + "\""  +
+    "}";
+    if(Data.write(userDir + "/" + user.id, data)){
+      tokenMap.put(user.token, user);
+      Utils.logUnsafe("New user registered", user.username);
+      return user;
+    }else{
+      return null;
+    }
   }
 }
