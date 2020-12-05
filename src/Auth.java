@@ -72,17 +72,17 @@ public class Auth{
    **/
   public User register(String username, String passwordA, String passwordB){
     Utils.logUnsafe("Trying to register new user", username);
-    /* TODO: Make sure strings are sanitized. */
     /* Check username meets requirements */
     if(
-      username == null      ||
-      username.length() < 8 ||
-      username.length() > 64
+      username == null         ||
+      username.length() < 8    ||
+      username.length() > 64   ||
+      !checkUsername(username) ||
+      userMap.containsKey(username)
     ){
       Utils.logUnsafe("Bad username for registration", username);
       return null;
     }
-    /* TODO: Check user is unique. */
     /* Check password meets requirements */
     if(
       passwordA == null       ||
