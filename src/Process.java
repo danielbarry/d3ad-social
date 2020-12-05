@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class Process extends Thread{
   private static final byte[] HTTP_LINE = "\r\n".getBytes();
   private static final byte[] HTTP_HEAD = "HTTP/1.1 200 OK".getBytes();
+  private static final byte[] HTTP_COOK = "Set-Cookie: ".getBytes();
   private static final byte[] HTTP_BAD = "<b>Error</b>".getBytes();
 
   private Socket s;
@@ -55,7 +56,7 @@ public class Process extends Thread{
     /* Authenticate (if required) */
     Auth.User user = parseAuth(kv, auth);
     /* Start sending data */
-    writeHead(s);
+    writeHead(s, user);
     /* Pass request onto handler */
     if(kv.containsKey("location")){
       /* TODO: Derive handler string. */
@@ -200,7 +201,11 @@ public class Process extends Thread{
       }
     /* Check if already logged in */
     }else if(kv.containsKey("Cookie")){
-      return auth.token(kv.get("Cookie"));
+      String rawCookie = kv.get("Cookie");
+      int z = rawCookie.lastIndexOf('=');
+      if(z >= 0){
+        return auth.token(rawCookie.substring(z + 1));
+      }
     }
     return null;
   }
@@ -211,9 +216,15 @@ public class Process extends Thread{
    * Pre-write the header for the client.
    *
    * @param s The socket to be write.
+   * @param user A valid authorized user if one has been found.
    **/
-  private static void writeHead(Socket s){
+  private static void writeHead(Socket s, Auth.User user){
     write(s, HTTP_HEAD);
+    if(user != null){
+      write(s, HTTP_LINE);
+      write(s, HTTP_COOK);
+      write(s, ("token=" + user.token).getBytes());
+    }
     write(s, HTTP_LINE);
     write(s, HTTP_LINE);
   }
