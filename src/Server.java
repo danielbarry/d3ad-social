@@ -15,6 +15,7 @@ public class Server extends Thread{
   private Auth auth;
   private ServerSocket ss;
   private int recBuffSize;
+  private int subDirLen;
 
   /**
    * Server()
@@ -28,6 +29,8 @@ public class Server extends Thread{
     this.auth = new Auth(config);
     int port = 8080;
     recBuffSize = 2048;
+    String subDir = "/";
+    subDirLen = 1;
     boolean reuseAddr = false;
     int timeout = 10000;
     try{
@@ -42,6 +45,12 @@ public class Server extends Thread{
     }
     reuseAddr = config.get("reuse-addr").value("false").equals("true");
     try{
+      subDir = config.get("sub-dir").value("/");
+      subDirLen = subDir.length();
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find sub directory value");
+    }
+    try{
       timeout = Integer.parseInt(config.get("timeout-ms").value(timeout + ""));
     }catch(NumberFormatException e){
       Utils.warn("Unable to find timeout value");
@@ -50,6 +59,7 @@ public class Server extends Thread{
     Utils.log("Requested port is '"                + port        + "'");
     Utils.log("Requested receive buffer size is '" + recBuffSize + "'");
     Utils.log("Requested reuse address is '"       + reuseAddr   + "'");
+    Utils.log("Requested sub directory is '"       + subDir      + "'");
     Utils.log("Requested timeout is '"             + timeout     + "'");
     /* Setup server socket */
     try{
@@ -100,7 +110,7 @@ public class Server extends Thread{
         /* Inner server main loop */
         for(;;){
           try{
-            (new Process(ss.accept(), recBuffSize, auth)).start();
+            (new Process(ss.accept(), recBuffSize, subDirLen, auth)).start();
           }catch(SocketTimeoutException ste){
             Utils.log("Socket timeout, client may have be disconnected");
           }

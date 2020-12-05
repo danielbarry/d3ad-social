@@ -11,5 +11,6 @@
   "security": {
     "salt": ""
   },
+  "sub-dir": "/",
   "timeout-ms": "10000"
 }

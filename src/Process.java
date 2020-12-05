@@ -20,6 +20,7 @@ public class Process extends Thread{
 
   private Socket s;
   private int recBuffSize;
+  private int subDirLen;
   private Auth auth;
 
   /**
@@ -29,11 +30,13 @@ public class Process extends Thread{
    *
    * @param socket The socket of the client.
    * @param recBuffSize The receiver buffer size.
+   * @param subDirLen The subdirectory length.
    * @param auth Access to the authentication mechanism.
    **/
-  public Process(Socket socket, int recBuffSize, Auth auth){
+  public Process(Socket socket, int recBuffSize, int subDirLen, Auth auth){
     this.s = socket;
     this.recBuffSize = recBuffSize;
+    this.subDirLen = subDirLen;
     this.auth = auth;
   }
 
@@ -60,17 +63,19 @@ public class Process extends Thread{
     /* Pass request onto handler */
     if(kv.containsKey("location")){
       /* TODO: Derive handler string. */
+      String loc = kv.get("location");
+      loc = loc.length() < subDirLen ? "" : loc.substring(subDirLen);
       Handler h = new HandlerHome(kv);
-      switch(kv.get("location")){
-        case "/" :
-        case "/index" :
-        case "/index.htm" :
-        case "/index.html" :
+      switch(loc){
+        case "" :
+        case "index" :
+        case "index.htm" :
+        case "index.html" :
           write(s, h.genHead(user));
           write(s, h.genBody());
           write(s, h.genFoot());
           break;
-        case "/login" :
+        case "login" :
           if(user == null){
             h = new HandlerLogin(kv);
           }
@@ -78,7 +83,7 @@ public class Process extends Thread{
           write(s, h.genBody());
           write(s, h.genFoot());
           break;
-        case "/register" :
+        case "register" :
           if(user == null){
             h = new HandlerRegister(kv);
           }
