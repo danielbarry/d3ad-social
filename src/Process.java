@@ -97,6 +97,12 @@ public class Process extends Thread{
           write(s, h.genBody());
           write(s, h.genFoot());
           break;
+        case "user" :
+          h = new HandlerUser(kv, user, auth.getUserById(loc));
+          write(s, h.genHead(user));
+          write(s, h.genBody());
+          write(s, h.genFoot());
+          break;
         default :
           writeBad(s);
           break;
