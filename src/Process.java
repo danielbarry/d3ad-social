@@ -19,6 +19,7 @@ public class Process extends Thread{
 
   private Socket s;
   private int recBuffSize;
+  private Auth auth;
 
   /**
    * Process()
@@ -27,10 +28,12 @@ public class Process extends Thread{
    *
    * @param socket The socket of the client.
    * @param recBuffSize The receiver buffer size.
+   * @param auth Access to the authentication mechanism.
    **/
-  public Process(Socket socket, int recBuffSize){
+  public Process(Socket socket, int recBuffSize, Auth auth){
     this.s = socket;
     this.recBuffSize = recBuffSize;
+    this.auth = auth;
   }
 
   /**
@@ -50,7 +53,7 @@ public class Process extends Thread{
     /* Parse the header */
     HashMap<String, String> kv = parseHead(raw);
     /* Authenticate (if required) */
-    Auth.User user = parseAuth(kv);
+    Auth.User user = parseAuth(kv, auth);
     /* Start sending data */
     writeHead(s);
     /* Pass request onto handler */
@@ -177,22 +180,23 @@ public class Process extends Thread{
    * returned if possible.
    *
    * @param kv The key value mappings from the header.
+   * @param auth The server authentication mechanism.
    * @return The logged in user, otherwise NULL.
    **/
-  private static Auth.User parseAuth(HashMap<String, String> kv){
+  private static Auth.User parseAuth(HashMap<String, String> kv, Auth auth){
     Auth.User user = null;
     /* Check if login or registration */
     if(kv.containsKey("username")){
       /* Is login */
       if(kv.containsKey("password")){
-        /* TODO: Attempt login. */
+        return auth.login(kv.get("username"), kv.get("password"));
       /* Is registration */
       }else if(kv.containsKey("passworda") && kv.containsKey("passwordb")){
-        /* TODO: Attempt registration. */
+        return auth.register(kv.get("username"), kv.get("passworda"), kv.get("passwordb"));
       }
     /* Check if already logged in */
     }else if(kv.containsKey("Cookie")){
-      /* TODO: Attempt to authenticate with the key. */
+      return auth.token(kv.get("Cookie"));
     }
     return null;
   }

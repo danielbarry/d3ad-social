@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
  **/
 public class Server extends Thread{
   private JSON config;
+  private Auth auth;
   private ServerSocket ss;
   private int recBuffSize;
 
@@ -24,6 +25,7 @@ public class Server extends Thread{
    **/
   public Server(JSON config){
     this.config = config;
+    this.auth = new Auth(config);
     int port = 8080;
     recBuffSize = 2048;
     boolean reuseAddr = false;
@@ -98,7 +100,7 @@ public class Server extends Thread{
         /* Inner server main loop */
         for(;;){
           try{
-            (new Process(ss.accept(), recBuffSize)).start();
+            (new Process(ss.accept(), recBuffSize, auth)).start();
           }catch(SocketTimeoutException ste){
             Utils.log("Socket timeout, client may have be disconnected");
           }
