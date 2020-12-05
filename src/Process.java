@@ -59,27 +59,31 @@ public class Process extends Thread{
     /* Pass request onto handler */
     if(kv.containsKey("location")){
       /* TODO: Derive handler string. */
+      Handler h = new HandlerHome(kv);
       switch(kv.get("location")){
         case "/" :
         case "/index" :
         case "/index.htm" :
         case "/index.html" :
-          HandlerHome hh = new HandlerHome(kv);
-          write(s, hh.genHead(user));
-          write(s, hh.genBody());
-          write(s, hh.genFoot());
+          write(s, h.genHead(user));
+          write(s, h.genBody());
+          write(s, h.genFoot());
           break;
         case "/login" :
-          HandlerLogin hl = new HandlerLogin(kv);
-          write(s, hl.genHead(user));
-          write(s, hl.genBody());
-          write(s, hl.genFoot());
+          if(user == null){
+            h = new HandlerLogin(kv);
+          }
+          write(s, h.genHead(user));
+          write(s, h.genBody());
+          write(s, h.genFoot());
           break;
         case "/register" :
-          HandlerRegister hr = new HandlerRegister(kv);
-          write(s, hr.genHead(user));
-          write(s, hr.genBody());
-          write(s, hr.genFoot());
+          if(user == null){
+            h = new HandlerRegister(kv);
+          }
+          write(s, h.genHead(user));
+          write(s, h.genBody());
+          write(s, h.genFoot());
           break;
         default :
           writeBad(s);
@@ -162,7 +166,7 @@ public class Process extends Thread{
       for(int i = 0; i < parts.length; i++){
         int s = parts[i].indexOf('=');
         if(s >= 0){
-          kv.put(parts[i].substring(0, s), parts[i].substring(s + 1));
+          kv.put(parts[i].substring(0, s).trim(), parts[i].substring(s + 1).trim());
         }else{
           Utils.logUnsafe("Unable to process form line", parts[i]);
         }

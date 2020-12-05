@@ -23,7 +23,7 @@ public abstract class Handler{
         "<body>" +
           "<b><a href=\"/\">[d3ad]</a> social</b>&nbsp;" +
           "<a href=\"/" +
-            (user == null ? "login\">[login" : "user/" + user.id + "\">[" + user.name) +
+            (user == null ? "login\">[login" : "user/" + user.id + "\">[" + user.username) +
           "]</a>" +
           "<br>"
     ).getBytes();

@@ -1,5 +1,6 @@
 package b.ds;
 
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -15,13 +16,26 @@ public class Auth{
    * in question.
    **/
   public class User{
+    /* Unique user ID */
     public String id;
-    public String name;
+    /* Unique salt for the user */
+    public String usalt;
+    /* The username the user has chosen (encrypted) */
+    public String username;
+    /* The password the user has chosen (encrypted) */
+    public String password;
+    /* The current user token */
     public String token;
-    public long tokenRevoke;
+    /* The time at which the token comes invalid */
+    public long revoke;
   }
 
-  private HashMap<String, User> tokenUsers;
+  private JSON config;
+  private String salt;
+  private String userDir;
+  private HashMap<String, User> idMap;
+  private HashMap<String, User> userMap;
+  private HashMap<String, User> tokenMap;
 
   /**
    * Auth()
@@ -31,8 +45,37 @@ public class Auth{
    * @param config Server configuration information.
    **/
   public Auth(JSON config){
-    /* TODO: This needs to be done for things like salting, etc. */
-    tokenUsers = new HashMap<String, User>();
+    this.config = config;
+    salt = config.get("security").get("salt").value("");
+    userDir = config.get("data").get("user-dir").value("dat/usr");
+    idMap = new HashMap<String, User>();
+    userMap = new HashMap<String, User>();
+    tokenMap = new HashMap<String, User>();
+    /* Read users from disk */
+    File[] users = (new File(userDir)).listFiles();
+    for(int x = 0; x < users.length; x++){
+      if(users[x].isFile() && !users[x].isDirectory() && users[x].length() > 0){
+        try{
+          JSON userData = JSON.build(users[x].getPath());
+          User user = new User();
+          user.id = userData.get("id").value(null);
+          user.usalt = userData.get("usalt").value(null);
+          user.username = userData.get("username").value(null);
+          user.password = userData.get("password").value(null);
+          if(
+            user.id != null       &&
+            user.usalt != null    &&
+            user.username != null &&
+            user.password != null
+          ){
+            idMap.put(user.id, user);
+            userMap.put(user.username, user);
+          }
+        }catch(Exception e){
+          Utils.warn("Failed to read user data");
+        }
+      }
+    }
   }
 
   /**
@@ -46,10 +89,48 @@ public class Auth{
    * @return The logged in user, otherwise NULL.
    **/
   public User register(String username, String passwordA, String passwordB){
-    /* TODO: Check username meets requirements. */
-    /* TODO: Check password meets requirements. */
-    /* TODO: Create new user. */
-    /* TODO: Login with user. */
+    Utils.logUnsafe("Trying to register new user", username);
+    /* TODO: Make sure strings are sanitized. */
+    /* Check username meets requirements */
+    if(
+      username == null      ||
+      username.length() < 8 ||
+      username.length() > 64
+    ){
+      Utils.logUnsafe("Bad username for registration", username);
+      return null;
+    }
+    /* Check password meets requirements */
+    if(
+      passwordA == null       ||
+      passwordA.length() < 8  ||
+      passwordA.length() > 64 ||
+      !passwordA.equals(passwordB)
+    ){
+      Utils.logUnsafe("Bad password for registration", username);
+      return null;
+    }
+    /* TODO: Check user is unique. */
+    /* Create new user */
+    User user = new User();
+    user.id = "id"; // TODO
+    user.usalt = "usalt"; // TODO
+    user.username = username; // TODO: Hash usalt + salt
+    user.password = passwordA; // TODO: Hash usalt + salt
+    user.token = "token"; // TODO
+    user.revoke = System.currentTimeMillis() * 2; // TODO
+    /* Save the user to disk */
+    String data = "{" +
+      "\"id\":\""       + user.id       + "\"," +
+      "\"usalt\":\""    + user.usalt    + "\"," +
+      "\"username\":\"" + user.username + "\"," +
+      "\"password\":\"" + user.password + "\""  +
+    "}";
+    if(Data.write(userDir + "/" + user.id, data)){
+      tokenMap.put(user.token, user);
+      Utils.logUnsafe("New user registered", username);
+    }
+    /* Login with user */
     return login(username, passwordA);
   }
 
@@ -63,9 +144,22 @@ public class Auth{
    * @return The logged in user, otherwise NULL.
    **/
   public User login(String username, String password){
-    /* TODO: Attempt to login the user. */
-    /* TODO: Generate a new token and update revoke deadline. */
-    return null;
+    User user = null;
+    /* TODO: Hash usalt + salt. */
+    /* Attempt to login the user */
+    if(userMap.containsKey(username)){
+      user = userMap.get(username);
+      /* Make sure for sure it's the right user and password */
+      if(user.username.equals(username) && user.password.equals(password)){
+        /* Generate a new token and update revoke deadline */
+        user.token = "token"; // TODO
+        user.revoke = System.currentTimeMillis() * 2; // TODO
+        tokenMap.put(user.token, user);
+      }else{
+        user = null;
+      }
+    }
+    return user;
   }
 
   /**
@@ -82,12 +176,12 @@ public class Auth{
       return null;
     }
     /* Check that we do have a token */
-    if(tokenUsers.containsKey(token)){
-      User user = tokenUsers.get(token);
+    if(tokenMap.containsKey(token)){
+      User user = tokenMap.get(token);
       /* Make sure it is for sure a token match and not just a hash match */
       if(token.equals(user.token)){
         /* Make sure the token is not timed out */
-        if(System.currentTimeMillis() <= user.tokenRevoke){
+        if(System.currentTimeMillis() <= user.revoke){
           return user;
         }
       }
