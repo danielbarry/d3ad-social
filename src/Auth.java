@@ -19,7 +19,7 @@ public class Auth{
     /* Unique user ID */
     public String id;
     /* Unique salt for the user */
-    public String usalt;
+    public byte[] usalt;
     /* The username the user has chosen (encrypted) */
     public String username;
     /* The password the user has chosen (encrypted) */
@@ -31,7 +31,7 @@ public class Auth{
   }
 
   private JSON config;
-  private String salt;
+  private byte[] salt;
   private String userDir;
   private HashMap<String, User> idMap;
   private HashMap<String, User> userMap;
@@ -46,7 +46,7 @@ public class Auth{
    **/
   public Auth(JSON config){
     this.config = config;
-    salt = config.get("security").get("salt").value("");
+    salt = Utils.hexToBytes(config.get("security").get("salt").value(""));
     userDir = config.get("data").get("user-dir").value("dat/usr");
     idMap = new HashMap<String, User>();
     userMap = new HashMap<String, User>();
@@ -82,6 +82,7 @@ public class Auth{
       Utils.logUnsafe("Bad username for registration", username);
       return null;
     }
+    /* TODO: Check user is unique. */
     /* Check password meets requirements */
     if(
       passwordA == null       ||
@@ -92,18 +93,23 @@ public class Auth{
       Utils.logUnsafe("Bad password for registration", username);
       return null;
     }
-    /* TODO: Check user is unique. */
     /* Create new user */
     User user = new User();
-    user.id = "id"; // TODO
-    user.usalt = "usalt"; // TODO
-    user.username = username; // TODO: Hash usalt + salt
-    user.password = passwordA; // TODO: Hash usalt + salt
-    user.token = "token"; // TODO
+    /* TODO: Check ID is random. */
+    user.id = Utils.bytesToHex(Utils.genRandHash());
+    user.usalt = Utils.genRandHash();
+    user.username = username;
+    user.password = Utils.genPassHash(salt, user.usalt, passwordA);
+    /* TODO: Check the token is random. */
+    user.token = Utils.bytesToHex(Utils.genRandHash());
     user.revoke = System.currentTimeMillis() * 2; // TODO
     /* Save the user to disk */
-    if(writeUser(userDir + "/" + user.id, user) == null){
+    if(writeUser(userDir + "/" + user.id, user) != user){
       Utils.warn("Unable to save new user");
+    }else{
+      idMap.put(user.id, user);
+      userMap.put(user.username, user);
+      tokenMap.put(user.token, user);
     }
     /* Login with user */
     return login(username, passwordA);
@@ -120,14 +126,20 @@ public class Auth{
    **/
   public User login(String username, String password){
     User user = null;
-    /* TODO: Hash usalt + salt. */
     /* Attempt to login the user */
     if(userMap.containsKey(username)){
       user = userMap.get(username);
+      password = Utils.genPassHash(salt, user.usalt, password);
+      Utils.log("pass -> " + password); // TODO
+      Utils.log("user.pass -> " + user.password); // TODO
       /* Make sure for sure it's the right user and password */
       if(user.username.equals(username) && user.password.equals(password)){
+        /* Remove existing token if required */
+        if(tokenMap.containsKey(user.token) && tokenMap.get(user.token).token == user.token){
+          tokenMap.remove(user.token);
+        }
         /* Generate a new token and update revoke deadline */
-        user.token = "token"; // TODO
+        user.token = Utils.bytesToHex(Utils.genRandHash());
         user.revoke = System.currentTimeMillis() * 2; // TODO
         tokenMap.put(user.token, user);
       }else{
@@ -178,7 +190,13 @@ public class Auth{
       JSON userData = JSON.build(userPath);
       User user = new User();
       user.id = userData.get("id").value(null);
-      user.usalt = userData.get("usalt").value(null);
+      String usalt = userData.get("usalt").value(null);
+      if(usalt != null){
+        user.usalt = Utils.hexToBytes(usalt);
+      }else{
+        Utils.warn("Failed to read user's salt from configuration");
+        return null;
+      }
       user.username = userData.get("username").value(null);
       user.password = userData.get("password").value(null);
       user.token = null;
@@ -210,14 +228,13 @@ public class Auth{
   private User writeUser(String path, User user){
     /* Save the user to disk */
     String data = "{" +
-      "\"id\":\""       + user.id       + "\"," +
-      "\"usalt\":\""    + user.usalt    + "\"," +
-      "\"username\":\"" + user.username + "\"," +
-      "\"password\":\"" + user.password + "\""  +
+      "\"id\":\""       + user.id                      + "\"," +
+      "\"usalt\":\""    + Utils.bytesToHex(user.usalt) + "\"," +
+      "\"username\":\"" + user.username                + "\"," +
+      "\"password\":\"" + user.password                + "\""  +
     "}";
     if(Data.write(userDir + "/" + user.id, data)){
-      tokenMap.put(user.token, user);
-      Utils.logUnsafe("New user registered", user.username);
+      Utils.logUnsafe("User configuration saved", user.username);
       return user;
     }else{
       return null;
