@@ -62,6 +62,7 @@ public class Auth{
           user.usalt = userData.get("usalt").value(null);
           user.username = userData.get("username").value(null);
           user.password = userData.get("password").value(null);
+          user.token = null;
           if(
             user.id != null       &&
             user.usalt != null    &&
@@ -179,7 +180,7 @@ public class Auth{
     if(tokenMap.containsKey(token)){
       User user = tokenMap.get(token);
       /* Make sure it is for sure a token match and not just a hash match */
-      if(token.equals(user.token)){
+      if(user.token != null && token.equals(user.token)){
         /* Make sure the token is not timed out */
         if(System.currentTimeMillis() <= user.revoke){
           return user;
