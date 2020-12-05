@@ -177,6 +177,30 @@ public class Auth{
   }
 
   /**
+   * getUserById()
+   *
+   * Get the user by a given ID, or NULL if the user cannot be found.
+   *
+   * @param id The String ID to use for searching.
+   * @return The user found, otherwise NULL.
+   **/
+  public User getUserById(String id){
+    /* Make sure it's not NULL */
+    if(id == null){
+      return null;
+    }
+    /* Check for user String */
+    if(idMap.containsKey(id)){
+      User user = idMap.get(id);
+      /* Make sure it really was a match */
+      if(user.id.equals(id)){
+        return user;
+      }
+    }
+    return null;
+  }
+
+  /**
    * readUser()
    *
    * Read user data from disk and update the relevant variables. Return NULL if

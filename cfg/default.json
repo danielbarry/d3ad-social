@@ -9,7 +9,8 @@
   "rec-buff-size": "2048",
   "reuse-addr": "false",
   "security": {
-    "salt": ""
+    "salt": "",
+    "token-timeout-ms": "86400000"
   },
   "sub-dir": "/",
   "timeout-ms": "10000",
