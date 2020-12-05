@@ -95,8 +95,8 @@ public class Auth{
     }
     /* Create new user */
     User user = new User();
-    /* TODO: Check ID is random. */
-    user.id = Utils.bytesToHex(Utils.genRandHash());
+    /* Generate unique ID */
+    while(idMap.containsKey(user.id = Utils.bytesToHex(Utils.genRandHash())));
     user.usalt = Utils.genRandHash();
     user.username = username;
     user.password = Utils.genPassHash(salt, user.usalt, passwordA);
