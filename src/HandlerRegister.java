@@ -16,12 +16,11 @@ public class HandlerRegister extends Handler{
    * @param kv The key value data from the header.
    **/
   public HandlerRegister(HashMap<String, String> kv){
-    /* TODO: Take values from key values of interest. */
+    /* Do nothing */
   }
 
   @Override
   public byte[] genBody(){
-    /* TODO: Implement this. */
     return (
       "<b>Warning:</b> The security was hacked together, please use random credentials." +
       "<form action=\"/register\" method=\"post\">" +

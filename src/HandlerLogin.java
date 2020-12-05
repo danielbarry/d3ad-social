@@ -16,12 +16,11 @@ public class HandlerLogin extends Handler{
    * @param kv The key value data from the header.
    **/
   public HandlerLogin(HashMap<String, String> kv){
-    /* TODO: Take values from key values of interest. */
+    /* Do nothing */
   }
 
   @Override
   public byte[] genBody(){
-    /* TODO: Implement this. */
     return (
       "<form action=\"/login\" method=\"post\">" +
         "<label for=\"username\">username:</label>" +

@@ -16,12 +16,11 @@ public class HandlerHome extends Handler{
    * @param kv The key value data from the header.
    **/
   public HandlerHome(HashMap<String, String> kv){
-    /* TODO: Take values from key values of interest. */
+    /* Do nothing */
   }
 
   @Override
   public byte[] genBody(){
-    /* TODO: Implement this. */
     return (
       "Content here"
     ).getBytes();
