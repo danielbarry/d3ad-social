@@ -1,7 +1,15 @@
 {
   "active": "true",
+  "data": {
+    "post-dir": "dat/pst",
+    "user-dir": "dat/usr"
+  },
+  "name": "d3ad",
   "port": "8080",
   "rec-buff-size": "2048",
-  "reuse-addr": "false".
+  "reuse-addr": "false",
+  "security": {
+    "salt": ""
+  },
   "timeout-ms": "10000"
 }
