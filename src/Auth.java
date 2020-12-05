@@ -240,4 +240,28 @@ public class Auth{
       return null;
     }
   }
+
+  /**
+   * checkUsername()
+   *
+   * Check that a username contains valid characters.
+   *
+   * @param username The username String to be checked.
+   * @return True if the username contains only valid characters, otherwise
+   * false.
+   **/
+  private boolean checkUsername(String username){
+    for(char c : username.toCharArray()){
+      if(
+        (c >= 'a' && c <= 'z') ||
+        (c >= 'A' && c <= 'Z') ||
+        (c >= '0' && c <= '9')
+      ){
+        continue;
+      }else{
+        return false;
+      }
+    }
+    return true;
+  }
 }
