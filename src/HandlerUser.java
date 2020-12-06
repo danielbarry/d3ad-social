@@ -27,6 +27,7 @@ public class HandlerUser extends Handler{
 
   @Override
   public byte[] genBody(){
+    /* TODO: Switch to StringBuilder object. */
     String res = "<b>" + subject.username + "'s posts</b>";
     if(viewer != null){
       res +=
