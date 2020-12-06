@@ -32,6 +32,8 @@ public class HandlerUser extends Handler{
     String res = "<b>" + subject.username + "'s posts</b>";
     if(viewer != null){
       res +=
+        "<br>" +
+        "<br>" +
         "<form action=\"/user/" + viewer.id + "\" method=\"post\">" +
           "<textarea" +
             " id=\"post\"" +

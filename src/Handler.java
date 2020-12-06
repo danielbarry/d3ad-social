@@ -27,6 +27,7 @@ public abstract class Handler{
           "<a href=\"/" +
             (user == null ? "login\">[login" : "user/" + user.id + "\">[" + user.username) +
           "]</a>" +
+          "<br>" +
           "<br>"
     ).getBytes();
   }
