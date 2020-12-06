@@ -1,3 +1,5 @@
+dat/**
+
 *.class
 *.jar
 *.log
