@@ -226,4 +226,20 @@ public class Utils{
     }
     return result;
   }
+
+  /**
+   * sanitizeString()
+   *
+   * Sanitize a String to be HTML safe.
+   *
+   * @param s The String to be checked.
+   * @return The sanitized String.
+   **/
+  public static String sanitizeString(String s){
+    return s.replaceAll("\\P{Print}", "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("\"", "&quot;");
+  }
 }
