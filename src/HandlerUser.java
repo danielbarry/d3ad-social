@@ -1,5 +1,6 @@
 package b.ds;
 
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -48,9 +49,20 @@ public class HandlerUser extends Handler{
     if(subject != null){
       /* Check for latest comment */
       if(subject.latest != null){
-        String postId = subject.latest;
+        /* TODO: Get path from configuration. */
+        Post post = Post.readPost("dat/pst" + "/" + subject.latest, new Post());
         int postCount = 0;
-        /* TODO: Begin loading out posts. */
+        /* Begin loading posts */
+        while(++postCount <= 16 && post != null){
+          res +=
+            "<br>" +
+            "<br>" +
+            "<b><a href=\"/user/" + subject.id + "\">@" + subject.username + "</a></b> on " +
+            (new Date(post.creation)) + " said:" +
+            "<br>" +
+            "<tt>" + post.message + "</tt>";
+          post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
+        }
       }
     }else{
       return "<b>Invalid user</b>".getBytes();
