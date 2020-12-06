@@ -45,7 +45,12 @@ public class HandlerUser extends Handler{
     }
     /* Check if this is a valid page */
     if(subject != null){
-      /* TODO: Check for latest comment. */
+      /* Check for latest comment */
+      if(subject.latest != null){
+        String postId = subject.latest;
+        int postCount = 0;
+        /* TODO: Begin loading out posts. */
+      }
     }else{
       return "<b>Invalid user</b>".getBytes();
     }
