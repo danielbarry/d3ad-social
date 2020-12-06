@@ -18,9 +18,11 @@ public abstract class Handler{
     return (
       "<html>" +
         "<head>" +
+          /* TODO: Get title from configuration. */
           "<title>[d3ad]</title>" +
         "</head>" +
         "<body>" +
+          /* TODO: Get title from configuration. */
           "<b><a href=\"/\">[d3ad]</a> social</b>&nbsp;" +
           "<a href=\"/" +
             (user == null ? "login\">[login" : "user/" + user.id + "\">[" + user.username) +
