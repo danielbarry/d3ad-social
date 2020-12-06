@@ -76,4 +76,16 @@ public abstract class Data{
     rrwl.writeLock().unlock();
     return result;
   }
+
+  /**
+   * exists()
+   *
+   * Check whether a file exists.
+   *
+   * @param path The path to be tests.
+   * @return True if it exists, otherwise false.
+   **/
+  public static boolean exists(String path){
+    return (new File(path)).exists();
+  }
 }
