@@ -8,6 +8,7 @@ package b.ds;
 public class Post{
   /* Unique post ID */
   public String id = null;
+  /* TODO: Just point to the user already in RAM. */
   /* The user ID that created the post */
   public String userid = null;
   /* The time the post was created */
