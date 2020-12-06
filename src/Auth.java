@@ -17,17 +17,19 @@ public class Auth{
    **/
   public class User{
     /* Unique user ID */
-    public String id;
+    public String id = null;
     /* Unique salt for the user */
-    public byte[] usalt;
+    public byte[] usalt = null;
     /* The username the user has chosen (encrypted) */
-    public String username;
+    public String username = null;
     /* The password the user has chosen (encrypted) */
-    public String password;
+    public String password = null;
     /* The current user token */
-    public String token;
+    public String token = null;
     /* The time at which the token comes invalid */
-    public long revoke;
+    public long revoke = -1;
+    /* The latest post by this user */
+    public String latest = null;
   }
 
   private JSON config;
