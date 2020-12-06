@@ -234,8 +234,10 @@ public class Auth{
       ){
         idMap.put(user.id, user);
         userMap.put(user.username, user);
+        return user;
+      }else{
+        return null;
       }
-      return user;
     }catch(Exception e){
       return null;
     }
