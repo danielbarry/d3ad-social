@@ -63,6 +63,7 @@ public class HandlerUser extends Handler{
             "<tt>" + post.message + "</tt>";
           post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
         }
+        /* TODO: We should provide a link to find out more. */
       }
     }else{
       return "<b>Invalid user</b>".getBytes();
