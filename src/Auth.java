@@ -32,13 +32,14 @@ public class Auth{
     public String latest = null;
   }
 
+  private static HashMap<String, User> idMap = new HashMap<String, User>();
+  private static HashMap<String, User> userMap = new HashMap<String, User>();
+  private static HashMap<String, User> tokenMap = new HashMap<String, User>();
+
   private JSON config;
   private byte[] salt;
   private String userDir;
   private long tokenTimeout;
-  private HashMap<String, User> idMap;
-  private HashMap<String, User> userMap;
-  private HashMap<String, User> tokenMap;
 
   /**
    * Auth()
@@ -52,14 +53,11 @@ public class Auth{
     salt = Utils.hexToBytes(config.get("security").get("salt").value(""));
     userDir = config.get("data").get("user-dir").value("dat/usr");
     tokenTimeout = Long.parseLong(config.get("security").get("token-timeout-ms").value("86400000"));
-    idMap = new HashMap<String, User>();
-    userMap = new HashMap<String, User>();
-    tokenMap = new HashMap<String, User>();
     /* Read users from disk */
     File[] users = (new File(userDir)).listFiles();
     for(int x = 0; x < users.length; x++){
       if(users[x].isFile() && !users[x].isDirectory() && users[x].length() > 0){
-        User user = readUser(users[x].getPath());
+        User user = readUser(users[x].getPath(), new User());
       }
     }
   }
@@ -208,13 +206,13 @@ public class Auth{
    * Read user data from disk and update the relevant variables. Return NULL if
    * an issue occurs.
    *
-   * @param userPath The path for the user configuration.
+   * @param path The path for the user configuration.
+   * @param user A user object to be written to.
    * @return The user object, otherwise NULL.
    **/
-  private User readUser(String userPath){
+  public static User readUser(String path, User user){
     try{
-      JSON userData = JSON.build(userPath);
-      User user = new User();
+      JSON userData = JSON.build(path);
       user.id = userData.get("id").value(null);
       String usalt = userData.get("usalt").value(null);
       if(usalt != null){
@@ -226,6 +224,8 @@ public class Auth{
       user.username = userData.get("username").value(null);
       user.password = userData.get("password").value(null);
       user.token = null;
+      user.revoke = System.currentTimeMillis();
+      user.latest = userData.get("latest").value(null);
       if(
         user.id != null       &&
         user.usalt != null    &&
@@ -251,15 +251,19 @@ public class Auth{
    * @param user The user object to be written.
    * @return The user object, otherwise NULL.
    **/
-  private User writeUser(String path, User user){
+  public static User writeUser(String path, User user){
+    /* TODO: Validation should be done here. */
     /* Save the user to disk */
     String data = "{" +
-      "\"id\":\""       + user.id                      + "\"," +
-      "\"usalt\":\""    + Utils.bytesToHex(user.usalt) + "\"," +
-      "\"username\":\"" + user.username                + "\"," +
-      "\"password\":\"" + user.password                + "\""  +
+      "\"id\":\""        + user.id                      + "\"" +
+      ",\"usalt\":\""    + Utils.bytesToHex(user.usalt) + "\"" +
+      ",\"username\":\"" + user.username                + "\"" +
+      ",\"password\":\"" + user.password                + "\"" +
+      /* NOTE: Do not store token. */
+      /* NOTE: Do not store revoke. */
+      (user.latest != null ? ",\"latest\":\"" + user.latest + "\"" : "") +
     "}";
-    if(Data.write(userDir + "/" + user.id, data)){
+    if(Data.write(path, data)){
       Utils.logUnsafe("User configuration saved", user.username);
       return user;
     }else{
