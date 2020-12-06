@@ -31,9 +31,14 @@ public class HandlerUser extends Handler{
     if(viewer != null){
       res +=
         "<form action=\"/user/" + viewer.id + "\" method=\"post\">" +
-          "<textarea id=\"post\" name=\"post\">" +
-            "Your thoughts?" +
-          "</textarea>" +
+          "<textarea" +
+            " id=\"post\"" +
+            " name=\"post\"" +
+            " cols=\"64\"" +
+            " rows=\"8\"" +
+            " maxlength=\"512\"" +
+            " placeholder=\"What do you think? (max 512 characters)\"" +
+          "></textarea>" +
           "<br>" +
           "<input type=\"submit\" value=\"submit\">" +
         "</form>";
