@@ -2,7 +2,9 @@ package b.ds;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
@@ -58,6 +60,11 @@ public class Process extends Thread{
     HashMap<String, String> kv = parseHead(raw);
     /* Authenticate (if required) */
     Auth.User user = parseAuth(kv, auth);
+    /* Handle user POST */
+    if(!parsePost(kv, user)){
+      /* Delete location to force a bad message */
+      kv.remove("location");
+    }
     /* Start sending data */
     writeHead(s, user);
     /* Pass request onto handler */
@@ -225,6 +232,63 @@ public class Process extends Thread{
       }
     }
     return null;
+  }
+
+  /**
+   * parsePost()
+   *
+   * Parse a POST request from the user from the context of a specific logged
+   * in user. Actions handled here may include commenting for example.
+   *
+   * @param kv The key value mappings from the header.
+   * @param user The authenticated user, otherwise NULL.
+   * @return True if there are no errors to be reported, otherwise false.
+   **/
+  private static boolean parsePost(HashMap<String, String> kv, Auth.User user){
+    /* Make sure we handle a logged in user */
+    if(user == null){
+      return true;
+    }
+    /* Check if a post request was made */
+    if(kv.containsKey("post")){
+      /* TODO: Get from configuration. */
+      String postDir = "dat/pst";
+      String userDir = "dat/usr";
+      /* Create a post object */
+      Post post = new Post();
+      while(Data.exists(postDir + "/" + (post.id = Utils.bytesToHex(Utils.genRandHash()))));
+      post.userid = user.id;
+      post.creation = System.currentTimeMillis();
+      post.previous = user.latest;
+      try{
+        post.message = URLDecoder.decode(kv.get("post"), "UTF-8");
+      }catch(UnsupportedEncodingException e){
+        return false;
+      }
+      /* Validate the input */
+      if(
+        post.message == null       ||
+        post.message.length() <= 0 ||
+        post.message.length() > 512
+      ){
+        return false;
+      }
+      /* Sanitize the input */
+      post.message = Utils.sanitizeString(post.message);
+      /* Save post */
+      if(Post.writePost(postDir + "/" + post.id, post) != post){
+        Utils.warn("Unable to save new post");
+        return false;
+      }
+      /* Update user data */
+      user.latest = post.id;
+      if(Auth.writeUser(userDir + "/" + user.id, user) != user){
+        Utils.warn("Unable to save updated user");
+        return false;
+      }
+      return true;
+    }
+    return true;
   }
 
   /**
