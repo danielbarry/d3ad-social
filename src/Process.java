@@ -17,6 +17,7 @@ import java.util.HashMap;
 public class Process extends Thread{
   private static final byte[] HTTP_LINE = "\r\n".getBytes();
   private static final byte[] HTTP_HEAD = "HTTP/1.1 200 OK".getBytes();
+  private static final byte[] HTTP_TYPE = "Content-Type: text/html; charset=utf-8".getBytes();
   private static final byte[] HTTP_COOK = "Set-Cookie: ".getBytes();
   private static final byte[] HTTP_BAD = "<b>Error</b>".getBytes();
 
@@ -301,6 +302,8 @@ public class Process extends Thread{
    **/
   private static void writeHead(Socket s, Auth.User user){
     write(s, HTTP_HEAD);
+    write(s, HTTP_LINE);
+    write(s, HTTP_TYPE);
     if(user != null){
       write(s, HTTP_LINE);
       write(s, HTTP_COOK);
