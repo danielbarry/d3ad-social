@@ -20,15 +20,21 @@ public abstract class Handler{
         "<head>" +
           /* TODO: Get title from configuration. */
           "<title>[d3ad]</title>" +
+          "<style>" +
+            "body{background-color:#111;color:#EEE;font-family:monospace;}" +
+            "a{color:#FFF;}a:before{content:\"[\"}a:after{content:\"]\"}" +
+            "p{background-color:#222;padding:8px;}" +
+            "quote{background-color:#EEE;color:#222;width:100%;}" +
+          "</style>" +
         "</head>" +
         "<body>" +
           /* TODO: Get title from configuration. */
-          "<b><a href=\"/\">[d3ad]</a> social</b>&nbsp;" +
-          "<a href=\"/" +
-            (user == null ? "login\">[login" : "user/" + user.id + "\">[" + user.username) +
-          "]</a>" +
-          "<br>" +
-          "<br>"
+          "<h1>" +
+            "<a href=\"/\">d3ad</a> social " +
+              "<a href=\"/" +
+              (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username) +
+            "</a>" +
+          "</h1>"
     ).getBytes();
   }
 

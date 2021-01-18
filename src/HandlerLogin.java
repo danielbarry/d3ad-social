@@ -33,7 +33,7 @@ public class HandlerLogin extends Handler{
         "<br>" +
         "<input type=\"submit\" value=\"submit\">" +
       "</form>" +
-      "<a href=\"/register\">[register]</a>"
+      "<a href=\"/register\">register</a>"
     ).getBytes();
   }
 }

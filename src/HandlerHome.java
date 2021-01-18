@@ -21,6 +21,7 @@ public class HandlerHome extends Handler{
 
   @Override
   public byte[] genBody(){
+    /* TODO: Return default content here. */
     return (
       "Content here"
     ).getBytes();

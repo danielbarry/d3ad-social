@@ -29,11 +29,9 @@ public class HandlerUser extends Handler{
   @Override
   public byte[] genBody(){
     /* TODO: Switch to StringBuilder object. */
-    String res = "<b>" + subject.username + "'s posts</b>";
+    String res = "<h2>" + subject.username + "'s posts</h2>";
     if(viewer != null){
       res +=
-        "<br>" +
-        "<br>" +
         "<form action=\"/user/" + viewer.id + "\" method=\"post\">" +
           "<textarea" +
             " id=\"post\"" +
@@ -57,12 +55,12 @@ public class HandlerUser extends Handler{
         /* Begin loading posts */
         while(++postCount <= 16 && post != null){
           res +=
-            "<br>" +
-            "<br>" +
-            "<b><a href=\"/user/" + subject.id + "\">@" + subject.username + "</a></b> on " +
-            (new Date(post.creation)) + " said:" +
-            "<br>" +
-            "<tt>" + post.message + "</tt>";
+            "<p>" +
+              "<b><a href=\"/user/" + subject.id + "\">@" + subject.username +
+              "</a></b> on " + (new Date(post.creation)) + " said:" +
+              "<br>" +
+              "<quote>" + post.message + "</quote>" +
+            "</p>";
           post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
         }
         /* TODO: We should provide a link to find out more. */
