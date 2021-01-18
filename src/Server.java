@@ -90,6 +90,8 @@ public class Server extends Thread{
         Utils.warn("Unable to set timeout");
       }
     }
+    /* Initialise default handler */
+    Handler.init(config);
   }
 
   /**

@@ -6,6 +6,28 @@ package b.ds;
  * A basic interface for a specific page or function.
  **/
 public abstract class Handler{
+  private static String title;
+  private static String head;
+
+  /**
+   **/
+  public static void init(JSON config){
+    title = config.get("title").value("d3ad");
+    head =
+      "<html>" +
+        "<head>" +
+          "<title>[" + title + "]</title>" +
+          /* TODO: Get CSS from configuration. */
+          "<style>";
+    for(int x = 0; x < config.get("css").length(); x++){
+      head += config.get("css").get(x).value("");
+    }
+    head +=
+          "</style>" +
+        "</head>" +
+        "<body>";
+  }
+
   /**
    * genHead()
    *
@@ -16,25 +38,13 @@ public abstract class Handler{
    **/
   public byte[] genHead(Auth.User user){
     return (
-      "<html>" +
-        "<head>" +
-          /* TODO: Get title from configuration. */
-          "<title>[d3ad]</title>" +
-          "<style>" +
-            "body{background-color:#111;color:#EEE;font-family:monospace;}" +
-            "a{color:#FFF;}a:before{content:\"[\"}a:after{content:\"]\"}" +
-            "p{background-color:#222;padding:8px;}" +
-            "quote{background-color:#EEE;color:#222;width:100%;}" +
-          "</style>" +
-        "</head>" +
-        "<body>" +
-          /* TODO: Get title from configuration. */
-          "<h1>" +
-            "<a href=\"/\">d3ad</a> social " +
-              "<a href=\"/" +
-              (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username) +
-            "</a>" +
-          "</h1>"
+      head +
+      "<h1>" +
+        "<a href=\"/\">" + title + "</a> social " +
+          "<a href=\"/" +
+          (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username) +
+        "</a>" +
+      "</h1>"
     ).getBytes();
   }
 

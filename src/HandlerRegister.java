@@ -23,6 +23,8 @@ public class HandlerRegister extends Handler{
   public byte[] genBody(){
     return (
       "<b>Warning:</b> The security was hacked together, please use random credentials." +
+      "<br>" +
+      "<br>" +
       "<form action=\"/register\" method=\"post\">" +
         "<label for=\"username\">username:</label>" +
         "<br>" +
