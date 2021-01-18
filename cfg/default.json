@@ -3,8 +3,8 @@
   "css": [
     "body{background-color:#111;color:#EEE;font-family:monospace;}",
     "a{color:#FFF;}a:before{content:\"[\"}a:after{content:\"]\"}",
-    "p{background-color:#222;padding:4px;width:100%;}",
-    "quote{background-color:#EEE;color:#222;display:block;width:100%;}"
+    "p{background-color:#222;padding:4px;}",
+    "quote{background-color:#EEE;color:#222;display:block;}"
   ],
   "data": {
     "post-dir": "dat/pst",
