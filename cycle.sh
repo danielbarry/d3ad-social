@@ -3,6 +3,17 @@
 # The user who has permission to pull the code
 USER="user"
 
+# restart_process()
+#
+# Stop any existing process by the same name and then start a new one.
+function restart_process {
+  pkill "d3ad.jar"
+  java -jar dist/d3ad.jar -c cfg/custom.json
+}
+
+# Restart process by default
+restart_process
+
 # Infinite loop
 while :
 do
@@ -15,8 +26,7 @@ do
     # Rebuild the files
     ant
     # Restart the process
-    pkill "d3ad.jar"
-    java -jar dist/d3ad.jar -c cfg/custom.json
+    restart_process
   else
     echo "No changes"
   fi
