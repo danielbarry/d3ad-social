@@ -21,5 +21,6 @@
     "token-timeout-ms": "86400000"
   },
   "sub-dir": "/",
-  "timeout-ms": "10000"
+  "timeout-ms": "10000",
+  "url": "127.0.0.1"
 }

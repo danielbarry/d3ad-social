@@ -6,10 +6,12 @@ package b.ds;
  * A basic interface for a specific page or function.
  **/
 public abstract class Handler{
-  private static byte[] mime;
-  private static String title;
-  private static String head;
+  public static String title;
+  public static String url;
   public static String sub;
+
+  private static byte[] mime;
+  private static String head;
 
   /**
    * init()
@@ -20,8 +22,12 @@ public abstract class Handler{
    * header.
    **/
   public static void init(JSON config){
-    mime = "Content-Type: text/html; charset=utf-8".getBytes();
+    /* Setup public variables */
     title = config.get("title").value("d3ad");
+    url = config.get("url").value("127.0.0.1");
+    sub = config.get("sub-dir").value("/");
+    /* Setup private variables */
+    mime = "Content-Type: text/html; charset=utf-8".getBytes();
     head =
       "<html>" +
         "<head>" +
@@ -35,7 +41,6 @@ public abstract class Handler{
           "</style>" +
         "</head>" +
         "<body>";
-    sub = config.get("sub-dir").value("/");
   }
 
   /**

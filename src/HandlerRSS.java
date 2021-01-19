@@ -37,9 +37,8 @@ public class HandlerRSS extends Handler{
       "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" +
       "<rss version=\"2.0\">" +
       "<channel>" +
-        /* TODO: Generate from configuration. */
-        "<title>[d3ad]</title>" +
-        "<link>127.0.0.1:8080" + sub + "</link>"
+        "<title>[" + title + "]</title>" +
+        "<link>" + url + sub + "</link>"
     ).getBytes();
   }
 
@@ -60,13 +59,11 @@ public class HandlerRSS extends Handler{
           res +=
             "<item>" +
               "<title>" + subject.username + "</title>" +
-              /* TODO: Get link from configuration. */
-              "<link>127.0.0.1:8080" + sub + "user/" + subject.id + "</link>" +
+              "<link>" + url + sub + "user/" + subject.id + "</link>" +
               "<description>" + post.message + "</description>" +
             "</item>";
           post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
         }
-        /* TODO: We should provide a link to find out more. */
       }
     }
     return res.getBytes();
