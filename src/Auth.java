@@ -77,7 +77,7 @@ public class Auth{
     /* Check username meets requirements */
     if(
       username == null         ||
-      username.length() < 8    ||
+      username.length() < 6    ||
       username.length() > 64   ||
       !checkUsername(username) ||
       userMap.containsKey(username)
