@@ -66,8 +66,6 @@ public class Process extends Thread{
       /* Delete location to force a bad message */
       kv.remove("location");
     }
-    /* Start sending data */
-    writeHead(s, user);
     /* Pass request onto handler */
     if(kv.containsKey("location")){
       String loc = kv.get("location");
@@ -85,6 +83,7 @@ public class Process extends Thread{
         case "index" :
         case "index.htm" :
         case "index.html" :
+          writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
           write(s, h.genFoot());
@@ -93,6 +92,7 @@ public class Process extends Thread{
           if(user == null){
             h = new HandlerLogin(kv);
           }
+          writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
           write(s, h.genFoot());
@@ -101,21 +101,25 @@ public class Process extends Thread{
           if(user == null){
             h = new HandlerRegister(kv);
           }
+          writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
           write(s, h.genFoot());
           break;
         case "user" :
           h = new HandlerUser(kv, user, auth.getUserById(loc));
+          writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
           write(s, h.genFoot());
           break;
         default :
+          writeHead(s, HTTP_TYPE, user);
           writeBad(s);
           break;
       }
     }else{
+      writeHead(s, HTTP_TYPE, user);
       writeBad(s);
     }
     /* Close the socket */
@@ -298,12 +302,13 @@ public class Process extends Thread{
    * Pre-write the header for the client.
    *
    * @param s The socket to be write.
+   * @param mime The mime byte array.
    * @param user A valid authorized user if one has been found.
    **/
-  private static void writeHead(Socket s, Auth.User user){
+  private static void writeHead(Socket s, byte[] mime, Auth.User user){
     write(s, HTTP_HEAD);
     write(s, HTTP_LINE);
-    write(s, HTTP_TYPE);
+    write(s, mime);
     if(user != null){
       write(s, HTTP_LINE);
       write(s, HTTP_COOK);

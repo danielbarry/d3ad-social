@@ -6,12 +6,20 @@ package b.ds;
  * A basic interface for a specific page or function.
  **/
 public abstract class Handler{
+  private static byte[] mime;
   private static String title;
   private static String head;
 
   /**
+   * init()
+   *
+   * Initialise the generic return data.
+   *
+   * @param config The configuration to be used for building the generic
+   * header.
    **/
   public static void init(JSON config){
+    mime = "Content-Type: text/html; charset=utf-8".getBytes();
     title = config.get("title").value("d3ad");
     head =
       "<html>" +
@@ -26,6 +34,17 @@ public abstract class Handler{
           "</style>" +
         "</head>" +
         "<body>";
+  }
+
+  /**
+   * genMine()
+   *
+   * Allow the mime return type to be overwritten.
+   *
+   * @return The mine return string.
+   **/
+  public byte[] genMime(){
+    return mime;
   }
 
   /**
