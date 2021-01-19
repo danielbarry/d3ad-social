@@ -27,8 +27,8 @@ public abstract class Handler{
           "<title>[" + title + "]</title>" +
           /* TODO: Get CSS from configuration. */
           "<style>";
-    for(int x = 0; x < config.get("css").length(); x++){
-      head += config.get("css").get(x).value("");
+    for(int x = 0; x < config.get("html").get("css").length(); x++){
+      head += config.get("html").get("css").get(x).value("");
     }
     head +=
           "</style>" +
