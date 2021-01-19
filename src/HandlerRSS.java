@@ -39,7 +39,7 @@ public class HandlerRSS extends Handler{
       "<channel>" +
         /* TODO: Generate from configuration. */
         "<title>[d3ad]</title>" +
-        "<link>127.0.0.1:8080</link>"
+        "<link>127.0.0.1:8080" + sub + "</link>"
     ).getBytes();
   }
 
@@ -61,7 +61,7 @@ public class HandlerRSS extends Handler{
             "<item>" +
               "<title>" + subject.username + "</title>" +
               /* TODO: Get link from configuration. */
-              "<link>127.0.0.1:8080/user/" + subject.id + "</link>" +
+              "<link>127.0.0.1:8080" + sub + "user/" + subject.id + "</link>" +
               "<description>" + post.message + "</description>" +
             "</item>";
           post = Post.readPost("dat/pst" + "/" + post.previous, new Post());

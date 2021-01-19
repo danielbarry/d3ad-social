@@ -9,6 +9,7 @@ public abstract class Handler{
   private static byte[] mime;
   private static String title;
   private static String head;
+  public static String sub;
 
   /**
    * init()
@@ -34,6 +35,7 @@ public abstract class Handler{
           "</style>" +
         "</head>" +
         "<body>";
+    sub = config.get("sub-dir").value("/");
   }
 
   /**
@@ -60,7 +62,7 @@ public abstract class Handler{
       head +
       "<h1>" +
         "<a href=\"/\">" + title + "</a> social " +
-          "<a href=\"/" +
+          "<a href=\"" + sub +
           (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username) +
         "</a>" +
       "</h1>"

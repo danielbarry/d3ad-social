@@ -33,7 +33,7 @@ public class HandlerHome extends Handler{
       Auth.User user = post.user;
       res +=
         "<p>" +
-          "<b><a href=\"/user/" + user.id + "\">@" + user.username +
+          "<b><a href=\"" + sub + "user/" + user.id + "\">@" + user.username +
           "</a></b> on " + (new Date(post.creation)) + " said:" +
           "<br>" +
           "<quote>" + post.message + "</quote>" +

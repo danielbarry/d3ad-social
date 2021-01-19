@@ -22,7 +22,7 @@ public class HandlerLogin extends Handler{
   @Override
   public byte[] genBody(){
     return (
-      "<form action=\"/login\" method=\"post\">" +
+      "<form action=\"" + sub + "login\" method=\"post\">" +
         "<label for=\"username\">username:</label>" +
         "<br>" +
         "<input type=\"text\" id=\"username\" name=\"username\">" +
@@ -33,7 +33,7 @@ public class HandlerLogin extends Handler{
         "<br>" +
         "<input type=\"submit\" value=\"submit\">" +
       "</form>" +
-      "<a href=\"/register\">register</a>"
+      "<a href=\"" + sub + "register\">register</a>"
     ).getBytes();
   }
 }

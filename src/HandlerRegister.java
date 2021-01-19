@@ -25,7 +25,7 @@ public class HandlerRegister extends Handler{
       "<b>Warning:</b> The security was hacked together, please use random credentials." +
       "<br>" +
       "<br>" +
-      "<form action=\"/register\" method=\"post\">" +
+      "<form action=\"" + sub + "register\" method=\"post\">" +
         "<label for=\"username\">username:</label>" +
         "<br>" +
         "<input type=\"text\" id=\"username\" name=\"username\">" +

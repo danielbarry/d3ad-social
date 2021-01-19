@@ -31,10 +31,10 @@ public class HandlerUser extends Handler{
     /* TODO: Switch to StringBuilder object. */
     String res =
       "<h2>" + subject.username + "'s posts " +
-      "<a href=\"/rss/" + subject.id + "\">RSS</a></h2>";
+      "<a href=\"" + sub + "rss/" + subject.id + "\">RSS</a></h2>";
     if(viewer != null){
       res +=
-        "<form action=\"/user/" + viewer.id + "\" method=\"post\">" +
+        "<form action=\"" + sub + "user/" + viewer.id + "\" method=\"post\">" +
           "<textarea" +
             " id=\"post\"" +
             " name=\"post\"" +
@@ -59,7 +59,7 @@ public class HandlerUser extends Handler{
         while(++postCount <= 16 && post != null){
           res +=
             "<p>" +
-              "<b><a href=\"/user/" + subject.id + "\">@" + subject.username +
+              "<b><a href=\"" + sub + "user/" + subject.id + "\">@" + subject.username +
               "</a></b> on " + (new Date(post.creation)) + " said:" +
               "<br>" +
               "<quote>" + post.message + "</quote>" +
