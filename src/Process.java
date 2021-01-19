@@ -123,11 +123,13 @@ public class Process extends Thread{
         default :
           writeHead(s, HTTP_TYPE, user);
           writeBad(s);
+          Utils.log("Unable to process request from location");
           break;
       }
     }else{
       writeHead(s, HTTP_TYPE, user);
       writeBad(s);
+      Utils.log("Unable to read header");
     }
     /* Close the socket */
     close(s);
