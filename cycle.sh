@@ -7,7 +7,7 @@ USER="user"
 #
 # Stop any existing process by the same name and then start a new one.
 function restart_process {
-  ps ax | grep d3ad | grep -v grep | awk '{print $1}' | xargs kill
+  kill "$(ps ax | grep d3ad | grep -v grep | awk '{print $1}')"
   java -jar dist/d3ad.jar -c cfg/custom.json &
 }
 
