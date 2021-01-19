@@ -61,7 +61,7 @@ public abstract class Handler{
     return (
       head +
       "<h1>" +
-        "<a href=\"/\">" + title + "</a> social " +
+        "<a href=\"" + sub + "\">" + title + "</a> social " +
           "<a href=\"" + sub +
           (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username) +
         "</a>" +
