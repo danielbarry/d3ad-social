@@ -7,11 +7,11 @@ USER="user"
 while :
 do
   # Fetch the latest changes
-  runuser -l $USER -c 'git fetch'
+  sudo -u $USER git fetch
   # Check whether pull required
   if ! git diff --quiet remotes/origin/HEAD; then
     # Pull the latest changes
-    runuser -l $USER -c 'git pull'
+    sudo -u $USER git pull
     # Rebuild the files
     ant
     # Restart the process
