@@ -52,6 +52,7 @@ public class HandlerUser extends Handler{
         /* TODO: Get path from configuration. */
         Post post = Post.readPost("dat/pst" + "/" + subject.latest, new Post());
         int postCount = 0;
+        /* TODO: Get length from configuration. */
         /* Begin loading posts */
         while(++postCount <= 16 && post != null){
           res +=

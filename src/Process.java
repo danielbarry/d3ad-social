@@ -258,7 +258,7 @@ public class Process extends Thread{
       /* Create a post object */
       Post post = new Post();
       while(Data.exists(postDir + "/" + (post.id = Utils.bytesToHex(Utils.genRandHash()))));
-      post.userid = user.id;
+      post.user = user;
       post.creation = System.currentTimeMillis();
       post.previous = user.latest;
       try{
