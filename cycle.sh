@@ -1,14 +1,17 @@
 #!/bin/bash
 
+# The user who has permission to pull the code
+USER="user"
+
 # Infinite loop
 while :
 do
   # Fetch the latest changes
-  git fetch
+  runuser -l $USER -c 'git fetch'
   # Check whether pull required
   if ! git diff --quiet remotes/origin/HEAD; then
     # Pull the latest changes
-    git pull
+    runuser -l $USER -c 'git pull'
     # Rebuild the files
     ant
     # Restart the process
