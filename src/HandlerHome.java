@@ -24,6 +24,7 @@ public class HandlerHome extends Handler{
   @Override
   public byte[] genBody(){
     String res = "<h2>Latest posts</h2>";
+    /* TODO: Show a more relevant page if user is logged in. */
     /* Grab latest list of posts */
     ArrayList<Post> posts = Post.getPosts();
     /* Begin loading posts from most recent (last) */
