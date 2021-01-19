@@ -56,7 +56,7 @@ public class HandlerRSS extends Handler{
         int postCount = 0;
         /* TODO: Get length from configuration. */
         /* Begin loading posts */
-        while(++postCount <= 16 && post != null){
+        while(++postCount <= 8 && post != null){
           res +=
             "<item>" +
               "<title>" + subject.username + "</title>" +
