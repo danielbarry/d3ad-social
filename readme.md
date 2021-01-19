@@ -22,6 +22,9 @@ This can be achieved by simply running:
 configuration for the server. This of course is a secret and should not be
 added to git.
 
+For running on a server, you may also use the bash script contain in
+`cycle.sh`, please read this small script to understand how it works.
+
 ## Contributing
 
 **Source:** Please fork the project and submit a Merge Request.
