@@ -8,7 +8,7 @@ USER="user"
 # Stop any existing process by the same name and then start a new one.
 function restart_process {
   pkill "d3ad.jar"
-  java -jar dist/d3ad.jar -c cfg/custom.json
+  java -jar dist/d3ad.jar -c cfg/custom.json &
 }
 
 # Restart process by default
