@@ -10,7 +10,7 @@
       "a{color:#FFF;}a:before{content:\"[\"}a:after{content:\"]\"}",
       "p{background-color:#222;padding:4px;}",
       "quote{background-color:#EEE;color:#222;display:block;}"
-    ],
+    ]
   },
   "name": "d3ad",
   "port": "8080",
