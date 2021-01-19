@@ -30,8 +30,8 @@ public class HandlerUser extends Handler{
   public byte[] genBody(){
     /* TODO: Switch to StringBuilder object. */
     String res =
-      "<h2>" + subject.username + "'s posts</h2>" +
-      "<a href=\"/rss/" + subject.id + "\">RSS</a>";
+      "<h2>" + subject.username + "'s posts " +
+      "<a href=\"/rss/" + subject.id + "\">RSS</a></h2>";
     if(viewer != null){
       res +=
         "<form action=\"/user/" + viewer.id + "\" method=\"post\">" +
