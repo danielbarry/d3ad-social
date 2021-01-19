@@ -29,7 +29,9 @@ public class HandlerUser extends Handler{
   @Override
   public byte[] genBody(){
     /* TODO: Switch to StringBuilder object. */
-    String res = "<h2>" + subject.username + "'s posts</h2>";
+    String res =
+      "<h2>" + subject.username + "'s posts</h2>" +
+      "<a href=\"/rss/" + subject.id + "\">RSS</a>";
     if(viewer != null){
       res +=
         "<form action=\"/user/" + viewer.id + "\" method=\"post\">" +
