@@ -31,12 +31,12 @@ do
     restart_process
   else
     echo "No changes"
-    # Check if process is running
-    res="$(ps aux | grep $PROC | grep -v grep)"
-    if [ "${RESULT:-null}" = null ]; then
-      # As it's not running, restart it
-      restart_process
-    fi
+  fi
+  # Check if process is running
+  res="$(ps aux | grep $PROC | grep -v grep)"
+  if [ "${RESULT:-null}" = null ]; then
+    # As it's not running, restart it
+    restart_process
   fi
   # Sleep for 5 minutes and check again
   sleep 300
