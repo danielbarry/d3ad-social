@@ -22,10 +22,10 @@ public class HandlerRegister extends Handler{
   @Override
   public byte[] genBody(){
     return (
-      "<b>Warning:</b> The security was hacked together, please use random credentials." +
-      "<br>" +
-      "<br>" +
       "<form action=\"" + sub + "register\" method=\"post\">" +
+        "<b>Warning:</b> The security was hacked together, please use random credentials." +
+        "<br>" +
+        "<br>" +
         "<label for=\"username\">username:</label>" +
         "<br>" +
         "<input type=\"text\" id=\"username\" name=\"username\">" +
@@ -39,12 +39,14 @@ public class HandlerRegister extends Handler{
         "<input type=\"password\" id=\"passwordb\" name=\"passwordb\">" +
         "<br>" +
         "<input type=\"submit\" value=\"submit\">" +
-      "</form>" +
-      "By registering, you agree to the site rules:" +
-      "<br>" +
-      "1. Don't contribute content you wouldn't show your mother." +
-      "<br>" +
-      "2. Don't abuse the service - if in doubt, ask."
+        "<br>" +
+        "<br>" +
+        "By registering, you agree to the site rules:" +
+        "<br>" +
+        "1. Don't contribute content you wouldn't show your mother." +
+        "<br>" +
+        "2. Don't abuse the service - if in doubt, ask." +
+      "</form>"
     ).getBytes();
   }
 }

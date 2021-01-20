@@ -32,8 +32,9 @@ public class HandlerLogin extends Handler{
         "<input type=\"password\" id=\"password\" name=\"password\">" +
         "<br>" +
         "<input type=\"submit\" value=\"submit\">" +
-      "</form>" +
-      "<a href=\"" + sub + "register\">register</a>"
+        "<br>" +
+        "<a href=\"" + sub + "register\">register</a>" +
+      "</form>"
     ).getBytes();
   }
 }
