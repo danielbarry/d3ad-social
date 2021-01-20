@@ -9,7 +9,11 @@ USER="user"
 #
 # Stop any existing process by the same name and then start a new one.
 function restart_process {
-  kill "$(ps ax | grep $PROC | grep -v grep | awk '{print $1}')"
+  # If process is running
+  res="$(ps aux | grep $PROC | grep -v grep)"
+  if [ ! "${RESULT:-null}" = null ]; then
+    kill "$(ps ax | grep $PROC | grep -v grep | awk '{print $1}')"
+  fi
   java -jar dist/d3ad.jar -c cfg/custom.json &
 }
 
