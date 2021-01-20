@@ -12,7 +12,7 @@ function restart_process {
   # If process is running
   res="$(ps ax | grep $PROC | grep -v grep)"
   if [ ! "${res:-null}" = null ]; then
-    pid="$(echo $res | awk '{print` $1}')"
+    pid="$(echo $res | awk '{print $1}')"
     echo "Trying to kill process $pid"
     kill $pid
   fi
