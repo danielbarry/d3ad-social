@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# String for process
+PROC="d4ad"
 # The user who has permission to pull the code
 USER="user"
 
@@ -7,7 +9,7 @@ USER="user"
 #
 # Stop any existing process by the same name and then start a new one.
 function restart_process {
-  kill "$(ps ax | grep d3ad | grep -v grep | awk '{print $1}')"
+  kill "$(ps ax | grep $PROC | grep -v grep | awk '{print $1}')"
   java -jar dist/d3ad.jar -c cfg/custom.json &
 }
 
@@ -29,6 +31,12 @@ do
     restart_process
   else
     echo "No changes"
+    # Check if process is running
+    res="$(ps aux | grep $PROC | grep -v grep)"
+    if [ "${RESULT:-null}" = null ]; then
+      # As it's not running, restart it
+      restart_process
+    fi
   fi
   # Sleep for 5 minutes and check again
   sleep 300
