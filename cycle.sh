@@ -10,10 +10,12 @@ USER="user"
 # Stop any existing process by the same name and then start a new one.
 function restart_process {
   # If process is running
-  res="$(ps aux | grep $PROC | grep -v grep)"
-  if [ ! "${RESULT:-null}" = null ]; then
+  res="$(ps ax | grep $PROC | grep -v grep)"
+  if [ ! "${res:-null}" = null ]; then
+    echo "Trying to kill process"
     kill "$(ps ax | grep $PROC | grep -v grep | awk '{print $1}')"
   fi
+  echo "Trying to start process"
   java -jar dist/d3ad.jar -c cfg/custom.json &
 }
 
@@ -37,8 +39,8 @@ do
     echo "No changes"
   fi
   # Check if process is running
-  res="$(ps aux | grep $PROC | grep -v grep)"
-  if [ "${RESULT:-null}" = null ]; then
+  res="$(ps ax | grep $PROC | grep -v grep)"
+  if [ "${res:-null}" = null ]; then
     # As it's not running, restart it
     restart_process
     # Do another loop shortly
