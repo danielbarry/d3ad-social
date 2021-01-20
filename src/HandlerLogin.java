@@ -8,20 +8,18 @@ import java.util.HashMap;
  * Generate a generic login page.
  **/
 public class HandlerLogin extends Handler{
-  /**
-   * HandlerLogin()
-   *
-   * Initialise the variables required to deliver a login page.
-   *
-   * @param kv The key value data from the header.
-   **/
-  public HandlerLogin(HashMap<String, String> kv){
-    /* Do nothing */
-  }
+  private static byte[] form;
 
-  @Override
-  public byte[] genBody(){
-    return (
+  /**
+   * init()
+   *
+   * Initialise the generic return data.
+   *
+   * @param config The configuration to be used for building the generic
+   * header.
+   **/
+  public static void init(JSON config){
+    form = (
       "<form action=\"" + sub + "login\" method=\"post\">" +
         "<label for=\"username\">username:</label>" +
         "<br>" +
@@ -36,5 +34,21 @@ public class HandlerLogin extends Handler{
         "<a href=\"" + sub + "register\">register</a>" +
       "</form>"
     ).getBytes();
+  }
+
+  /**
+   * HandlerLogin()
+   *
+   * Initialise the variables required to deliver a login page.
+   *
+   * @param kv The key value data from the header.
+   **/
+  public HandlerLogin(HashMap<String, String> kv){
+    /* Do nothing */
+  }
+
+  @Override
+  public byte[] genBody(){
+    return form;
   }
 }

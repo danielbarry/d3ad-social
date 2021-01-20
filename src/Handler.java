@@ -12,6 +12,8 @@ public abstract class Handler{
 
   private static byte[] mime;
   private static String head;
+  private static byte[] error;
+  private static byte[] foot;
 
   /**
    * init()
@@ -41,6 +43,11 @@ public abstract class Handler{
           "</style>" +
         "</head>" +
         "<body>";
+    error = "<b>Error</b>".getBytes();
+    foot = (
+        "</body>" +
+      "</html>"
+    ).getBytes();
   }
 
   /**
@@ -63,15 +70,14 @@ public abstract class Handler{
    * @return The bytes to be written to the client.
    **/
   public byte[] genHead(Auth.User user){
-    return (
-      head +
-      "<h1>" +
-        "<a href=\"" + sub + "\">" + title + "</a> social " +
-          "<a href=\"" + sub +
-          (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username) +
-        "</a>" +
-      "</h1>"
-    ).getBytes();
+    return ((new StringBuilder(head))
+      .append("<h1>")
+      .append(  "<a href=\"").append(sub).append("\">").append(title).append("</a> social ")
+      .append(    "<a href=\"").append(sub)
+      .append(    (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username))
+      .append(  "</a>")
+      .append("</h1>")
+    ).toString().getBytes();
   }
 
   /**
@@ -82,7 +88,7 @@ public abstract class Handler{
    * @return The bytes to be written to the client.
    **/
   public byte[] genBody(){
-    return "<b>Error</b>".getBytes();
+    return error;
   }
 
   /**
@@ -93,9 +99,6 @@ public abstract class Handler{
    * @return The bytes to be written to the client.
    **/
   public byte[] genFoot(){
-    return (
-        "</body>" +
-      "</html>"
-    ).getBytes();
+    return foot;
   }
 }

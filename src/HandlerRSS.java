@@ -9,8 +9,35 @@ import java.util.HashMap;
  * Generate a generic RSS reply.
  **/
 public class HandlerRSS extends Handler{
+  private static byte[] mime;
+  private static byte[] head;
+  private static byte[] foot;
+
   private Auth.User viewer;
   private Auth.User subject;
+
+  /**
+   * init()
+   *
+   * Initialise the generic return data.
+   *
+   * @param config The configuration to be used for building the generic
+   * header.
+   **/
+  public static void init(JSON config){
+    mime = "Content-Type: application/xml".getBytes();
+    head = (
+      "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" +
+      "<rss version=\"2.0\">" +
+      "<channel>" +
+        "<title>[" + title + "]</title>" +
+        "<link>" + url + sub + "</link>"
+    ).getBytes();
+    foot = (
+      "</channel>" +
+      "</rss>"
+    ).getBytes();
+  }
 
   /**
    * HandlerRSS()
@@ -28,24 +55,17 @@ public class HandlerRSS extends Handler{
 
   @Override
   public byte[] genMime(){
-    return "Content-Type: application/xml".getBytes();
+    return mime;
   }
 
   @Override
   public byte[] genHead(Auth.User user){
-    return (
-      "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" +
-      "<rss version=\"2.0\">" +
-      "<channel>" +
-        "<title>[" + title + "]</title>" +
-        "<link>" + url + sub + "</link>"
-    ).getBytes();
+    return head;
   }
 
   @Override
   public byte[] genBody(){
-    /* TODO: Switch to StringBuilder object. */
-    String res = "";
+    StringBuilder res = new StringBuilder();
     /* Check if this is a valid page */
     if(subject != null){
       /* Check for latest comment */
@@ -56,24 +76,21 @@ public class HandlerRSS extends Handler{
         /* TODO: Get length from configuration. */
         /* Begin loading posts */
         while(++postCount <= 8 && post != null){
-          res +=
-            "<item>" +
-              "<title>" + subject.username + "</title>" +
-              "<link>" + url + sub + "user/" + subject.id + "</link>" +
-              "<description>" + post.message + "</description>" +
-            "</item>";
+          res
+            .append("<item>")
+            .append(  "<title>").append(subject.username).append("</title>")
+            .append(  "<link>").append(url).append(sub).append("user/").append(subject.id).append("</link>")
+            .append(  "<description>").append(post.message).append("</description>")
+            .append("</item>");
           post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
         }
       }
     }
-    return res.getBytes();
+    return res.toString().getBytes();
   }
 
   @Override
   public byte[] genFoot(){
-    return (
-      "</channel>" +
-      "</rss>"
-    ).getBytes();
+    return foot;
   }
 }

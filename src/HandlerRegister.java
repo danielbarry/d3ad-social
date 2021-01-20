@@ -8,20 +8,18 @@ import java.util.HashMap;
  * Generate a generic registration page.
  **/
 public class HandlerRegister extends Handler{
-  /**
-   * HandlerRegister()
-   *
-   * Initialise the variables required to deliver a registration page.
-   *
-   * @param kv The key value data from the header.
-   **/
-  public HandlerRegister(HashMap<String, String> kv){
-    /* Do nothing */
-  }
+  private static byte[] form;
 
-  @Override
-  public byte[] genBody(){
-    return (
+  /**
+   * init()
+   *
+   * Initialise the generic return data.
+   *
+   * @param config The configuration to be used for building the generic
+   * header.
+   **/
+  public static void init(JSON config){
+    form = (
       "<form action=\"" + sub + "register\" method=\"post\">" +
         "<b>Warning:</b> The security was hacked together, please use random credentials." +
         "<br>" +
@@ -48,5 +46,21 @@ public class HandlerRegister extends Handler{
         "2. Don't abuse the service - if in doubt, ask." +
       "</form>"
     ).getBytes();
+  }
+
+  /**
+   * HandlerRegister()
+   *
+   * Initialise the variables required to deliver a registration page.
+   *
+   * @param kv The key value data from the header.
+   **/
+  public HandlerRegister(HashMap<String, String> kv){
+    /* Do nothing */
+  }
+
+  @Override
+  public byte[] genBody(){
+    return form;
   }
 }

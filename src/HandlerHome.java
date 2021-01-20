@@ -11,6 +11,18 @@ import java.util.HashMap;
  **/
 public class HandlerHome extends Handler{
   /**
+   * init()
+   *
+   * Initialise the generic return data.
+   *
+   * @param config The configuration to be used for building the generic
+   * header.
+   **/
+  public static void init(JSON config){
+    /* Do nothing */
+  }
+
+  /**
    * HandlerHome()
    *
    * Initialise the variables required to deliver a home page.
@@ -23,7 +35,7 @@ public class HandlerHome extends Handler{
 
   @Override
   public byte[] genBody(){
-    String res = "<h2>Latest posts</h2>";
+    StringBuilder res = new StringBuilder("<h2>Latest posts</h2>");
     /* TODO: Show a more relevant page if user is logged in. */
     /* Grab latest list of posts */
     ArrayList<Post> posts = Post.getPosts();
@@ -31,14 +43,14 @@ public class HandlerHome extends Handler{
     for(int x = posts.size() - 1; x >= 0; x--){
       Post post = posts.get(x);
       Auth.User user = post.user;
-      res +=
-        "<p>" +
-          "<b><a href=\"" + sub + "user/" + user.id + "\">@" + user.username +
-          "</a></b> on " + (new Date(post.creation)) + " said:" +
-          "<br>" +
-          "<quote>" + post.message + "</quote>" +
-        "</p>";
+      res
+        .append("<p>")
+        .append(  "<b><a href=\"").append(sub).append("user/").append(user.id).append("\">@").append(user.username)
+        .append(  "</a></b> on ").append(new Date(post.creation)).append(" said:")
+        .append(  "<br>")
+        .append(  "<quote>").append(post.message).append("</quote>")
+        .append("</p>");
     }
-    return res.getBytes();
+    return res.toString().getBytes();
   }
 }
