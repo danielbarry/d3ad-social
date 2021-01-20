@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # String for process
-PROC="d4ad"
+PROC="d3ad"
 # The user who has permission to pull the code
 USER="user"
 
