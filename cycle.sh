@@ -41,7 +41,10 @@ do
   if [ "${RESULT:-null}" = null ]; then
     # As it's not running, restart it
     restart_process
+    # Do another loop shortly
+    sleep 30
+  else
+    # Sleep for 5 minutes and check again
+    sleep 300
   fi
-  # Sleep for 5 minutes and check again
-  sleep 300
 done
