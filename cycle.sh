@@ -12,8 +12,9 @@ function restart_process {
   # If process is running
   res="$(ps ax | grep $PROC | grep -v grep)"
   if [ ! "${res:-null}" = null ]; then
-    echo "Trying to kill process"
-    kill "$(ps ax | grep $PROC | grep -v grep | awk '{print $1}')"
+    pid="$(echo $res | awk '{print` $1}')"
+    echo "Trying to kill process $pid"
+    kill $pid
   fi
   echo "Trying to start process"
   java -jar dist/d3ad.jar -c cfg/custom.json &
