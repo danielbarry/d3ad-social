@@ -82,7 +82,6 @@ public class Post{
    * @return The post object, otherwise NULL.
    **/
   public static Post writePost(String path, Post post){
-    /* TODO: Validation should be done here. */
     /* Save the post to disk */
     JSON data = null;
     try{

@@ -254,18 +254,23 @@ public class Auth{
    * @return The user object, otherwise NULL.
    **/
   public static User writeUser(String path, User user){
-    /* TODO: Validation should be done here. */
     /* Save the user to disk */
-    String data = "{" +
-      "\"id\":\""        + user.id                      + "\"" +
-      ",\"usalt\":\""    + Utils.bytesToHex(user.usalt) + "\"" +
-      ",\"username\":\"" + user.username                + "\"" +
-      ",\"password\":\"" + user.password                + "\"" +
+    JSON data = null;
+    try{
+      data = new JSON(false);
+      data.set(new JSON("id", user.id));
+      data.set(new JSON("usalt", Utils.bytesToHex(user.usalt)));
+      data.set(new JSON("username", user.username));
+      data.set(new JSON("password", user.password));
       /* NOTE: Do not store token. */
       /* NOTE: Do not store revoke. */
-      (user.latest != null ? ",\"latest\":\"" + user.latest + "\"" : "") +
-    "}";
-    if(Data.write(path, data)){
+      if(user.latest != null){
+        data.set(new JSON("latest", user.latest));
+      }
+    }catch(Exception e){
+      data = null;
+    }
+    if(data != null && Data.write(path, data.toString())){
       Utils.logUnsafe("User configuration saved", user.username);
       return user;
     }else{
