@@ -174,17 +174,10 @@ public class JSON{
   public static JSON build(String filename) throws Exception{
     /* Check that the file is valid */
     File file = new File(filename);
-    if(file == null || !file.isFile()){
-      throw new Exception("Unable to find JSON file");
-    }
     /* Load the file */
-    String json = "";
     Scanner s = new Scanner(file);
-    while(s.hasNextLine()){
-      json += s.nextLine();
-    }
+    String json = s.useDelimiter("\\A").next();
     s.close();
-    /* Parse from root */
     return new JSON(json);
   }
 
