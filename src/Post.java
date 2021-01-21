@@ -84,14 +84,20 @@ public class Post{
   public static Post writePost(String path, Post post){
     /* TODO: Validation should be done here. */
     /* Save the post to disk */
-    String data = "{" +
-      "\"id\":\""        + post.id                      + "\"" +
-      ",\"userid\":\""   + post.user.id                 + "\"" +
-      ",\"creation\":\"" + post.creation                + "\"" +
-      (post.previous != null ? ",\"previous\":\"" + post.previous + "\"" : "") +
-      ",\"message\":\""  + post.message                 + "\"" +
-    "}";
-    if(Data.write(path, data)){
+    JSON data = null;
+    try{
+      data = new JSON(false);
+      data.set(new JSON("id", post.id));
+      data.set(new JSON("userid", post.user.id));
+      data.set(new JSON("creation", Long.toString(post.creation)));
+      if(post.previous != null){
+        data.set(new JSON("previous", post.previous));
+      }
+      data.set(new JSON("message", post.message));
+    }catch(Exception e){
+      data = null;
+    }
+    if(data != null && Data.write(path, data.toString())){
       Utils.log("Post configuration saved " + post.id);
       /* TODO: Get length of post buffer from configuration. */
       /* Add to posts buffer */
