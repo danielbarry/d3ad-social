@@ -392,11 +392,11 @@ public class JSON{
         return a.append(']');
       case TYPE_STR :
         if(key != null && val != null){
-          return new StringBuilder('\"' + sanStr(key) + "\":\"" + sanStr(val) + '\"');
+          return (new StringBuilder("\"")).append(sanStr(key)).append("\":\"").append(sanStr(val)).append('\"');
         }else if(key != null){
-          return new StringBuilder('\"' + sanStr(key) + '\"');
+          return (new StringBuilder("\"")).append(sanStr(key)).append('\"');
         }else if(val != null){
-          return new StringBuilder('\"' + sanStr(val) + '\"');
+          return (new StringBuilder("\"")).append(sanStr(val)).append('\"');
         }else{
           return new StringBuilder("");
         }
