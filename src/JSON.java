@@ -344,7 +344,7 @@ public class JSON{
   public StringBuilder toStringBuilder(){
     switch(type){
       case TYPE_OBJ :
-        StringBuilder o = new StringBuilder(key != null ? "\"" + key + "\":{" : "{");
+        StringBuilder o = new StringBuilder(key != null ? "\"" + sanStr(key) + "\":{" : "{");
         if(childs != null){
           Iterator io = childs.entrySet().iterator();
           while(io.hasNext()){
@@ -356,7 +356,7 @@ public class JSON{
         }
         return o.append('}');
       case TYPE_ARR :
-        StringBuilder a = new StringBuilder(key != null ? "\"" + key + "\":[" : "[");
+        StringBuilder a = new StringBuilder(key != null ? "\"" + sanStr(key) + "\":[" : "[");
         if(childs != null){
           Iterator ia = childs.entrySet().iterator();
           while(ia.hasNext()){
@@ -369,11 +369,11 @@ public class JSON{
         return a.append(']');
       case TYPE_STR :
         if(key != null && val != null){
-          return new StringBuilder('\"' + key + "\":\"" + val + '\"');
+          return new StringBuilder('\"' + sanStr(key) + "\":\"" + sanStr(val) + '\"');
         }else if(key != null){
-          return new StringBuilder('\"' + key + '\"');
+          return new StringBuilder('\"' + sanStr(key) + '\"');
         }else if(val != null){
-          return new StringBuilder('\"' + val + '\"');
+          return new StringBuilder('\"' + sanStr(val) + '\"');
         }else{
           return new StringBuilder("");
         }
@@ -393,6 +393,25 @@ public class JSON{
   @Override
   public String toString(){
     return toStringBuilder().toString();
+  }
+
+  /**
+   * sanStr()
+   *
+   * Ensure a JSON String about to be saved or written has appropriate escape
+   * sequences. NOTE: This is slow and should only be done for small Strings.
+   *
+   * @param s The String to be sanitized.
+   * @return The sanitized String.
+   **/
+  private static String sanStr(String s){
+    return s.replaceAll("\\\\", "\\\\\\\\")
+            .replaceAll("\"", "\\\\\"")
+            .replaceAll("\t", "\\\\t")
+            .replaceAll("\r", "\\\\r")
+            .replaceAll("\n", "\\\\n")
+            .replaceAll("\f", "\\\\f")
+            .replaceAll("\b", "\\\\b");
   }
 
   /**
