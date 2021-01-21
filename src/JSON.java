@@ -267,6 +267,28 @@ public class JSON{
   }
 
   /**
+   * set()
+   *
+   * Set a JSON element to the current JSON object. If the object exists by the
+   * same key/value, the old one is overwritten silently.
+   *
+   * @param c The child JSON object to be added. NOTE: Recursion could occur if
+   * this JSON object is already already in the tree structure.
+   * @return True if the object was added, otherwise false.
+   **/
+  public boolean set(JSON c){
+    if(c != null){
+      /* Make sure this object has a type than can have children */
+      if(type == TYPE_STR){
+        type = TYPE_OBJ;
+      }
+      childs.put(c.key(c.value(null)).toString(), c);
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * get()
    *
    * Get a child element of this JSON object. NOTE: Only objects and arrays can
