@@ -63,7 +63,8 @@ public class JSON{
             /* Handle this child object */
             }else{
               JSON child = new JSON(json, x);
-              childs.put(child.key(child.value(null)), child);
+              /* NOTE: There is no key or value for this type, so make one */
+              childs.put((new Integer(childs.size())).toString(), child);
               x += child.getRawLen();
             }
             break;
