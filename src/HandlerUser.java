@@ -87,7 +87,8 @@ public class HandlerUser extends Handler{
   public static StringBuilder genPostForm(StringBuilder sb, Auth.User viewer){
     if(viewer != null){
       return sb
-        .append("<form action=\"").append(sub).append("user/").append(viewer.id).append("\" method=\"post\">")
+        .append("<form action=\"").append(sub).append("user/").append(viewer.id)
+          .append("\" method=\"post\">")
         .append(  "<textarea")
         .append(    " id=\"post\"")
         .append(    " name=\"post\"")
@@ -116,10 +117,13 @@ public class HandlerUser extends Handler{
   public static StringBuilder genPostEntry(StringBuilder sb, Post post, Auth auth){
     return sb
       .append("<p>")
-      .append(  "<b><a href=\"").append("user/").append(post.user.id).append("\">@").append(post.user.username)
-      .append(  "</a></b> on ").append(new Date(post.creation)).append(" said:")
+      .append(  "<b><a href=\"").append(sub).append("user/")
+        .append(post.user.id).append("\">@").append(post.user.username)
+      .append(  "</a></b> on ").append(new Date(post.creation))
+        .append(" said:")
       .append(  "<br>")
-      .append(  "<quote>").append(HandlerUser.postProcessMessage(post.message, auth)).append("</quote>")
+      .append(  "<quote>").append(HandlerUser.postProcessMessage(post.message, auth))
+        .append("</quote>")
       .append("</p>");
   }
 
