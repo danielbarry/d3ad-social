@@ -47,13 +47,15 @@ public class HandlerUser extends Handler{
 
   @Override
   public byte[] genBody(){
-    StringBuilder res = (new StringBuilder())
-      .append("<h2>").append(subject.username).append("'s posts ")
-      .append("<a href=\"").append(sub).append("rss/").append(subject.id).append("\">RSS</a></h2>");
-    /* Generate post form */
-    res = genPostForm(res, viewer);
+    StringBuilder res = new StringBuilder();
     /* Check if this is a valid page */
     if(subject != null){
+      res
+        .append("<h2>").append(subject.username).append("'s posts <a href=\"")
+        .append(sub).append("rss/").append(subject.id)
+        .append("\">RSS</a></h2>");
+      /* Generate post form */
+      res = genPostForm(res, viewer);
       /* Check for latest comment */
       if(subject.latest != null){
         /* TODO: Get path from configuration. */
