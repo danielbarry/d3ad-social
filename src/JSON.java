@@ -165,6 +165,19 @@ public class JSON{
   }
 
   /**
+   * JSON()
+   *
+   * Create a JSON object with the provided key and value.
+   *
+   * @param key The key for this JSON object.
+   * @param val The value for this JSON object.
+   **/
+  public JSON(String key, String val) throws Exception{
+    this("{}", 0);
+    set(key, val);
+  }
+
+  /**
    * build()
    *
    * A factory builder to parse the JSON string from a file and generate the
