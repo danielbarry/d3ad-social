@@ -289,6 +289,22 @@ public class JSON{
   }
 
   /**
+   * set()
+   *
+   * Set the key value pair for this object. This overrides any existing key
+   * value pair for this JSON object.
+   *
+   * @param key The key to be set for this object.
+   * @param val The value to be set for this object.
+   * @return The instance of this object.
+   **/
+  public JSON set(String key, String val){
+    this.key = key;
+    this.val = val;
+    return this;
+  }
+
+  /**
    * get()
    *
    * Get a child element of this JSON object. NOTE: Only objects and arrays can
