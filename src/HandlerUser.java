@@ -1,5 +1,7 @@
 package b.ds;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -96,7 +98,9 @@ public class HandlerUser extends Handler{
    * Post-process the message String just before being served up to add social
    * elements.
    *
+   * @param m The message to be formatted.
    * @param auth Access to the authentication object.
+   * @return The StringBuilder object generated.
    **/
   public static StringBuilder postProcessMessage(String m, Auth auth){
     StringBuilder r = new StringBuilder();
@@ -106,6 +110,7 @@ public class HandlerUser extends Handler{
     for(int x = 0; x < p.length; x++){
       /* Make sure it's long enough to be processed */
       if(p[x].length() > 2){
+        boolean u = false;
         /* Process first character */
         switch(p[x].charAt(0)){
           case '@' :
@@ -125,6 +130,9 @@ public class HandlerUser extends Handler{
             ++b;
             r.append(p[x]);
             break;
+          case '[' :
+            u = true;
+            break;
           default :
             r.append(p[x]);
             break;
@@ -137,8 +145,30 @@ public class HandlerUser extends Handler{
             }
             ++b;
             break;
+          case ']' :
+            if(u){
+              try{
+                String uStr = p[x].substring(1, p[x].length() - 1);
+                URL url = new URL(uStr);
+                String uName = uStr;
+                if(uName.length() > 20){
+                  uName = uName.substring(0, 16);
+                  uName += "..";
+                }
+                r.append("<a href=\"").append(uStr).append("\">").append(uName)
+                  .append("</a>");
+              }catch(MalformedURLException e){
+                r.append(p[x]);
+              }
+            }else{
+              r.append(p[x]);
+            }
+            break;
           default :
-            /* Do nothing */
+            /* If we never completed the URL, print what we have */
+            if(u){
+              r.append(p[x]);
+            }
             break;
         }
       }else{
