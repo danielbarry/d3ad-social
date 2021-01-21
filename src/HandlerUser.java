@@ -13,6 +13,7 @@ public class HandlerUser extends Handler{
 
   private Auth.User viewer;
   private Auth.User subject;
+  private Auth auth;
 
   /**
    * init()
@@ -34,10 +35,12 @@ public class HandlerUser extends Handler{
    * @param kv The key value data from the header.
    * @param viewer The logged in user, otherwise NULL.
    * @param subject The user being viewed, otherwise NULL.
+   * @param auth Access to the authentication object.
    **/
-  public HandlerUser(HashMap<String, String> kv, Auth.User viewer, Auth.User subject){
+  public HandlerUser(HashMap<String, String> kv, Auth.User viewer, Auth.User subject, Auth auth){
     this.viewer = viewer;
     this.subject = subject;
+    this.auth = auth;
   }
 
   @Override
@@ -75,7 +78,7 @@ public class HandlerUser extends Handler{
             .append(  "<b><a href=\"").append("user/").append(subject.id).append("\">@").append(subject.username)
             .append(  "</a></b> on ").append(new Date(post.creation)).append(" said:")
             .append(  "<br>")
-            .append(  "<quote>").append(post.message).append("</quote>")
+            .append(  "<quote>").append(postProcessMessage(post.message, auth)).append("</quote>")
             .append("</p>");
           post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
         }
@@ -85,5 +88,68 @@ public class HandlerUser extends Handler{
       return error;
     }
     return res.toString().getBytes();
+  }
+
+  /**
+   * postProcessMessage()
+   *
+   * Post-process the message String just before being served up to add social
+   * elements.
+   *
+   * @param auth Access to the authentication object.
+   **/
+  public static StringBuilder postProcessMessage(String m, Auth auth){
+    StringBuilder r = new StringBuilder();
+    String[] p = m.split("\\s+");
+    /* Process each part */
+    int b = 0;
+    for(int x = 0; x < p.length; x++){
+      /* Make sure it's long enough to be processed */
+      if(p[x].length() > 2){
+        /* Process first character */
+        switch(p[x].charAt(0)){
+          case '@' :
+            Auth.User user = auth.getUserByName(p[x].substring(1));
+            if(user != null){
+              r.append("<a href=\"").append(sub).append("user/")
+                .append(user.id).append("\">@").append(user.username)
+                .append("</a>");
+            }else{
+              r.append(p[x]);
+            }
+            break;
+          case '*' :
+            if(b % 2 == 0){
+              r.append("<b>");
+            }
+            ++b;
+            r.append(p[x]);
+            break;
+          default :
+            r.append(p[x]);
+            break;
+        }
+        /* Process last character */
+        switch(p[x].charAt(p[x].length() - 1)){
+          case '*' :
+            if(b % 2 == 1){
+              r.append("</b>");
+            }
+            ++b;
+            break;
+          default :
+            /* Do nothing */
+            break;
+        }
+      }else{
+        r.append(p[x]);
+      }
+      r.append(' ');
+    }
+    /* Close off bold tag if not done */
+    if(b % 2 == 1){
+      r.append("</b>");
+    }
+    return r;
   }
 }

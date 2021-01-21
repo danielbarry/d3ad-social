@@ -118,7 +118,7 @@ public class Process extends Thread{
           write(s, h.genFoot());
           break;
         case "user" :
-          h = new HandlerUser(kv, user, auth.getUserById(loc));
+          h = new HandlerUser(kv, user, auth.getUserById(loc), auth);
           writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
