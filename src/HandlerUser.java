@@ -179,13 +179,17 @@ public class HandlerUser extends Handler{
           case ']' :
             if(u){
               try{
-                String uStr = p[x].substring(1, p[x].length() - 1);
+                String uStr = p[x]
+                  .substring(1, p[x].length() - 1)
+                  .replaceAll("&amp;", "&");
                 URL url = new URL(uStr);
                 String uName = uStr;
-                if(uName.length() > 20){
-                  uName = uName.substring(0, 16);
+                /* TODO: Get URL short length from configuration. */
+                if(uName.length() > 40){
+                  uName = uName.substring(0, 40);
                   uName += "..";
                 }
+                uName.replaceAll("&", "&amp;");
                 r.append("<a href=\"").append(uStr).append("\">").append(uName)
                   .append("</a>");
               }catch(MalformedURLException e){
