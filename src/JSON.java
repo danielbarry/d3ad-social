@@ -178,6 +178,23 @@ public class JSON{
   }
 
   /**
+   * JSON()
+   *
+   * Create blank JSON object.
+   *
+   * @param array If true, this JSON object will become an array. The default
+   * is a String, but will be forced to become an object if children are added.
+   * NOTE: If creating the root JSON element, it should not be an array as per
+   * the JSON format.
+   **/
+  public JSON(boolean array) throws Exception{
+    this("{}", 0);
+    if(array){
+      type = TYPE_ARR;
+    }
+  }
+
+  /**
    * build()
    *
    * A factory builder to parse the JSON string from a file and generate the
