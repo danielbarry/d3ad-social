@@ -293,7 +293,6 @@ public class JSON{
       Iterator i = childs.entrySet().iterator();
       for(int z = 0; z < x && i.hasNext(); z++){
         i.next();
-        i.remove();
       }
       return (JSON)(((Map.Entry)(i.next())).getValue());
     }else{
@@ -350,7 +349,6 @@ public class JSON{
           while(io.hasNext()){
             JSON c = (JSON)(((Map.Entry)(io.next())).getValue());
             o.append(c.toStringBuilder());
-            io.remove();
             o.append(io.hasNext() ? "," : "");
           }
         }
@@ -362,7 +360,6 @@ public class JSON{
           while(ia.hasNext()){
             JSON c = (JSON)(((Map.Entry)(ia.next())).getValue());
             a.append(c.toStringBuilder());
-            ia.remove();
             a.append(ia.hasNext() ? "," : "");
           }
         }
