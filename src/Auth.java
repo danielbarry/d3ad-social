@@ -201,6 +201,30 @@ public class Auth{
   }
 
   /**
+   * getUserByName()
+   *
+   * Get the user by a given name, or NULL if the user cannot be found.
+   *
+   * @param name The String name to use for searching.
+   * @return The user found, otherwise NULL.
+   **/
+  public User getUserByName(String name){
+    /* Make sure it's not NULL */
+    if(name == null){
+      return null;
+    }
+    /* Check for user String */
+    if(userMap.containsKey(name)){
+      User user = userMap.get(name);
+      /* Make sure it really was a match */
+      if(user.username.equals(name)){
+        return user;
+      }
+    }
+    return null;
+  }
+
+  /**
    * readUser()
    *
    * Read user data from disk and update the relevant variables. Return NULL if
