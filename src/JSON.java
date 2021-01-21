@@ -1,7 +1,9 @@
 package b.ds;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -10,7 +12,7 @@ import java.util.Scanner;
  * A single file JSON parser.
  *
  * @author B[]
- * @version 1.0
+ * @version 1.0 (modified)
  * @since 2020-10-20
  **/
 public class JSON{
@@ -22,7 +24,7 @@ public class JSON{
   private int type;
   private String key;
   private String val;
-  private ArrayList<JSON> childs;
+  private HashMap<String, JSON> childs;
 
   /**
    * JSON()
@@ -38,7 +40,7 @@ public class JSON{
     type = TYPE_STR;
     key = null;
     val = null;
-    childs = new ArrayList<JSON>();
+    childs = new HashMap<String, JSON>();
     /* Parse for object type */
     boolean string = false;
     boolean escape = false;
@@ -61,10 +63,10 @@ public class JSON{
             /* Handle this child object */
             }else{
               if(childs == null){
-                childs = new ArrayList<JSON>();
+                childs = new HashMap<String, JSON>();
               }
               JSON child = new JSON(json, x);
-              childs.add(child);
+              childs.put(child.key(child.value(null)), child);
               x += child.getRawLen();
             }
             break;
@@ -83,10 +85,10 @@ public class JSON{
               string = !string;
             }else{
               if(childs == null){
-                childs = new ArrayList<JSON>();
+                childs = new HashMap<String, JSON>();
               }
               JSON child = new JSON(json, x);
-              childs.add(child);
+              childs.put(child.key(child.value(null)), child);
               x += child.getRawLen();
             }
             break;
@@ -280,14 +282,20 @@ public class JSON{
    * get()
    *
    * Get a child element of this JSON object. NOTE: Only objects and arrays can
-   * have child elements.
+   * have child elements. This method is slow because it has to search through
+   * the entire list to find the desired element.
    *
    * @param x The index of the element to retrieve.
    * @return The JSON object at the given location, otherwise this object.
    **/
   public JSON get(int x){
     if(childs != null && x >= 0 && x < childs.size()){
-      return childs.get(x);
+      Iterator i = childs.entrySet().iterator();
+      for(int z = 0; z < x && i.hasNext(); z++){
+        i.next();
+        i.remove();
+      }
+      return (JSON)(((Map.Entry)(i.next())).getValue());
     }else{
       return this;
     }
@@ -303,13 +311,9 @@ public class JSON{
    * @return The JSON object at the given location, otherwise this object.
    **/
   public JSON get(String key){
-    if(childs != null && key != null){
-      for(int x = 0; x < childs.size(); x++){
-        JSON c = childs.get(x);
-        if(c != null && c.key(null) != null && c.key(null).equals(key)){
-          return c;
-        }
-      }
+    if(childs != null){
+      JSON c = childs.get(key);
+      return c != null ? c : this;
     }
     return this;
   }
@@ -323,19 +327,63 @@ public class JSON{
    * @return True if the child exists, otherwise false.
    **/
   public boolean exists(String key){
-    if(childs != null && key != null){
-      for(int x = 0; x < childs.size(); x++){
-        JSON c = childs.get(x);
-        if(c.key(null) != null && c.key(null).equals(key)){
-          return true;
-        }
-      }
+    if(childs != null){
+      return childs.containsKey(key);
     }
     return false;
   }
 
   /**
-   * toString()
+   * toStringBuilder()
+   *
+   * Convert this object and all child objects to a printable String.
+   *
+   * @return A printable String representing this object and it's child
+   * elements.
+   **/
+  public StringBuilder toStringBuilder(){
+    switch(type){
+      case TYPE_OBJ :
+        StringBuilder o = new StringBuilder(key != null ? "\"" + key + "\":{" : "{");
+        if(childs != null){
+          Iterator io = childs.entrySet().iterator();
+          while(io.hasNext()){
+            JSON c = (JSON)(((Map.Entry)(io.next())).getValue());
+            o.append(c.toStringBuilder());
+            io.remove();
+            o.append(io.hasNext() ? "," : "");
+          }
+        }
+        return o.append('}');
+      case TYPE_ARR :
+        StringBuilder a = new StringBuilder(key != null ? "\"" + key + "\":[" : "[");
+        if(childs != null){
+          Iterator ia = childs.entrySet().iterator();
+          while(ia.hasNext()){
+            JSON c = (JSON)(((Map.Entry)(ia.next())).getValue());
+            a.append(c.toStringBuilder());
+            ia.remove();
+            a.append(ia.hasNext() ? "," : "");
+          }
+        }
+        return a.append(']');
+      case TYPE_STR :
+        if(key != null && val != null){
+          return new StringBuilder('\"' + key + "\":\"" + val + '\"');
+        }else if(key != null){
+          return new StringBuilder('\"' + key + '\"');
+        }else if(val != null){
+          return new StringBuilder('\"' + val + '\"');
+        }else{
+          return new StringBuilder("");
+        }
+      default :
+        return new StringBuilder();
+    }
+  }
+
+  /**
+   * toStringBuilder()
    *
    * Convert this object and all child objects to a printable String.
    *
@@ -344,40 +392,7 @@ public class JSON{
    **/
   @Override
   public String toString(){
-    switch(type){
-      case TYPE_OBJ :
-        String o = key != null ? "\"" + key + "\":{" : "{";
-        if(childs != null){
-          for(int x = 0; x < childs.size(); x++){
-            JSON c = childs.get(x);
-            o += c.toString();
-            o += x < childs.size() - 1 ? "," : "";
-          }
-        }
-        return o + '}';
-      case TYPE_ARR :
-        String a = key != null ? "\"" + key + "\":[" : "[";
-        if(childs != null){
-          for(int x = 0; x < childs.size(); x++){
-            JSON c = childs.get(x);
-            a += c.toString();
-            a += x < childs.size() - 1 ? "," : "";
-          }
-        }
-        return a + ']';
-      case TYPE_STR :
-        if(key != null && val != null){
-          return '\"' + key + "\":\"" + val + '\"';
-        }else if(key != null){
-          return '\"' + key + '\"';
-        }else if(val != null){
-          return '\"' + val + '\"';
-        }else{
-          return "";
-        }
-      default :
-        return "";
-    }
+    return toStringBuilder().toString();
   }
 
   /**
@@ -431,10 +446,10 @@ public class JSON{
     /* Run parser tests */
     for(int x = 0; x < test.length; x++){
       try{
-        boolean a = assurt(new JSON(test[x]).toString().equals(test[x]));
+        boolean a = assurt(new JSON(test[x]).toStringBuilder().toString().equals(test[x]));
         if(!a){
           System.out.println("  in:  '" + test[x] + "'");
-          System.out.println("  got: '" + new JSON(test[x]).toString() + "' !=");
+          System.out.println("  got: '" + new JSON(test[x]).toStringBuilder() + "' !=");
           System.out.println("  exp: '" + test[x] + "'");
         }
         r &= a;
@@ -447,9 +462,9 @@ public class JSON{
     /* Run getter tests */
     try{
       r &= assurt(new JSON("{\"test\":[{\"arg-a\":\"123\"},{\"arg-b\":\"456\"}]}")
-        .get(0).get(0).toString().equals("{\"arg-a\":\"123\"}"));
+        .get(0).get(0).toStringBuilder().toString().equals("{\"arg-a\":\"123\"}"));
       r &= assurt(new JSON("{\"test\":[\"arg-a\":\"123\",\"arg-b\":\"456\"]}")
-        .get(0).get("arg-b").toString().equals("\"arg-b\":\"456\""));
+        .get(0).get("arg-b").toStringBuilder().toString().equals("\"arg-b\":\"456\""));
     }catch(Exception e){
       System.out.println(">> Major Screw Up <<");
       e.printStackTrace();
