@@ -22,6 +22,7 @@ public class Process extends Thread{
   private static final byte[] HTTP_BAD = "<b>Error</b>".getBytes();
 
   private Socket s;
+  private long start;
   private int recBuffSize;
   private int subDirLen;
   private Auth auth;
@@ -32,12 +33,14 @@ public class Process extends Thread{
    * Allow the client to be processed.
    *
    * @param socket The socket of the client.
+   * @param start The start time for the process.
    * @param recBuffSize The receiver buffer size.
    * @param subDirLen The subdirectory length.
    * @param auth Access to the authentication mechanism.
    **/
-  public Process(Socket socket, int recBuffSize, int subDirLen, Auth auth){
+  public Process(Socket socket, long start, int recBuffSize, int subDirLen, Auth auth){
     this.s = socket;
+    this.start = start;
     this.recBuffSize = recBuffSize;
     this.subDirLen = subDirLen;
     this.auth = auth;
@@ -134,7 +137,7 @@ public class Process extends Thread{
     }
     /* Close the socket */
     close(s);
-    Utils.log("Process client ended");
+    Utils.log("Process client ended after " + (System.currentTimeMillis() - start) + " ms");
   }
 
   /**

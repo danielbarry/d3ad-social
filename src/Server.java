@@ -118,7 +118,15 @@ public class Server extends Thread{
         /* Inner server main loop */
         for(;;){
           try{
-            (new Process(ss.accept(), recBuffSize, subDirLen, auth)).start();
+            (
+              new Process(
+                ss.accept(),
+                System.currentTimeMillis(),
+                recBuffSize,
+                subDirLen,
+                auth
+              )
+            ).start();
           }catch(SocketTimeoutException ste){
             Utils.log("Socket timeout, client may have be disconnected");
           }
