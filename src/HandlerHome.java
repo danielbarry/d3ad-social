@@ -10,6 +10,9 @@ import java.util.HashMap;
  * Generate a generic home page.
  **/
 public class HandlerHome extends Handler{
+  private Auth.User viewer;
+  private Auth auth;
+
   /**
    * init()
    *
@@ -28,28 +31,25 @@ public class HandlerHome extends Handler{
    * Initialise the variables required to deliver a home page.
    *
    * @param kv The key value data from the header.
+   * @param viewer The logged in user, otherwise NULL.
+   * @param auth Access to the authentication object.
    **/
-  public HandlerHome(HashMap<String, String> kv){
-    /* Do nothing */
+  public HandlerHome(HashMap<String, String> kv, Auth.User viewer, Auth auth){
+    this.viewer = viewer;
+    this.auth = auth;
   }
 
   @Override
   public byte[] genBody(){
-    StringBuilder res = new StringBuilder("<h2>Latest posts</h2>");
+    StringBuilder res = new StringBuilder("<h2>latest posts</h2>");
+    /* Generate post form */
+    HandlerUser.genPostForm(res, viewer);
     /* TODO: Show a more relevant page if user is logged in. */
     /* Grab latest list of posts */
     ArrayList<Post> posts = Post.getPosts();
     /* Begin loading posts from most recent (last) */
     for(int x = posts.size() - 1; x >= 0; x--){
-      Post post = posts.get(x);
-      Auth.User user = post.user;
-      res
-        .append("<p>")
-        .append(  "<b><a href=\"").append(sub).append("user/").append(user.id).append("\">@").append(user.username)
-        .append(  "</a></b> on ").append(new Date(post.creation)).append(" said:")
-        .append(  "<br>")
-        .append(  "<quote>").append(post.message).append("</quote>")
-        .append("</p>");
+      res = HandlerUser.genPostEntry(res, posts.get(x), auth);
     }
     return res.toString().getBytes();
   }

@@ -80,7 +80,7 @@ public class Process extends Thread{
         hand = hand.substring(0, z);
         loc = loc.substring(z + 1, loc.length());
       }
-      Handler h = new HandlerHome(kv);
+      Handler h = new HandlerHome(kv, user, auth);
       Utils.logUnsafe("User requesting from location", hand);
       switch(hand){
         case "" :
