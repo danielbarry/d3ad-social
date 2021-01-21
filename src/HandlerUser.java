@@ -50,8 +50,41 @@ public class HandlerUser extends Handler{
     StringBuilder res = (new StringBuilder())
       .append("<h2>").append(subject.username).append("'s posts ")
       .append("<a href=\"").append(sub).append("rss/").append(subject.id).append("\">RSS</a></h2>");
+    /* Generate post form */
+    res = genPostForm(res, viewer);
+    /* Check if this is a valid page */
+    if(subject != null){
+      /* Check for latest comment */
+      if(subject.latest != null){
+        /* TODO: Get path from configuration. */
+        Post post = Post.readPost("dat/pst" + "/" + subject.latest, new Post());
+        int postCount = 0;
+        /* TODO: Get length from configuration. */
+        /* Begin loading posts */
+        while(++postCount <= 16 && post != null){
+          res = genPostEntry(res, post, auth);
+          post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
+        }
+        /* TODO: We should provide a link to find out more. */
+      }
+    }else{
+      return error;
+    }
+    return res.toString().getBytes();
+  }
+
+  /**
+   * genPostForm()
+   *
+   * Generate a user post form to add messages if they are logged in.
+   *
+   * @param sb The StringBuilder object to add the form data to.
+   * @param viewer The logged in viewer of the content, otherwise NULL.
+   * @return The generated form added to the StringBuilder objects.
+   **/
+  public static StringBuilder genPostForm(StringBuilder sb, Auth.User viewer){
     if(viewer != null){
-      res
+      return sb
         .append("<form action=\"").append(sub).append("user/").append(viewer.id).append("\" method=\"post\">")
         .append(  "<textarea")
         .append(    " id=\"post\"")
@@ -65,31 +98,27 @@ public class HandlerUser extends Handler{
         .append(  "<input type=\"submit\" value=\"submit\">")
         .append("</form>");
     }
-    /* Check if this is a valid page */
-    if(subject != null){
-      /* Check for latest comment */
-      if(subject.latest != null){
-        /* TODO: Get path from configuration. */
-        Post post = Post.readPost("dat/pst" + "/" + subject.latest, new Post());
-        int postCount = 0;
-        /* TODO: Get length from configuration. */
-        /* Begin loading posts */
-        while(++postCount <= 16 && post != null){
-          res
-            .append("<p>")
-            .append(  "<b><a href=\"").append("user/").append(subject.id).append("\">@").append(subject.username)
-            .append(  "</a></b> on ").append(new Date(post.creation)).append(" said:")
-            .append(  "<br>")
-            .append(  "<quote>").append(postProcessMessage(post.message, auth)).append("</quote>")
-            .append("</p>");
-          post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
-        }
-        /* TODO: We should provide a link to find out more. */
-      }
-    }else{
-      return error;
-    }
-    return res.toString().getBytes();
+    return sb;
+  }
+
+  /**
+   * genPostEntry()
+   *
+   * Generate a formatted post entry.
+   *
+   * @param sb The StringBuilder object to use for appending the content.
+   * @param post The post to be formatted.
+   * @param auth Access to the authentication object.
+   * @return The formatted post appended to the StringBuilder object.
+   **/
+  public static StringBuilder genPostEntry(StringBuilder sb, Post post, Auth auth){
+    return sb
+      .append("<p>")
+      .append(  "<b><a href=\"").append("user/").append(post.user.id).append("\">@").append(post.user.username)
+      .append(  "</a></b> on ").append(new Date(post.creation)).append(" said:")
+      .append(  "<br>")
+      .append(  "<quote>").append(HandlerUser.postProcessMessage(post.message, auth)).append("</quote>")
+      .append("</p>");
   }
 
   /**
