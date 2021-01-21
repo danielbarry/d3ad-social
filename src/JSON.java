@@ -62,9 +62,6 @@ public class JSON{
               }
             /* Handle this child object */
             }else{
-              if(childs == null){
-                childs = new HashMap<String, JSON>();
-              }
               JSON child = new JSON(json, x);
               childs.put(child.key(child.value(null)), child);
               x += child.getRawLen();
@@ -84,9 +81,6 @@ public class JSON{
             if(type == TYPE_STR){
               string = !string;
             }else{
-              if(childs == null){
-                childs = new HashMap<String, JSON>();
-              }
               JSON child = new JSON(json, x);
               childs.put(child.key(child.value(null)), child);
               x += child.getRawLen();
