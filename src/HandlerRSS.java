@@ -31,7 +31,9 @@ public class HandlerRSS extends Handler{
       "<rss version=\"2.0\">" +
       "<channel>" +
         "<title>[" + title + "]</title>" +
-        "<link>" + url + sub + "</link>"
+        "<link>" + url + sub + "</link>" +
+        /* TODO: Get this value from the configuration. */
+        "<ttl>" + 30 + "</ttl>"
     ).getBytes();
     foot = (
       "</channel>" +
