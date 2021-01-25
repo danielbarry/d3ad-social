@@ -20,9 +20,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Utils{
   private static final char[] HEX =
     {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+  private static final int DISK_BUFF_MAX = 4096;
 
   private static BufferedWriter bw;
   private static Lock logLock;
+  private static StringBuilder diskBuff = new StringBuilder();
 
   static{
     bw = null;
@@ -53,8 +55,11 @@ public class Utils{
    *
    * @param type The type identifier for the message.
    * @param msg The message to be printed.
+   * @param force True if we should force a disk write, otherwise allow the
+   * logger to batch disk writes. You may want to force a disk write on an
+   * error for example, where it's possible the program may crash soon.
    **/
-  private static void write(String type, String msg){
+  private static void write(String type, String msg, boolean force){
     StackTraceElement ste = Thread.currentThread().getStackTrace()[3];
     StringBuilder sb = new StringBuilder("[");
     sb.append(timestamp());
@@ -70,17 +75,22 @@ public class Utils{
     sb.append(type);
     sb.append("] ");
     sb.append(msg);
-    String s = sb.toString();
     logLock.lock();
     /* Write error stream so program output can be separated from logs */
-    System.err.println(s);
+    System.err.println(sb.toString());
     if(bw != null){
-      try{
-        bw.append(s);
-        bw.newLine();
-        bw.flush();
-      }catch(IOException e){
-        /* Don't log, we could end up in an infinite loop */
+      /* Append to disk buffer */
+      diskBuff.append(sb);
+      /* Only write to disk if force or buffer is filled */
+      if(force || diskBuff.length() > DISK_BUFF_MAX){
+        try{
+          bw.append(diskBuff.toString());
+          bw.newLine();
+          bw.flush();
+          diskBuff = new StringBuilder();
+        }catch(IOException e){
+          /* Don't log, we could end up in an infinite loop */
+        }
       }
     }
     logLock.unlock();
@@ -94,7 +104,7 @@ public class Utils{
    * @param msg The message to be logged.
    **/
   public static void log(String msg){
-    write(">>", msg);
+    write(">>", msg, false);
   }
 
   /**
@@ -108,7 +118,7 @@ public class Utils{
    * @param unsafe The message/data that is potentially unsafe.
    **/
   public static void logUnsafe(String msg, String unsafe){
-    write(">>", msg + " B64:'" + Base64.getEncoder().encodeToString(unsafe.getBytes()) + "'");
+    write(">>", msg + " B64:'" + Base64.getEncoder().encodeToString(unsafe.getBytes()) + "'", false);
   }
 
   /**
@@ -119,7 +129,7 @@ public class Utils{
    * @param msg The message to be logged.
    **/
   public static void warn(String msg){
-    write("!!", msg);
+    write("!!", msg, false);
   }
 
   /**
@@ -131,7 +141,7 @@ public class Utils{
    * @param msg The message to be logged.
    **/
   public static void error(String msg){
-    write("EE", msg);
+    write("EE", msg, true);
     if(bw != null){
       try{
         bw.flush();
