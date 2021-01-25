@@ -75,9 +75,10 @@ public class Utils{
     sb.append(type);
     sb.append("] ");
     sb.append(msg);
+    sb.append(System.lineSeparator());
     logLock.lock();
     /* Write error stream so program output can be separated from logs */
-    System.err.println(sb.toString());
+    System.err.print(sb.toString());
     if(bw != null){
       /* Append to disk buffer */
       diskBuff.append(sb);
@@ -85,7 +86,6 @@ public class Utils{
       if(force || diskBuff.length() > DISK_BUFF_MAX){
         try{
           bw.append(diskBuff.toString());
-          bw.newLine();
           bw.flush();
           diskBuff = new StringBuilder();
         }catch(IOException e){
