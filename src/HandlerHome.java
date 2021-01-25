@@ -46,7 +46,7 @@ public class HandlerHome extends Handler{
     HandlerUser.genPostForm(res, viewer);
     /* TODO: Show a more relevant page if user is logged in. */
     /* Grab latest list of posts */
-    ArrayList<Post> posts = Post.getPosts();
+    ArrayList<Post> posts = Post.getRecent();
     /* Begin loading posts from most recent (last) */
     for(int x = posts.size() - 1; x >= 0; x--){
       res = HandlerUser.genPostEntry(res, posts.get(x), auth);

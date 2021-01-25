@@ -294,7 +294,7 @@ public class Process extends Thread{
       /* Sanitize the input */
       post.message = Utils.sanitizeString(post.message);
       /* Save post */
-      if(Post.writePost(postDir + "/" + post.id, post) != post){
+      if(Post.writePost(postDir, post.id, post) != post){
         Utils.warn("Unable to save new post");
         return false;
       }

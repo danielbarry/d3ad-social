@@ -71,7 +71,7 @@ public class HandlerRSS extends Handler{
       /* Check for latest comment */
       if(subject.latest != null){
         /* TODO: Get path from configuration. */
-        Post post = Post.readPost("dat/pst" + "/" + subject.latest, new Post());
+        Post post = Post.readPost("dat/pst", subject.latest);
         int postCount = 0;
         /* TODO: Get length from configuration. */
         /* Begin loading posts */
@@ -82,7 +82,7 @@ public class HandlerRSS extends Handler{
             .append(  "<link>").append(url).append(sub).append("user/").append(subject.id).append("</link>")
             .append(  "<description>").append(post.message).append("</description>")
             .append("</item>");
-          post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
+          post = Post.readPost("dat/pst", post.previous);
         }
       }
     }

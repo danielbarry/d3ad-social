@@ -59,13 +59,13 @@ public class HandlerUser extends Handler{
       /* Check for latest comment */
       if(subject.latest != null){
         /* TODO: Get path from configuration. */
-        Post post = Post.readPost("dat/pst" + "/" + subject.latest, new Post());
+        Post post = Post.readPost("dat/pst", subject.latest);
         int postCount = 0;
         /* TODO: Get length from configuration. */
         /* Begin loading posts */
         while(++postCount <= 16 && post != null){
           res = genPostEntry(res, post, auth);
-          post = Post.readPost("dat/pst" + "/" + post.previous, new Post());
+          post = Post.readPost("dat/pst", post.previous);
         }
         /* TODO: We should provide a link to find out more. */
       }

@@ -1,6 +1,8 @@
 package b.ds;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Post.java
@@ -9,7 +11,8 @@ import java.util.ArrayList;
  **/
 public class Post{
   private static Auth auth;
-  private static ArrayList<Post> posts;
+  private static HashMap<String, Post> idMap;
+  private static ArrayList<Post> recent;
 
   /* Unique post ID */
   public String id = null;
@@ -31,7 +34,8 @@ public class Post{
    **/
   public static void init(Auth auth){
     Post.auth = auth;
-    posts = new ArrayList<Post>();
+    idMap = new HashMap<String, Post>();
+    recent = new ArrayList<Post>();
   }
 
   /**
@@ -40,13 +44,20 @@ public class Post{
    * Read user post from disk and update the relevant variables. Return NULL if
    * an issue occurs.
    *
-   * @param path The path for the user configuration.
-   * @param post A post object to be written to.
+   * @param loc The location of the post.
+   * @param id The ID for the post configuration.
    * @return The post object, otherwise NULL.
    **/
-  public static Post readPost(String path, Post post){
+  public static Post readPost(String loc, String id){
+    /* Try to load from cache */
+    Post post = idMap.get(id);
+    if(post != null && post.id.equals(id)){
+      return post;
+    }
+    /* Load from disk */
     try{
-      JSON postData = JSON.build(path);
+      JSON postData = JSON.build(loc + "/" + id);
+      post = new Post();
       post.id = postData.get("id").value(null);
       post.user = auth.getUserById(postData.get("userid").value(null));
       try{
@@ -62,6 +73,7 @@ public class Post{
         post.creation >= 0   &&
         post.message != null
       ){
+        addPost(post);
         return post;
       }else{
         return null;
@@ -77,11 +89,12 @@ public class Post{
    * Write the post data to disk and update the relevant variables. Return NULL
    * if an issue occurs.
    *
-   * @param path The path for the user configuration.
+   * @param loc The location of the post.
+   * @param id The id for the post configuration.
    * @param post The post object to be written.
    * @return The post object, otherwise NULL.
    **/
-  public static Post writePost(String path, Post post){
+  public static Post writePost(String loc, String id, Post post){
     /* Save the post to disk */
     JSON data = null;
     try{
@@ -96,14 +109,15 @@ public class Post{
     }catch(Exception e){
       data = null;
     }
-    if(data != null && Data.write(path, data.toString())){
+    if(data != null && Data.write(loc + "/" + id, data.toString())){
       Utils.log("Post configuration saved " + post.id);
       /* TODO: Get length of post buffer from configuration. */
       /* Add to posts buffer */
-      if(posts.size() >= 16){
-        posts.remove(0);
+      if(recent.size() >= 16){
+        recent.remove(0);
       }
-      posts.add(post);
+      recent.add(post);
+      addPost(post);
       return post;
     }else{
       return null;
@@ -111,13 +125,47 @@ public class Post{
   }
 
   /**
-   * getPosts()
+   * addPost()
    *
-   * Get a list of the latest buffer.
+   * Add a post to the cache if it is not already added.
    *
-   * @return A clone of the latest buffer of posts.
+   * @param post The post to be added.
    **/
-  public static ArrayList<Post> getPosts(){
-    return (ArrayList<Post>)(posts.clone());
+  private static void addPost(Post post){
+    /* Check the post object is already in cache */
+    Post temp = idMap.get(post.id);
+    if(temp != null && temp == post){
+      return;
+    }
+    /* Make sure cache remains of reasonable size */
+    /* NOTE: We assume 1 post = 1kB, so 1 millions posts = 1GB */
+    /* TODO: Derive max cache from configuration. */
+    if(idMap.size() >= 1000000){
+      Object[] keys = idMap.keySet().toArray();
+      Utils.log("Need reduce cache, currently is " + keys.length);
+      /* Iterate through keys (this is expensive, do it rarely) */
+      /* TODO: Derive remove percentage from configuration. */
+      int removeNum = keys.length / 4;
+      int startPos = removeNum * (new Random(System.currentTimeMillis())).nextInt(4);
+      int endPos = startPos + removeNum;
+      endPos = endPos < keys.length ? endPos : keys.length;
+      for(int x = startPos; x < endPos; x++){
+        idMap.remove(keys[x]);
+      }
+      Utils.log("Cache reduced to " + idMap.size());
+    }
+    /* Update cache */
+    idMap.put(post.id, post);
+  }
+
+  /**
+   * getRecent()
+   *
+   * Get a list of the latest list of posts.
+   *
+   * @return A clone of the latest list of posts.
+   **/
+  public static ArrayList<Post> getRecent(){
+    return (ArrayList<Post>)(recent.clone());
   }
 }
