@@ -18,6 +18,7 @@ public class HandlerUser extends Handler{
   private Auth.User viewer;
   private Auth.User subject;
   private Auth auth;
+  private int page;
 
   /**
    * init()
@@ -54,11 +55,19 @@ public class HandlerUser extends Handler{
    * @param viewer The logged in user, otherwise NULL.
    * @param subject The user being viewed, otherwise NULL.
    * @param auth Access to the authentication object.
+   * @param page The page to be accessed.
    **/
-  public HandlerUser(HashMap<String, String> kv, Auth.User viewer, Auth.User subject, Auth auth){
+  public HandlerUser(
+    HashMap<String, String> kv,
+    Auth.User viewer,
+    Auth.User subject,
+    Auth auth,
+    int page
+  ){
     this.viewer = viewer;
     this.subject = subject;
     this.auth = auth;
+    this.page = page >= 0 ? page : 0;
   }
 
   @Override
@@ -75,13 +84,35 @@ public class HandlerUser extends Handler{
       /* Check for latest comment */
       if(subject.latest != null){
         Post post = Post.readPost(pstDir, subject.latest);
-        int postCount = 0;
         /* Begin loading posts */
-        while(++postCount <= len && post != null){
-          res = genPostEntry(res, post, auth);
+        int start = page * len;
+        int end = start + len;
+        for(int x = 0; x < end && post != null; x++){
+          if(x >= start){
+            res = genPostEntry(res, post, auth);
+          }
           post = Post.readPost(pstDir, post.previous);
         }
-        /* TODO: We should provide a link to find out more. */
+        /* Provide a link to find out more */
+        res.append("<h2>");
+        if(page > 0){
+          res.append("<a href=\"")
+            .append(sub).append(USER_SUB)
+            .append(subject.id).append("/")
+            .append(page - 1)
+            .append("\">prev</a>");
+        }
+        if(page > 0 && post != null){
+          res.append(" ");
+        }
+        if(post != null){
+          res.append("<a href=\"")
+            .append(sub).append(USER_SUB)
+            .append(subject.id).append("/")
+            .append(page + 1)
+            .append("\">next</a>");
+        }
+        res.append("</h2>");
       }
     }else{
       return error;

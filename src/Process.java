@@ -85,14 +85,14 @@ public class Process extends Thread{
     }
     /* Pass request onto handler */
     if(kv.containsKey("location")){
-      String loc = kv.get("location");
-      loc = loc.length() < subDirLen ? "" : loc.substring(subDirLen);
+      String[] loc = new String[]{ kv.get("location") };
+      loc[0] = loc[0].length() < subDirLen ? "" : loc[0].substring(subDirLen);
       /* Derive handler string */
-      String hand = loc;
+      String hand = loc[0];
       int z = hand.indexOf('/');
       if(z >= 0){
         hand = hand.substring(0, z);
-        loc = loc.substring(z + 1, loc.length());
+        loc = loc[0].substring(z + 1, loc[0].length()).split("/");
       }
       Handler h = new HandlerHome(kv, user, auth);
       Utils.logUnsafe("User requesting from location", hand);
@@ -125,14 +125,22 @@ public class Process extends Thread{
           write(s, h.genFoot());
           break;
         case "rss" :
-          h = new HandlerRSS(kv, user, auth.getUserById(loc));
+          h = new HandlerRSS(kv, user, auth.getUserById(loc[0]));
           writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
           write(s, h.genFoot());
           break;
         case "user" :
-          h = new HandlerUser(kv, user, auth.getUserById(loc), auth);
+          int page = 0;
+          if(loc.length > 1){
+            try{
+              page = Integer.parseInt(loc[1]);
+            }catch(NumberFormatException e){
+              page = 0;
+            }
+          }
+          h = new HandlerUser(kv, user, auth.getUserById(loc[0]), auth, page);
           writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
