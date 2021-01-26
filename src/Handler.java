@@ -6,9 +6,13 @@ package b.ds;
  * A basic interface for a specific page or function.
  **/
 public abstract class Handler{
+  public static final String USER_SUB = "user/";
+
   public static String title;
   public static String url;
   public static String sub;
+  public static String pstDir;
+  public static String usrDir;
 
   private static byte[] mime;
   private static String head;
@@ -28,13 +32,14 @@ public abstract class Handler{
     title = config.get("title").value("d3ad");
     url = config.get("url").value("127.0.0.1");
     sub = config.get("sub-dir").value("/");
+    pstDir = config.get("data").get("post-dir").value("dat/pst");
+    usrDir = config.get("data").get("user-dir").value("dat/usr");
     /* Setup private variables */
     mime = "Content-Type: text/html; charset=utf-8".getBytes();
     head =
       "<html>" +
         "<head>" +
           "<title>[" + title + "]</title>" +
-          /* TODO: Get CSS from configuration. */
           "<style>";
     for(int x = 0; x < config.get("html").get("css").length(); x++){
       head += config.get("html").get("css").get(x).value("");
@@ -74,7 +79,7 @@ public abstract class Handler{
       .append("<h1>")
       .append(  "<a href=\"").append(sub).append("\">").append(title).append("</a> social ")
       .append(    "<a href=\"").append(sub)
-      .append(    (user == null ? "login\">login" : "user/" + user.id + "\">@" + user.username))
+      .append(    (user == null ? "login\">login" : USER_SUB + user.id + "\">@" + user.username))
       .append(  "</a>")
       .append("</h1>")
     ).toString().getBytes();

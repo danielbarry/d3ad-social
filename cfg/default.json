@@ -11,12 +11,17 @@
       "a{color:#888;}a:before{content:\"[\"}a:after{content:\"]\"}",
       "form,p{background-color:#333;margin:auto;max-width:640px;padding:4px;}",
       "quote{background-color:#FFF;color:#222;display:block;}"
-    ]
+    ],
+    "length": "16"
   },
   "name": "d3ad",
   "port": "8080",
   "rec-buff-size": "2048",
   "reuse-addr": "false",
+  "rss": {
+    "length": "8",
+    "ttl-mins": "30"
+  },
   "security": {
     "salt": "",
     "token-timeout-ms": "86400000"

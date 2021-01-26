@@ -11,6 +11,7 @@ import java.util.HashMap;
  * Generate a generic user page.
  **/
 public class HandlerUser extends Handler{
+  private static int len;
   private static byte[] error;
 
   private Auth.User viewer;
@@ -26,6 +27,14 @@ public class HandlerUser extends Handler{
    * header.
    **/
   public static void init(JSON config){
+    /* Pull values from configuration */
+    len = 16;
+    try{
+      len = Integer.parseInt(config.get("html").get("length").value(len + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find length value");
+    }
+    /* Pre-generate known strings */
     error = "<b>Invalid user</b>".getBytes();
   }
 
@@ -58,14 +67,12 @@ public class HandlerUser extends Handler{
       res = genPostForm(res, viewer);
       /* Check for latest comment */
       if(subject.latest != null){
-        /* TODO: Get path from configuration. */
-        Post post = Post.readPost("dat/pst", subject.latest);
+        Post post = Post.readPost(pstDir, subject.latest);
         int postCount = 0;
-        /* TODO: Get length from configuration. */
         /* Begin loading posts */
-        while(++postCount <= 16 && post != null){
+        while(++postCount <= len && post != null){
           res = genPostEntry(res, post, auth);
-          post = Post.readPost("dat/pst", post.previous);
+          post = Post.readPost(pstDir, post.previous);
         }
         /* TODO: We should provide a link to find out more. */
       }
@@ -87,7 +94,7 @@ public class HandlerUser extends Handler{
   public static StringBuilder genPostForm(StringBuilder sb, Auth.User viewer){
     if(viewer != null){
       return sb
-        .append("<form action=\"").append(sub).append("user/").append(viewer.id)
+        .append("<form action=\"").append(sub).append(USER_SUB).append(viewer.id)
           .append("\" method=\"post\">")
         .append(  "<textarea")
         .append(    " id=\"post\"")
@@ -117,7 +124,7 @@ public class HandlerUser extends Handler{
   public static StringBuilder genPostEntry(StringBuilder sb, Post post, Auth auth){
     return sb
       .append("<p>")
-      .append(  "<b><a href=\"").append(sub).append("user/")
+      .append(  "<b><a href=\"").append(sub).append(USER_SUB)
         .append(post.user.id).append("\">@").append(post.user.username)
       .append(  "</a></b> on ").append(new Date(post.creation))
         .append(" said:")
@@ -151,7 +158,7 @@ public class HandlerUser extends Handler{
           case '@' :
             Auth.User user = auth.getUserByName(p[x].substring(1));
             if(user != null){
-              r.append("<a href=\"").append(sub).append("user/")
+              r.append("<a href=\"").append(sub).append(USER_SUB)
                 .append(user.id).append("\">@").append(user.username)
                 .append("</a>");
             }else{

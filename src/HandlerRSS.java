@@ -9,6 +9,8 @@ import java.util.HashMap;
  * Generate a generic RSS reply.
  **/
 public class HandlerRSS extends Handler{
+  private static int len;
+  private static int ttl;
   private static byte[] mime;
   private static byte[] head;
   private static byte[] foot;
@@ -25,6 +27,20 @@ public class HandlerRSS extends Handler{
    * header.
    **/
   public static void init(JSON config){
+    /* Pull values from configuration */
+    len = 8;
+    try{
+      len = Integer.parseInt(config.get("rss").get("length").value(len + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find length value");
+    }
+    ttl = 30;
+    try{
+      ttl = Integer.parseInt(config.get("rss").get("ttl-mins").value(ttl + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find ttl value");
+    }
+    /* Pre-generate known strings */
     mime = "Content-Type: application/xml".getBytes();
     head = (
       "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" +
@@ -32,8 +48,7 @@ public class HandlerRSS extends Handler{
       "<channel>" +
         "<title>[" + title + "]</title>" +
         "<link>" + url + sub + "</link>" +
-        /* TODO: Get this value from the configuration. */
-        "<ttl>" + 30 + "</ttl>"
+        "<ttl>" + ttl + "</ttl>"
     ).getBytes();
     foot = (
       "</channel>" +
@@ -72,19 +87,17 @@ public class HandlerRSS extends Handler{
     if(subject != null){
       /* Check for latest comment */
       if(subject.latest != null){
-        /* TODO: Get path from configuration. */
-        Post post = Post.readPost("dat/pst", subject.latest);
+        Post post = Post.readPost(pstDir, subject.latest);
         int postCount = 0;
-        /* TODO: Get length from configuration. */
         /* Begin loading posts */
-        while(++postCount <= 8 && post != null){
+        while(++postCount <= len && post != null){
           res
             .append("<item>")
             .append(  "<title>").append(subject.username).append("</title>")
-            .append(  "<link>").append(url).append(sub).append("user/").append(subject.id).append("</link>")
+            .append(  "<link>").append(url).append(sub).append(USER_SUB).append(subject.id).append("</link>")
             .append(  "<description>").append(post.message).append("</description>")
             .append("</item>");
-          post = Post.readPost("dat/pst", post.previous);
+          post = Post.readPost(pstDir, post.previous);
         }
       }
     }

@@ -26,6 +26,8 @@ public class Process extends Thread{
   private int recBuffSize;
   private int subDirLen;
   private Auth auth;
+  private String pstDir;
+  private String usrDir;
 
   /**
    * Process()
@@ -37,13 +39,25 @@ public class Process extends Thread{
    * @param recBuffSize The receiver buffer size.
    * @param subDirLen The subdirectory length.
    * @param auth Access to the authentication mechanism.
+   * @param pstDir The post directory.
+   * @param usrDir The user directory.
    **/
-  public Process(Socket socket, long start, int recBuffSize, int subDirLen, Auth auth){
+  public Process(
+    Socket socket,
+    long start,
+    int recBuffSize,
+    int subDirLen,
+    Auth auth,
+    String pstDir,
+    String usrDir
+  ){
     this.s = socket;
     this.start = start;
     this.recBuffSize = recBuffSize;
     this.subDirLen = subDirLen;
     this.auth = auth;
+    this.pstDir = pstDir;
+    this.usrDir = usrDir;
   }
 
   /**
@@ -65,7 +79,7 @@ public class Process extends Thread{
     /* Authenticate (if required) */
     Auth.User user = parseAuth(kv, auth);
     /* Handle user POST */
-    if(!parsePost(kv, user)){
+    if(!parsePost(kv, user, pstDir, usrDir)){
       /* Delete location to force a bad message */
       kv.remove("location");
     }
@@ -260,21 +274,25 @@ public class Process extends Thread{
    *
    * @param kv The key value mappings from the header.
    * @param user The authenticated user, otherwise NULL.
+   * @param pstDir The post directory.
+   * @param usrDir The user directory.
    * @return True if there are no errors to be reported, otherwise false.
    **/
-  private static boolean parsePost(HashMap<String, String> kv, Auth.User user){
+  private static boolean parsePost(
+    HashMap<String, String> kv,
+    Auth.User user,
+    String pstDir,
+    String usrDir
+  ){
     /* Make sure we handle a logged in user */
     if(user == null){
       return true;
     }
     /* Check if a post request was made */
     if(kv.containsKey("post")){
-      /* TODO: Get from configuration. */
-      String postDir = "dat/pst";
-      String userDir = "dat/usr";
       /* Create a post object */
       Post post = new Post();
-      while(Data.exists(postDir + "/" + (post.id = Utils.bytesToHex(Utils.genRandHash()))));
+      while(Data.exists(pstDir + "/" + (post.id = Utils.bytesToHex(Utils.genRandHash()))));
       post.user = user;
       post.creation = System.currentTimeMillis();
       post.previous = user.latest;
@@ -294,13 +312,13 @@ public class Process extends Thread{
       /* Sanitize the input */
       post.message = Utils.sanitizeString(post.message);
       /* Save post */
-      if(Post.writePost(postDir, post.id, post) != post){
+      if(Post.writePost(pstDir, post.id, post) != post){
         Utils.warn("Unable to save new post");
         return false;
       }
       /* Update user data */
       user.latest = post.id;
-      if(Auth.writeUser(userDir + "/" + user.id, user) != user){
+      if(Auth.writeUser(usrDir + "/" + user.id, user) != user){
         Utils.warn("Unable to save updated user");
         return false;
       }

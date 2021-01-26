@@ -16,6 +16,8 @@ public class Server extends Thread{
   private ServerSocket ss;
   private int recBuffSize;
   private int subDirLen;
+  private String pstDir;
+  private String usrDir;
 
   /**
    * Server()
@@ -31,6 +33,8 @@ public class Server extends Thread{
     recBuffSize = 2048;
     String subDir = "/";
     subDirLen = 1;
+    pstDir = "dat/pst";
+    usrDir = "dat/usr";
     boolean reuseAddr = false;
     int timeout = 10000;
     try{
@@ -55,6 +59,8 @@ public class Server extends Thread{
     }catch(NumberFormatException e){
       Utils.warn("Unable to find timeout value");
     }
+    pstDir = config.get("data").get("post-dir").value("dat/pst");
+    usrDir = config.get("data").get("user-dir").value("dat/usr");
     /* Log out server values */
     Utils.log("Requested port is '"                + port        + "'");
     Utils.log("Requested receive buffer size is '" + recBuffSize + "'");
@@ -124,7 +130,9 @@ public class Server extends Thread{
                 System.currentTimeMillis(),
                 recBuffSize,
                 subDirLen,
-                auth
+                auth,
+                pstDir,
+                usrDir
               )
             ).start();
           }catch(SocketTimeoutException ste){
