@@ -12,7 +12,8 @@
       "form,p{background-color:#333;margin:auto;max-width:640px;padding:4px;}",
       "quote{background-color:#FFF;color:#222;display:block;}"
     ],
-    "length": "16"
+    "length": "16",
+    "max-word-length": "40"
   },
   "name": "d3ad",
   "port": "8080",

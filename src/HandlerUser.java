@@ -12,6 +12,7 @@ import java.util.HashMap;
  **/
 public class HandlerUser extends Handler{
   private static int len;
+  private static int maxWordLen;
   private static byte[] error;
 
   private Auth.User viewer;
@@ -33,6 +34,12 @@ public class HandlerUser extends Handler{
       len = Integer.parseInt(config.get("html").get("length").value(len + ""));
     }catch(NumberFormatException e){
       Utils.warn("Unable to find length value");
+    }
+    maxWordLen = 40;
+    try{
+      maxWordLen = Integer.parseInt(config.get("html").get("max-word-length").value(maxWordLen + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find max word length value");
     }
     /* Pre-generate known strings */
     error = "<b>Invalid user</b>".getBytes();
@@ -195,9 +202,8 @@ public class HandlerUser extends Handler{
                   .replaceAll("&amp;", "&");
                 URL url = new URL(uStr);
                 String uName = uStr;
-                /* TODO: Get URL short length from configuration. */
-                if(uName.length() > 40){
-                  uName = uName.substring(0, 40);
+                if(uName.length() > maxWordLen){
+                  uName = uName.substring(0, maxWordLen);
                   uName += "..";
                 }
                 uName.replaceAll("&", "&amp;");
