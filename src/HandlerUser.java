@@ -18,7 +18,7 @@ public class HandlerUser extends Handler{
   private Auth.User viewer;
   private Auth.User subject;
   private Auth auth;
-  private int page;
+  private String postId;
 
   /**
    * init()
@@ -55,19 +55,19 @@ public class HandlerUser extends Handler{
    * @param viewer The logged in user, otherwise NULL.
    * @param subject The user being viewed, otherwise NULL.
    * @param auth Access to the authentication object.
-   * @param page The page to be accessed.
+   * @param postId The post to be displayed for this user.
    **/
   public HandlerUser(
     HashMap<String, String> kv,
     Auth.User viewer,
     Auth.User subject,
     Auth auth,
-    int page
+    String postId
   ){
     this.viewer = viewer;
     this.subject = subject;
     this.auth = auth;
-    this.page = page >= 0 ? page : 0;
+    this.postId = postId;
   }
 
   @Override
@@ -83,36 +83,28 @@ public class HandlerUser extends Handler{
       res = genPostForm(res, viewer);
       /* Check for latest comment */
       if(subject.latest != null){
-        Post post = Post.readPost(pstDir, subject.latest);
+        Post post = Post.readPost(
+          pstDir,
+          postId != null ? postId : subject.latest
+        );
+        /* Make sure this is a valid post to display for this user */
+        if(post == null || !post.user.id.equals(subject.id)){
+          return error;
+        }
+        int postCount = 0;
         /* Begin loading posts */
-        int start = page * len;
-        int end = start + len;
-        for(int x = 0; x < end && post != null; x++){
-          if(x >= start){
-            res = genPostEntry(res, post, auth);
-          }
+        while(++postCount <= len && post != null){
+          res = genPostEntry(res, post, auth);
           post = Post.readPost(pstDir, post.previous);
         }
         /* Provide a link to find out more */
-        res.append("<h2>");
-        if(page > 0){
-          res.append("<a href=\"")
+        if(post != null && post.previous != null){
+          res.append("<h2><a href=\"")
             .append(sub).append(USER_SUB)
             .append(subject.id).append("/")
-            .append(page - 1)
-            .append("\">prev</a>");
+            .append(post.id)
+            .append("\">more</a></h2>");
         }
-        if(page > 0 && post != null){
-          res.append(" ");
-        }
-        if(post != null){
-          res.append("<a href=\"")
-            .append(sub).append(USER_SUB)
-            .append(subject.id).append("/")
-            .append(page + 1)
-            .append("\">next</a>");
-        }
-        res.append("</h2>");
       }
     }else{
       return error;

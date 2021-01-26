@@ -132,15 +132,11 @@ public class Process extends Thread{
           write(s, h.genFoot());
           break;
         case "user" :
-          int page = 0;
+          String postId = null;
           if(loc.length > 1){
-            try{
-              page = Integer.parseInt(loc[1]);
-            }catch(NumberFormatException e){
-              page = 0;
-            }
+            postId = loc[1];
           }
-          h = new HandlerUser(kv, user, auth.getUserById(loc[0]), auth, page);
+          h = new HandlerUser(kv, user, auth.getUserById(loc[0]), auth, postId);
           writeHead(s, h.genMime(), user);
           write(s, h.genHead(user));
           write(s, h.genBody());
