@@ -72,7 +72,9 @@ public class HandlerUser extends Handler{
 
   @Override
   public byte[] genBody(){
-    StringBuilder res = new StringBuilder();
+    /* TODO: Better derivation of this value. */
+    /* NOTE: 1024 bytes (post) x number of posts, plus rough page overhead. */
+    StringBuilder res = new StringBuilder(1024 * (len + 1));
     /* Check if this is a valid page */
     if(subject != null){
       res
@@ -176,7 +178,9 @@ public class HandlerUser extends Handler{
    * @return The StringBuilder object generated.
    **/
   public static StringBuilder postProcessMessage(String m, Auth auth){
-    StringBuilder r = new StringBuilder();
+    /* TODO: Better derivation of this value. */
+    /* NOTE: 1024 bytes (post). */
+    StringBuilder r = new StringBuilder(1024);
     String[] p = m.split("\\s+");
     /* Process each part */
     int b = 0;

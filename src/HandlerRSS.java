@@ -82,7 +82,9 @@ public class HandlerRSS extends Handler{
 
   @Override
   public byte[] genBody(){
-    StringBuilder res = new StringBuilder();
+    /* TODO: Better derivation of this value. */
+    /* NOTE: 1024 bytes (post) x number of posts, plus rough page overhead. */
+    StringBuilder res = new StringBuilder(1024 * (len + 1));
     /* Check if this is a valid page */
     if(subject != null){
       /* Check for latest comment */
