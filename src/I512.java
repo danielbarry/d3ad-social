@@ -213,7 +213,19 @@ public final class I512 extends Number implements Comparable<I512>{
   }
 
   public static int compare(byte[] x, byte[] y){
-    return ((new BigInteger(x)).abs()).compareTo((new BigInteger(y)).abs());
+    if(x.length == MAX_ARR_LEN && y.length == MAX_ARR_LEN){
+      for(int i = 0; i < MAX_ARR_LEN; i += 4){
+        /* NOTE: Prevent too much branching by doing single op check */
+        int a = x[i] << 24 | x[i + 1] << 16 | x[i + 2] << 8 | x[i + 3];
+        int b = y[i] << 24 | y[i + 1] << 16 | y[i + 2] << 8 | y[i + 3];
+        if(a != b){
+          return a < b ? -1 : 1;
+        }
+      }
+      return 0;
+    }else{
+      return (new BigInteger(x)).compareTo(new BigInteger(y));
+    }
   }
 
 //  public static int highestOneBit(byte[] i){
