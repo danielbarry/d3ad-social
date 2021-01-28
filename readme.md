@@ -46,8 +46,7 @@ These items are yet to be completed:
 * [ ] Post cool-down (should take some seconds at least between posts)
 * [ ] Prevent double post (with something like refresh)
 * [ ] JSON parser should use a global HashMap to save on memory
-* [ ] Prepare StringBuilder with estimated size of output String
 
 ### Usability
 
-* [ ] Tagging over users should add the post to their timeline
+* [ ] Tagging other users should add the post to their timeline
