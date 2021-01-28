@@ -296,7 +296,7 @@ public class Process extends Thread{
     if(kv.containsKey("post")){
       /* Create a post object */
       Post post = new Post();
-      while(Data.exists(pstDir + "/" + (post.id = Utils.bytesToHex(Utils.genRandHash()))));
+      while(Data.exists(pstDir + "/" + (post.id = Utils.genRandHash())));
       post.user = user;
       post.creation = System.currentTimeMillis();
       post.previous = user.latest;
@@ -317,13 +317,13 @@ public class Process extends Thread{
       /* Sanitize the input */
       post.message = Utils.sanitizeString(post.message);
       /* Save post */
-      if(Post.writePost(pstDir, post.id, post) != post){
+      if(Post.writePost(pstDir, post.id.toString(), post) != post){
         Utils.warn("Unable to save new post");
         return false;
       }
       /* Update user data */
       user.latest = post.id;
-      if(Auth.writeUser(usrDir + "/" + user.id, user) != user){
+      if(Auth.writeUser(usrDir + "/" + user.id.toString(), user) != user){
         Utils.warn("Unable to save updated user");
         return false;
       }
@@ -348,7 +348,7 @@ public class Process extends Thread{
     if(user != null){
       write(s, HTTP_LINE);
       write(s, HTTP_COOK);
-      write(s, ("token=" + user.token).getBytes());
+      write(s, ("token=" + user.token.toString()).getBytes());
     }
     write(s, HTTP_LINE);
     write(s, HTTP_LINE);

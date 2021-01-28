@@ -79,7 +79,8 @@ public abstract class Handler{
       .append("<h1>")
       .append(  "<a href=\"").append(sub).append("\">").append(title).append("</a> social ")
       .append(    "<a href=\"").append(sub)
-      .append(    (user == null ? "login\">login" : USER_SUB + user.id + "\">@" + user.username))
+      .append(    (user == null ? "login\">login" : USER_SUB +
+        user.id.toString() + "\">@" + user.username))
       .append(  "</a>")
       .append("</h1>")
     ).toString().getBytes();

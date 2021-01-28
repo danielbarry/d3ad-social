@@ -11,17 +11,17 @@ import java.util.Random;
  **/
 public class Post{
   private static Auth auth;
-  private static HashMap<String, Post> idMap;
+  private static HashMap<I512, Post> idMap;
   private static ArrayList<Post> recent;
 
   /* Unique post ID */
-  public String id = null;
+  public I512 id = null;
   /* The user that created the post */
   public Auth.User user = null;
   /* The time the post was created */
   public long creation = -1;
   /* The previous post by the same user */
-  public String previous = null;
+  public I512 previous = null;
   /* The escaped (safe) message string */
   public String message = null;
 
@@ -34,7 +34,7 @@ public class Post{
    **/
   public static void init(Auth auth){
     Post.auth = auth;
-    idMap = new HashMap<String, Post>();
+    idMap = new HashMap<I512, Post>();
     recent = new ArrayList<Post>();
   }
 
@@ -49,23 +49,24 @@ public class Post{
    * @return The post object, otherwise NULL.
    **/
   public static Post readPost(String loc, String id){
+    I512 i = new I512(id);
     /* Try to load from cache */
-    Post post = idMap.get(id);
-    if(post != null && post.id.equals(id)){
+    Post post = idMap.get(i);
+    if(post != null && post.id.equals(i)){
       return post;
     }
     /* Load from disk */
     try{
       JSON postData = JSON.build(loc + "/" + id);
       post = new Post();
-      post.id = postData.get("id").value(null);
+      post.id = new I512(postData.get("id").value(null));
       post.user = auth.getUserById(postData.get("userid").value(null));
       try{
         post.creation = Long.parseLong(postData.get("creation").value(".."));
       }catch(NumberFormatException e){
         post.creation = -1;
       }
-      post.previous = postData.get("previous").value(null);
+      post.previous = new I512(postData.get("previous").value(null));
       post.message = postData.get("message").value(null);
       if(
         post.id != null      &&
@@ -79,6 +80,7 @@ public class Post{
         return null;
       }
     }catch(Exception e){
+      e.printStackTrace();
       return null;
     }
   }
@@ -99,11 +101,11 @@ public class Post{
     JSON data = null;
     try{
       data = new JSON(false);
-      data.set(new JSON("id", post.id));
-      data.set(new JSON("userid", post.user.id));
+      data.set(new JSON("id", post.id.toString()));
+      data.set(new JSON("userid", post.user.id.toString()));
       data.set(new JSON("creation", Long.toString(post.creation)));
       if(post.previous != null){
-        data.set(new JSON("previous", post.previous));
+        data.set(new JSON("previous", post.previous.toString()));
       }
       data.set(new JSON("message", post.message));
     }catch(Exception e){

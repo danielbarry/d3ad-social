@@ -89,7 +89,7 @@ public class HandlerRSS extends Handler{
     if(subject != null){
       /* Check for latest comment */
       if(subject.latest != null){
-        Post post = Post.readPost(pstDir, subject.latest);
+        Post post = Post.readPost(pstDir, subject.latest.toString());
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
@@ -99,7 +99,7 @@ public class HandlerRSS extends Handler{
             .append(  "<link>").append(url).append(sub).append(USER_SUB).append(subject.id).append("</link>")
             .append(  "<description>").append(post.message).append("</description>")
             .append("</item>");
-          post = Post.readPost(pstDir, post.previous);
+          post = Post.readPost(pstDir, post.previous.toString());
         }
       }
     }

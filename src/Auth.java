@@ -17,27 +17,27 @@ public class Auth{
    **/
   public class User{
     /* Unique user ID */
-    public String id = null;
+    public I512 id = null;
     /* Unique salt for the user */
-    public byte[] usalt = null;
-    /* The username the user has chosen (encrypted) */
+    public I512 usalt = null;
+    /* The username the user has chosen */
     public String username = null;
     /* The password the user has chosen (encrypted) */
-    public String password = null;
+    public I512 password = null;
     /* The current user token */
-    public String token = null;
+    public I512 token = null;
     /* The time at which the token comes invalid */
     public long revoke = -1;
     /* The latest post by this user */
-    public String latest = null;
+    public I512 latest = null;
   }
 
-  private static HashMap<String, User> idMap = new HashMap<String, User>();
+  private static HashMap<I512, User> idMap = new HashMap<I512, User>();
   private static HashMap<String, User> userMap = new HashMap<String, User>();
-  private static HashMap<String, User> tokenMap = new HashMap<String, User>();
+  private static HashMap<I512, User> tokenMap = new HashMap<I512, User>();
 
   private JSON config;
-  private byte[] salt;
+  private I512 salt;
   private String userDir;
   private long tokenTimeout;
 
@@ -50,7 +50,7 @@ public class Auth{
    **/
   public Auth(JSON config){
     this.config = config;
-    salt = Utils.hexToBytes(config.get("security").get("salt").value(""));
+    salt = new I512(config.get("security").get("salt").value("0"));
     userDir = config.get("data").get("user-dir").value("dat/usr");
     tokenTimeout = Long.parseLong(config.get("security").get("token-timeout-ms").value("86400000"));
     /* Read users from disk */
@@ -98,12 +98,12 @@ public class Auth{
     /* Create new user */
     User user = new User();
     /* Generate unique ID */
-    while(idMap.containsKey(user.id = Utils.bytesToHex(Utils.genRandHash())));
+    while(idMap.containsKey(user.id = Utils.genRandHash()));
     user.usalt = Utils.genRandHash();
     user.username = username;
     user.password = Utils.genPassHash(salt, user.usalt, passwordA);
     /* Generate unique token */
-    while(tokenMap.containsKey(user.token = Utils.bytesToHex(Utils.genRandHash())));
+    while(tokenMap.containsKey(user.token = Utils.genRandHash()));
     user.revoke = System.currentTimeMillis() + tokenTimeout;
     /* Save the user to disk */
     if(writeUser(userDir + "/" + user.id, user) != user){
@@ -131,15 +131,15 @@ public class Auth{
     /* Attempt to login the user */
     if(userMap.containsKey(username)){
       user = userMap.get(username);
-      password = Utils.genPassHash(salt, user.usalt, password);
+      I512 pwd = Utils.genPassHash(salt, user.usalt, password);
       /* Make sure for sure it's the right user and password */
-      if(user.username.equals(username) && user.password.equals(password)){
+      if(user.username.equals(username) && user.password.compareTo(pwd) == 0){
         /* Remove existing token if required */
         if(tokenMap.containsKey(user.token) && tokenMap.get(user.token).token == user.token){
           tokenMap.remove(user.token);
         }
         /* Generate a unique token and update revoke deadline */
-        while(tokenMap.containsKey(user.token = Utils.bytesToHex(Utils.genRandHash())));
+        while(tokenMap.containsKey(user.token = Utils.genRandHash()));
         user.revoke = System.currentTimeMillis() + tokenTimeout;
         tokenMap.put(user.token, user);
       }else{
@@ -162,11 +162,12 @@ public class Auth{
     if(token == null){
       return null;
     }
+    I512 t = new I512(token);
     /* Check that we do have a token */
-    if(tokenMap.containsKey(token)){
-      User user = tokenMap.get(token);
+    if(tokenMap.containsKey(t)){
+      User user = tokenMap.get(t);
       /* Make sure it is for sure a token match and not just a hash match */
-      if(user.token != null && token.equals(user.token)){
+      if(user.token != null && t.equals(user.token)){
         /* Make sure the token is not timed out */
         if(System.currentTimeMillis() <= user.revoke){
           return user;
@@ -189,11 +190,12 @@ public class Auth{
     if(id == null){
       return null;
     }
+    I512 i = new I512(id);
     /* Check for user String */
-    if(idMap.containsKey(id)){
-      User user = idMap.get(id);
+    if(idMap.containsKey(i)){
+      User user = idMap.get(i);
       /* Make sure it really was a match */
-      if(user.id.equals(id)){
+      if(user.id.equals(i)){
         return user;
       }
     }
@@ -237,19 +239,19 @@ public class Auth{
   public static User readUser(String path, User user){
     try{
       JSON userData = JSON.build(path);
-      user.id = userData.get("id").value(null);
-      String usalt = userData.get("usalt").value(null);
-      if(usalt != null){
-        user.usalt = Utils.hexToBytes(usalt);
-      }else{
+      user.id = new I512(userData.get("id").value(null));
+      user.usalt = null;
+      try{
+        user.usalt = new I512(userData.get("usalt").value(null));
+      }catch(NumberFormatException e){
         Utils.warn("Failed to read user's salt from configuration");
         return null;
       }
       user.username = userData.get("username").value(null);
-      user.password = userData.get("password").value(null);
+      user.password = new I512(userData.get("password").value(null));
       user.token = null;
       user.revoke = System.currentTimeMillis();
-      user.latest = userData.get("latest").value(null);
+      user.latest = new I512(userData.get("latest").value(null));
       if(
         user.id != null       &&
         user.usalt != null    &&
@@ -282,14 +284,14 @@ public class Auth{
     JSON data = null;
     try{
       data = new JSON(false);
-      data.set(new JSON("id", user.id));
-      data.set(new JSON("usalt", Utils.bytesToHex(user.usalt)));
+      data.set(new JSON("id", user.id.toString()));
+      data.set(new JSON("usalt", user.usalt.toString()));
       data.set(new JSON("username", user.username));
-      data.set(new JSON("password", user.password));
+      data.set(new JSON("password", user.password.toString()));
       /* NOTE: Do not store token. */
       /* NOTE: Do not store revoke. */
       if(user.latest != null){
-        data.set(new JSON("latest", user.latest));
+        data.set(new JSON("latest", user.latest.toString()));
       }
     }catch(Exception e){
       data = null;

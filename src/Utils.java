@@ -161,11 +161,11 @@ public class Utils{
    *
    * @return The securely random hash.
    **/
-  public static byte[] genRandHash(){
+  public static I512 genRandHash(){
     SecureRandom sr = new SecureRandom();
     byte[] hash = new byte[64];
     sr.nextBytes(hash);
-    return hash;
+    return new I512(hash);
   }
 
   /**
@@ -179,62 +179,18 @@ public class Utils{
    * @return The securely hashed password. If something goes wrong, either it
    * will crash the entire program (for security) or return a NULL value.
    **/
-  public static String genPassHash(byte[] salt, byte[] usalt, String password){
-    String hash = null;
+  public static I512 genPassHash(I512 salt, I512 usalt, String password){
+    I512 hash = null;
     try{
       MessageDigest md = MessageDigest.getInstance("SHA-512");
-      md.update(salt);
-      md.update(usalt);
-      byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
-      hash = bytesToHex(bytes);
+      md.update(salt.toByteArray());
+      md.update(usalt.toByteArray());
+      hash = new I512(md.digest(password.getBytes(StandardCharsets.UTF_8)));
     }catch(NoSuchAlgorithmException e){
       error("Unable to hash password");
       hash = null;
     }
     return hash;
-  }
-
-  /**
-   * bytesToHex()
-   *
-   * Encode a byte array as hex String.
-   *
-   * @param b The bytes array to be encoded.
-   * @return The encoded hex String.
-   **/
-  public static String bytesToHex(byte[] b){
-    char[] s = new char[2 * b.length];
-    int i = 0;
-    for(int x = 0; x < b.length; x++){
-      s[i++] = HEX[(0xF0 & b[x]) >>> 4];
-      s[i++] = HEX[(0x0F & b[x])      ];
-    }
-    return new String(s);
-  }
-
-  /**
-   * hexToBytes()
-   *
-   * Decode a hex String as a byte array.
-   *
-   * @param cs The string to be decoded.
-   * @return The decoded byte array.
-   **/
-  public static byte[] hexToBytes(CharSequence cs){
-    int nChars = cs.length();
-    if(nChars % 2 != 0){
-      Utils.warn("Invalid String length for decoding");
-    }
-    byte[] result = new byte[nChars / 2];
-    for(int i = 0; i < nChars; i += 2){
-      int msb = Character.digit(cs.charAt(i), 16);
-      int lsb = Character.digit(cs.charAt(i + 1), 16);
-      if(msb < 0 || lsb < 0){
-        Utils.warn("Non hexadecimal character encountered, unknown results");
-      }
-      result[i / 2] = (byte) ((msb << 4) | lsb);
-    }
-    return result;
   }
 
   /**

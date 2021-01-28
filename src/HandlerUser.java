@@ -87,7 +87,7 @@ public class HandlerUser extends Handler{
       if(subject.latest != null){
         Post post = Post.readPost(
           pstDir,
-          postId != null ? postId : subject.latest
+          postId != null ? postId : subject.latest.toString()
         );
         /* Make sure this is a valid post to display for this user */
         if(post == null || !post.user.id.equals(subject.id)){
@@ -97,7 +97,7 @@ public class HandlerUser extends Handler{
         /* Begin loading posts */
         while(++postCount <= len && post != null){
           res = genPostEntry(res, post, auth);
-          post = Post.readPost(pstDir, post.previous);
+          post = Post.readPost(pstDir, post.previous.toString());
         }
         /* Provide a link to find out more */
         if(post != null && post.previous != null){
@@ -158,7 +158,7 @@ public class HandlerUser extends Handler{
     return sb
       .append("<p>")
       .append(  "<b><a href=\"").append(sub).append(USER_SUB)
-        .append(post.user.id).append("\">@").append(post.user.username)
+        .append(post.user.id.toString()).append("\">@").append(post.user.username)
       .append(  "</a></b> on ").append(new Date(post.creation))
         .append(" said:")
       .append(  "<br>")
