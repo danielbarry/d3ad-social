@@ -306,6 +306,7 @@ public class Process extends Thread{
         return false;
       }
       /* Validate the input */
+      /* TODO: Get length limit from configuration. */
       if(
         post.message == null       ||
         post.message.length() <= 0 ||

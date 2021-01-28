@@ -131,6 +131,7 @@ public class HandlerUser extends Handler{
         .append(    " name=\"post\"")
         .append(    " cols=\"64\"")
         .append(    " rows=\"8\"")
+        /* TODO: Get length limit from configuration. */
         .append(    " maxlength=\"512\"")
         .append(    " placeholder=\"What do you think? (max 512 characters)\"")
         .append(  "></textarea>")
