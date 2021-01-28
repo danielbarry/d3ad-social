@@ -24,7 +24,7 @@ public class Utils{
 
   private static BufferedWriter bw;
   private static Lock logLock;
-  private static StringBuilder diskBuff = new StringBuilder();
+  private static StringBuilder diskBuff = new StringBuilder(DISK_BUFF_MAX + 1024);
 
   static{
     bw = null;
@@ -87,7 +87,7 @@ public class Utils{
         try{
           bw.append(diskBuff.toString());
           bw.flush();
-          diskBuff = new StringBuilder();
+          diskBuff = new StringBuilder(DISK_BUFF_MAX + 1024);
         }catch(IOException e){
           /* Don't log, we could end up in an infinite loop */
         }
