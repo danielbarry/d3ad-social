@@ -16,7 +16,7 @@ public final class I512 extends Number implements Comparable<I512>{
 
   private static final int MAX_ARR_LEN = 64;
 
-  private byte[] val = new byte[64];
+  private byte[] val = new byte[MAX_ARR_LEN];
 
   /**
    * I512()
@@ -26,11 +26,18 @@ public final class I512 extends Number implements Comparable<I512>{
    * @param value The value to be represented by the I512 object.
    **/
   public I512(byte[] value) throws NumberFormatException{
-    if(value == null || value.length > MAX_ARR_LEN){
+    /* NOTE: BigInteger adds an additional 0x00 to front of array. */
+    if(value == null || value.length > MAX_ARR_LEN + 1){
       throw new NumberFormatException("Unable to create I512 from supplied value");
     }else{
-      /* Copy array into lower bytes */
-      System.arraycopy(value, 0, val, MAX_ARR_LEN - value.length, value.length);
+      int len = value.length <= MAX_ARR_LEN ? value.length : MAX_ARR_LEN;
+      if(value.length <= MAX_ARR_LEN){
+        /* Copy array into lower bytes */
+        System.arraycopy(value, 0, val, MAX_ARR_LEN - value.length, len);
+      }else{
+        /* Skip additional byte(s) */
+        System.arraycopy(value, value.length - MAX_ARR_LEN, val, 0, len);
+      }
     }
   }
 
@@ -40,16 +47,16 @@ public final class I512 extends Number implements Comparable<I512>{
    * Constructs a newly allocated Integer object that represents the byte[]
    * value indicated by the String parameter. The string is converted to an
    * byte[] value in exactly the manner used by the parseInt method for radix
-   * 10.
+   * 16.
    *
    * @param s The String to be converted to an I512.
    **/
   public I512(String s) throws NumberFormatException{
-    this(parseInt(s, 10));
+    this(parseInt(s, 16));
   }
 
   public static String toString(byte[] i, int radix){
-    return (new BigInteger(i)).toString(radix);
+    return ((new BigInteger(i)).abs()).toString(radix);
   }
 
   public static String toHexString(byte[] i){
@@ -69,7 +76,7 @@ public final class I512 extends Number implements Comparable<I512>{
   }
 
   public static byte[] parseInt(String s, int radix) throws NumberFormatException{
-    return (new BigInteger(s, radix)).toByteArray();
+    return ((new BigInteger(s, radix)).abs()).toByteArray();
   }
 
   public static byte[] parseInt(String s) throws NumberFormatException{
@@ -135,7 +142,7 @@ public final class I512 extends Number implements Comparable<I512>{
 
   @Override
   public String toString(){
-    return toString(val);
+    return toHexString(val);
   }
 
   @Override
@@ -173,7 +180,7 @@ public final class I512 extends Number implements Comparable<I512>{
   }
 
   public static int compare(byte[] x, byte[] y){
-    return (new BigInteger(x)).compareTo(new BigInteger(y));
+    return ((new BigInteger(x)).abs()).compareTo((new BigInteger(y)).abs());
   }
 
 //  public static int highestOneBit(byte[] i){
