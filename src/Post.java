@@ -69,9 +69,9 @@ public class Post{
       post.previous = new I512(postData.get("previous").value(null));
       post.message = postData.get("message").value(null);
       if(
-        post.id != null      &&
-        post.user != null    &&
-        post.creation >= 0   &&
+        post.id != null    &&
+        post.user != null  &&
+        post.creation >= 0 &&
         post.message != null
       ){
         addPost(post);
