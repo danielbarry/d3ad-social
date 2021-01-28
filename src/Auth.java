@@ -133,7 +133,7 @@ public class Auth{
       user = userMap.get(username);
       I512 pwd = Utils.genPassHash(salt, user.usalt, password);
       /* Make sure for sure it's the right user and password */
-      if(user.username.equals(username) && user.password.compareTo(pwd) == 0){
+      if(user.username.equals(username) && user.password.equals(pwd)){
         /* Remove existing token if required */
         if(tokenMap.containsKey(user.token) && tokenMap.get(user.token).token == user.token){
           tokenMap.remove(user.token);
