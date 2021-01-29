@@ -91,6 +91,7 @@ public class HandlerUser extends Handler{
         );
         /* Make sure this is a valid post to display for this user */
         if(post == null || !post.user.id.equals(subject.id)){
+          Utils.warn("Requested post under wrong user");
           return error;
         }
         int postCount = 0;
