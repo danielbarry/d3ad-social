@@ -40,12 +40,16 @@ These items are yet to be completed:
 
 * [ ] Login delay (prevent brute force approaches)
 * [ ] Use thread pool to handle clients to prevent memory exhaustion
+* [ ] Implement HashMap that is more robust to collisions.
 
 ### Performance
 
 * [ ] Post cool-down (should take some seconds at least between posts)
 * [ ] Prevent double post (with something like refresh)
-* [ ] JSON parser should use a global HashMap to save on memory
+* [ ] JSON parser should use a global HashMap to save on memory - this approach
+already failed once.
+* [ ] JSON set should offer the ability to add objects in the place of values
+* [ ] Use JSON data structure in RAM instead of classes for quicker saving, etc
 
 ### Usability
 
