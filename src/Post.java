@@ -77,9 +77,11 @@ public class Post{
         addPost(post);
         return post;
       }else{
+        Utils.warn("Failed to read post");
         return null;
       }
     }catch(Exception e){
+      Utils.warn("Exception thrown whilst trying to read post");
       return null;
     }
   }

@@ -262,9 +262,11 @@ public class Auth{
         userMap.put(user.username, user);
         return user;
       }else{
+        Utils.warn("Could not read user");
         return null;
       }
     }catch(Exception e){
+      Utils.warn("Exception throw whilst reading user");
       return null;
     }
   }
