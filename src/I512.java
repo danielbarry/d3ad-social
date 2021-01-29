@@ -14,7 +14,8 @@ public final class I512 extends Number implements Comparable<I512>{
   public static final int SIZE = 512;
 //  public static final Class<I512> TYPE;
 
-  private static final String ZERO_ARR_STR = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+  private static final char[] HEX =
+    {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
   private static final int MAX_ARR_LEN = 64;
 
   private byte[] val = new byte[MAX_ARR_LEN];
@@ -61,12 +62,13 @@ public final class I512 extends Number implements Comparable<I512>{
   }
 
   public static String toHexString(byte[] i){
-    String s = toString(i, 16);
-    if(s.length() >= MAX_ARR_LEN * 2){
-      return s;
-    }else{
-      return ZERO_ARR_STR.substring(0, MAX_ARR_LEN - s.length()) + s;
+    char[] s = new char[2 * i.length];
+    int z = 0;
+    for(int x = 0; x < i.length; x++){
+      s[z++] = HEX[(0xF0 & i[x]) >>> 4];
+      s[z++] = HEX[(0x0F & i[x])      ];
     }
+    return new String(s);
   }
 
   public static String toOctalString(byte[] i){
