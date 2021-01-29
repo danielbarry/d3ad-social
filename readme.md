@@ -50,6 +50,7 @@ These items are yet to be completed:
 already failed once.
 * [ ] JSON set should offer the ability to add objects in the place of values
 * [ ] Use JSON data structure in RAM instead of classes for quicker saving, etc
+* [ ] Send output straight to socket instead of using StringBuilder
 
 ### Usability
 
