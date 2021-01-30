@@ -55,3 +55,6 @@ already failed once.
 ### Usability
 
 * [ ] Tagging other users should add the post to their timeline
+* [ ] Post edit button
+* [ ] Admin role moderation:
+  * [ ] Delete posts
