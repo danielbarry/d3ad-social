@@ -39,7 +39,6 @@ These items are yet to be completed:
 ### Security
 
 * [ ] Login delay (prevent brute force approaches)
-* [ ] Use thread pool to handle clients to prevent memory exhaustion
 * [ ] Implement HashMap that is more robust to collisions.
 
 ### Performance
@@ -50,7 +49,6 @@ These items are yet to be completed:
 already failed once.
 * [ ] JSON set should offer the ability to add objects in the place of values
 * [ ] Use JSON data structure in RAM instead of classes for quicker saving, etc
-* [ ] Send output straight to socket instead of using StringBuilder
 
 ### Usability
 
