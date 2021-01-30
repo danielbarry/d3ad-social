@@ -15,7 +15,7 @@ import java.util.HashMap;
  * This class is responsible for parsing the client and figuring out how it
  * should be handled.
  **/
-public class Process extends Thread{
+public class Process implements Runnable{
   private static final byte[] HTTP_LINE = "\r\n".getBytes();
   private static final byte[] HTTP_HEAD = "HTTP/1.1 200 OK".getBytes();
   private static final byte[] HTTP_TYPE = "Content-Type: text/html; charset=utf-8".getBytes();
