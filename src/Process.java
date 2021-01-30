@@ -2,6 +2,7 @@ package b.ds;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.URLDecoder;
@@ -84,77 +85,82 @@ public class Process extends Thread{
       kv.remove("location");
     }
     /* Pass request onto handler */
-    if(kv.containsKey("location")){
-      String[] loc = new String[]{ kv.get("location") };
-      loc[0] = loc[0].length() < subDirLen ? "" : loc[0].substring(subDirLen);
-      /* Derive handler string */
-      String hand = loc[0];
-      int z = hand.indexOf('/');
-      if(z >= 0){
-        hand = hand.substring(0, z);
-        loc = loc[0].substring(z + 1, loc[0].length()).split("/");
+    try{
+      OutputStream os = s.getOutputStream();
+      if(kv.containsKey("location")){
+        String[] loc = new String[]{ kv.get("location") };
+        loc[0] = loc[0].length() < subDirLen ? "" : loc[0].substring(subDirLen);
+        /* Derive handler string */
+        String hand = loc[0];
+        int z = hand.indexOf('/');
+        if(z >= 0){
+          hand = hand.substring(0, z);
+          loc = loc[0].substring(z + 1, loc[0].length()).split("/");
+        }
+        Handler h = new HandlerHome(kv, user, auth);
+        Utils.logUnsafe("User requesting from location", hand);
+        switch(hand){
+          case "" :
+          case "index" :
+          case "index.htm" :
+          case "index.html" :
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
+          case "login" :
+            if(user == null){
+              h = new HandlerLogin(kv);
+            }
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
+          case "register" :
+            if(user == null){
+              h = new HandlerRegister(kv);
+            }
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
+          case "rss" :
+            h = new HandlerRSS(kv, user, auth.getUserById(loc[0]));
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
+          case "user" :
+            String postId = null;
+            if(loc.length > 1){
+              postId = loc[1];
+            }
+            h = new HandlerUser(kv, user, auth.getUserById(loc[0]), auth, postId);
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
+          default :
+            writeHead(os, HTTP_TYPE, user);
+            writeBad(os);
+            Utils.log("Unable to process request from location");
+            break;
+        }
+      }else{
+        writeHead(os, HTTP_TYPE, user);
+        writeBad(os);
+        Utils.log("Unable to read header");
       }
-      Handler h = new HandlerHome(kv, user, auth);
-      Utils.logUnsafe("User requesting from location", hand);
-      switch(hand){
-        case "" :
-        case "index" :
-        case "index.htm" :
-        case "index.html" :
-          writeHead(s, h.genMime(), user);
-          write(s, h.genHead(user));
-          write(s, h.genBody());
-          write(s, h.genFoot());
-          break;
-        case "login" :
-          if(user == null){
-            h = new HandlerLogin(kv);
-          }
-          writeHead(s, h.genMime(), user);
-          write(s, h.genHead(user));
-          write(s, h.genBody());
-          write(s, h.genFoot());
-          break;
-        case "register" :
-          if(user == null){
-            h = new HandlerRegister(kv);
-          }
-          writeHead(s, h.genMime(), user);
-          write(s, h.genHead(user));
-          write(s, h.genBody());
-          write(s, h.genFoot());
-          break;
-        case "rss" :
-          h = new HandlerRSS(kv, user, auth.getUserById(loc[0]));
-          writeHead(s, h.genMime(), user);
-          write(s, h.genHead(user));
-          write(s, h.genBody());
-          write(s, h.genFoot());
-          break;
-        case "user" :
-          String postId = null;
-          if(loc.length > 1){
-            postId = loc[1];
-          }
-          h = new HandlerUser(kv, user, auth.getUserById(loc[0]), auth, postId);
-          writeHead(s, h.genMime(), user);
-          write(s, h.genHead(user));
-          write(s, h.genBody());
-          write(s, h.genFoot());
-          break;
-        default :
-          writeHead(s, HTTP_TYPE, user);
-          writeBad(s);
-          Utils.log("Unable to process request from location");
-          break;
-      }
-    }else{
-      writeHead(s, HTTP_TYPE, user);
-      writeBad(s);
-      Utils.log("Unable to read header");
+      /* Close the socket */
+      close(s);
+    }catch(IOException e){
+      Utils.warn("Failed to write to socket");
     }
-    /* Close the socket */
-    close(s);
     Utils.log("Process client ended after " + (System.currentTimeMillis() - start) + " ms");
   }
 
@@ -337,21 +343,21 @@ public class Process extends Thread{
    *
    * Pre-write the header for the client.
    *
-   * @param s The socket to be write.
+   * @param os The OutputStream to write the data to.
    * @param mime The mime byte array.
    * @param user A valid authorized user if one has been found.
    **/
-  private static void writeHead(Socket s, byte[] mime, Auth.User user){
-    write(s, HTTP_HEAD);
-    write(s, HTTP_LINE);
-    write(s, mime);
+  private static void writeHead(OutputStream os, byte[] mime, Auth.User user) throws IOException{
+    os.write(HTTP_HEAD);
+    os.write(HTTP_LINE);
+    os.write(mime);
     if(user != null){
-      write(s, HTTP_LINE);
-      write(s, HTTP_COOK);
-      write(s, ("token=" + user.token.toString()).getBytes());
+      os.write(HTTP_LINE);
+      os.write(HTTP_COOK);
+      os.write(("token=" + user.token.toString()).getBytes());
     }
-    write(s, HTTP_LINE);
-    write(s, HTTP_LINE);
+    os.write(HTTP_LINE);
+    os.write(HTTP_LINE);
   }
 
   /**
@@ -359,28 +365,10 @@ public class Process extends Thread{
    *
    * Write an error to the client.
    *
-   * @param s The socket to be write.
+   * @param os The OutputStream to write the data to.
    **/
-  private static void writeBad(Socket s){
-    write(s, HTTP_BAD);
-  }
-
-  /**
-   * write()
-   *
-   * Write to the client.
-   *
-   * @param s The socket to be write.
-   * @param b The bytes to be written.
-   **/
-  private static void write(Socket s, byte[] b){
-    if(s != null){
-      try{
-        s.getOutputStream().write(b);
-      }catch(IOException e){
-        /* Do nothing */
-      }
-    }
+  private static void writeBad(OutputStream os) throws IOException{
+    os.write(HTTP_BAD);
   }
 
   /**
@@ -390,15 +378,9 @@ public class Process extends Thread{
    *
    * @param s The socket to be write.
    **/
-  private static void close(Socket s){
-    if(s != null){
-      try{
-        s.getOutputStream().flush();
-        s.getOutputStream().close();
-        s.close();
-      }catch(IOException e){
-        /* Do nothing */
-      }
-    }
+  private static void close(Socket s) throws IOException{
+    s.getOutputStream().flush();
+    s.getOutputStream().close();
+    s.close();
   }
 }

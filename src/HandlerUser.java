@@ -1,5 +1,7 @@
 package b.ds;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
@@ -14,6 +16,7 @@ public class HandlerUser extends Handler{
   private static int len;
   private static int maxWordLen;
   private static byte[] error;
+  private static byte[] form;
 
   private Auth.User viewer;
   private Auth.User subject;
@@ -44,6 +47,20 @@ public class HandlerUser extends Handler{
     }
     /* Pre-generate known strings */
     error = "<b>Invalid user</b>".getBytes();
+    form = (
+        "<textarea" +
+          " id=\"post\"" +
+          " name=\"post\"" +
+          " cols=\"64\"" +
+          " rows=\"8\"" +
+          /* TODO: Get length limit from configuration. */
+          " maxlength=\"512\"" +
+          " placeholder=\"What do you think? (max 512 characters)\"" +
+        "></textarea>" +
+        "<br>" +
+        "<input type=\"submit\" value=\"submit\">" +
+      "</form>"
+    ).getBytes();
   }
 
   /**
@@ -71,18 +88,18 @@ public class HandlerUser extends Handler{
   }
 
   @Override
-  public byte[] genBody(){
-    /* TODO: Better derivation of this value. */
-    /* NOTE: 1024 bytes (post) x number of posts, plus rough page overhead. */
-    StringBuilder res = new StringBuilder(1024 * (len + 1));
+  public void genBody(OutputStream os) throws IOException{
     /* Check if this is a valid page */
     if(subject != null){
-      res
-        .append("<h2>").append(subject.username).append("'s posts <a href=\"")
-        .append(sub).append("rss/").append(subject.id)
-        .append("\">RSS</a></h2>");
+      os.write("<h2>".getBytes());
+      os.write(subject.username.getBytes());
+      os.write("'s posts <a href=\"".getBytes());
+      os.write(sub.getBytes());
+      os.write("rss/".getBytes());
+      os.write(subject.id.toString().getBytes());
+      os.write("\">RSS</a></h2>".getBytes());
       /* Generate post form */
-      res = genPostForm(res, viewer);
+      genPostForm(os, viewer);
       /* Check for latest comment */
       if(subject.latest != null){
         Post post = Post.readPost(
@@ -92,27 +109,29 @@ public class HandlerUser extends Handler{
         /* Make sure this is a valid post to display for this user */
         if(post == null || !post.user.id.equals(subject.id)){
           Utils.warn("Requested post under wrong user");
-          return error;
+          os.write(error);
+          return;
         }
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
-          res = genPostEntry(res, post, auth);
+          genPostEntry(os, post, auth);
           post = Post.readPost(pstDir, post.previous.toString());
         }
         /* Provide a link to find out more */
         if(post != null && post.previous != null){
-          res.append("<h2><a href=\"")
-            .append(sub).append(USER_SUB)
-            .append(subject.id).append("/")
-            .append(post.id)
-            .append("\">more</a></h2>");
+          os.write("<h2><a href=\"".getBytes());
+          os.write(sub.getBytes());
+          os.write(USER_SUB.getBytes());
+          os.write(subject.id.toString().getBytes());
+          os.write("/".getBytes());
+          os.write(post.id.toString().getBytes());
+          os.write("\">more</a></h2>".getBytes());
         }
       }
     }else{
-      return error;
+      os.write(error);
     }
-    return res.toString().getBytes();
   }
 
   /**
@@ -120,29 +139,18 @@ public class HandlerUser extends Handler{
    *
    * Generate a user post form to add messages if they are logged in.
    *
-   * @param sb The StringBuilder object to add the form data to.
+   * @param os The OutputStream to write the data to.
    * @param viewer The logged in viewer of the content, otherwise NULL.
-   * @return The generated form added to the StringBuilder objects.
    **/
-  public static StringBuilder genPostForm(StringBuilder sb, Auth.User viewer){
+  public static void genPostForm(OutputStream os, Auth.User viewer) throws IOException{
     if(viewer != null){
-      return sb
-        .append("<form action=\"").append(sub).append(USER_SUB).append(viewer.id)
-          .append("\" method=\"post\">")
-        .append(  "<textarea")
-        .append(    " id=\"post\"")
-        .append(    " name=\"post\"")
-        .append(    " cols=\"64\"")
-        .append(    " rows=\"8\"")
-        /* TODO: Get length limit from configuration. */
-        .append(    " maxlength=\"512\"")
-        .append(    " placeholder=\"What do you think? (max 512 characters)\"")
-        .append(  "></textarea>")
-        .append(  "<br>")
-        .append(  "<input type=\"submit\" value=\"submit\">")
-        .append("</form>");
+      os.write("<form action=\"".getBytes());
+        os.write(sub.getBytes());
+        os.write(USER_SUB.getBytes());
+        os.write(viewer.id.toString().getBytes());
+        os.write("\" method=\"post\">".getBytes());
+      os.write(form);
     }
-    return sb;
   }
 
   /**
@@ -150,22 +158,22 @@ public class HandlerUser extends Handler{
    *
    * Generate a formatted post entry.
    *
-   * @param sb The StringBuilder object to use for appending the content.
+   * @param os The OutputStream to write the data to.
    * @param post The post to be formatted.
    * @param auth Access to the authentication object.
-   * @return The formatted post appended to the StringBuilder object.
    **/
-  public static StringBuilder genPostEntry(StringBuilder sb, Post post, Auth auth){
-    return sb
-      .append("<p>")
-      .append(  "<b><a href=\"").append(sub).append(USER_SUB)
-        .append(post.user.id.toString()).append("\">@").append(post.user.username)
-      .append(  "</a></b> on ").append(new Date(post.creation))
-        .append(" said:")
-      .append(  "<br>")
-      .append(  "<quote>").append(HandlerUser.postProcessMessage(post.message, auth))
-        .append("</quote>")
-      .append("</p>");
+  public static void genPostEntry(OutputStream os, Post post, Auth auth) throws IOException{
+    os.write("<p><b><a href=\"".getBytes());
+      os.write(sub.getBytes());
+      os.write(USER_SUB.getBytes());
+      os.write(post.user.id.toString().getBytes());
+      os.write("\">@".getBytes());
+      os.write(post.user.username.getBytes());
+    os.write(  "</a></b> on ".getBytes());
+      os.write((new Date(post.creation)).toString().getBytes());
+      os.write(" said:<br><quote>".getBytes());
+    HandlerUser.postProcessMessage(os, post.message, auth);
+    os.write("</quote></p>".getBytes());
   }
 
   /**
@@ -174,14 +182,11 @@ public class HandlerUser extends Handler{
    * Post-process the message String just before being served up to add social
    * elements.
    *
+   * @param os The OutputStream to write the data to.
    * @param m The message to be formatted.
    * @param auth Access to the authentication object.
-   * @return The StringBuilder object generated.
    **/
-  public static StringBuilder postProcessMessage(String m, Auth auth){
-    /* TODO: Better derivation of this value. */
-    /* NOTE: 1024 bytes (post). */
-    StringBuilder r = new StringBuilder(1024);
+  public static void postProcessMessage(OutputStream os, String m, Auth auth) throws IOException{
     String[] p = m.split("\\s+");
     /* Process each part */
     int b = 0;
@@ -194,32 +199,36 @@ public class HandlerUser extends Handler{
           case '@' :
             Auth.User user = auth.getUserByName(p[x].substring(1));
             if(user != null){
-              r.append("<a href=\"").append(sub).append(USER_SUB)
-                .append(user.id).append("\">@").append(user.username)
-                .append("</a>");
+              os.write("<a href=\"".getBytes());
+                os.write(sub.getBytes());
+                os.write(USER_SUB.getBytes());
+                os.write(user.id.toString().getBytes());
+                os.write("\">@".getBytes());
+                os.write(user.username.getBytes());
+                os.write("</a>".getBytes());
             }else{
-              r.append(p[x]);
+              os.write(p[x].getBytes());
             }
             break;
           case '*' :
             if(b % 2 == 0){
-              r.append("<b>");
+              os.write("<b>".getBytes());
             }
             ++b;
-            r.append(p[x]);
+            os.write(p[x].getBytes());
             break;
           case '[' :
             u = true;
             break;
           default :
-            r.append(p[x]);
+            os.write(p[x].getBytes());
             break;
         }
         /* Process last character */
         switch(p[x].charAt(p[x].length() - 1)){
           case '*' :
             if(b % 2 == 1){
-              r.append("</b>");
+              os.write("</b>".getBytes());
             }
             ++b;
             break;
@@ -236,31 +245,33 @@ public class HandlerUser extends Handler{
                   uName += "..";
                 }
                 uName.replaceAll("&", "&amp;");
-                r.append("<a href=\"").append(uStr).append("\">").append(uName)
-                  .append("</a>");
+                os.write("<a href=\"".getBytes());
+                  os.write(uStr.getBytes());
+                  os.write("\">".getBytes());
+                  os.write(uName.getBytes());
+                  os.write("</a>".getBytes());
               }catch(MalformedURLException e){
-                r.append(p[x]);
+                os.write(p[x].getBytes());
               }
             }else{
-              r.append(p[x]);
+              os.write(p[x].getBytes());
             }
             break;
           default :
             /* If we never completed the URL, print what we have */
             if(u){
-              r.append(p[x]);
+              os.write(p[x].getBytes());
             }
             break;
         }
       }else{
-        r.append(p[x]);
+        os.write(p[x].getBytes());
       }
-      r.append(' ');
+      os.write(" ".getBytes());
     }
     /* Close off bold tag if not done */
     if(b % 2 == 1){
-      r.append("</b>");
+      os.write("</b>".getBytes());
     }
-    return r;
   }
 }

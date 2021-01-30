@@ -1,5 +1,8 @@
 package b.ds;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * Handler.java
  *
@@ -15,7 +18,7 @@ public abstract class Handler{
   public static String usrDir;
 
   private static byte[] mime;
-  private static String head;
+  private static byte[] head;
   private static byte[] error;
   private static byte[] foot;
 
@@ -36,18 +39,19 @@ public abstract class Handler{
     usrDir = config.get("data").get("user-dir").value("dat/usr");
     /* Setup private variables */
     mime = "Content-Type: text/html; charset=utf-8".getBytes();
-    head =
+    String h =
       "<html>" +
         "<head>" +
           "<title>[" + title + "]</title>" +
           "<style>";
     for(int x = 0; x < config.get("html").get("css").length(); x++){
-      head += config.get("html").get("css").get(x).value("");
+      h += config.get("html").get("css").get(x).value("");
     }
-    head +=
+    h +=
           "</style>" +
         "</head>" +
         "<body>";
+    head = h.getBytes();
     error = "<b>Error</b>".getBytes();
     foot = (
         "</body>" +
@@ -60,7 +64,7 @@ public abstract class Handler{
    *
    * Allow the mime return type to be overwritten.
    *
-   * @return The mine return string.
+   * @param os The mime type to be written.
    **/
   public byte[] genMime(){
     return mime;
@@ -71,19 +75,29 @@ public abstract class Handler{
    *
    * Generate the page header content.
    *
+   * @param os The OutputStream to write the data to.
    * @param user The logged in user, otherwise NULL.
-   * @return The bytes to be written to the client.
    **/
-  public byte[] genHead(Auth.User user){
-    return ((new StringBuilder(head))
-      .append("<h1>")
-      .append(  "<a href=\"").append(sub).append("\">").append(title).append("</a> social ")
-      .append(    "<a href=\"").append(sub)
-      .append(    (user == null ? "login\">login" : USER_SUB +
-        user.id.toString() + "\">@" + user.username))
-      .append(  "</a>")
-      .append("</h1>")
-    ).toString().getBytes();
+  public void genHead(OutputStream os, Auth.User user) throws IOException{
+    os.write(head);
+    os.write("<h1>".getBytes());
+    os.write(  "<a href=\"".getBytes());
+      os.write(sub.getBytes());
+      os.write("\">".getBytes());
+      os.write(title.getBytes());
+      os.write("</a> social ".getBytes());
+    os.write(    "<a href=\"".getBytes());
+      os.write(sub.getBytes());
+    if(user == null){
+      os.write(    "login\">login".getBytes());
+    }else{
+      os.write(    USER_SUB.getBytes());
+        os.write(user.id.toString().getBytes());
+        os.write("\">@".getBytes());
+        os.write(user.username.getBytes());
+    }
+    os.write(  "</a>".getBytes());
+    os.write("</h1>".getBytes());
   }
 
   /**
@@ -91,10 +105,10 @@ public abstract class Handler{
    *
    * Process the requirements of the handler.
    *
-   * @return The bytes to be written to the client.
+   * @param os The OutputStream to write the data to.
    **/
-  public byte[] genBody(){
-    return error;
+  public void genBody(OutputStream os) throws IOException{
+    os.write(error);
   }
 
   /**
@@ -102,9 +116,9 @@ public abstract class Handler{
    *
    * Generate the page footer content.
    *
-   * @return The bytes to be written to the client.
+   * @param os The OutputStream to write the data to.
    **/
-  public byte[] genFoot(){
-    return foot;
+  public void genFoot(OutputStream os) throws IOException{
+    os.write(foot);
   }
 }

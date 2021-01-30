@@ -1,5 +1,7 @@
 package b.ds;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 /**
@@ -48,7 +50,7 @@ public class HandlerLogin extends Handler{
   }
 
   @Override
-  public byte[] genBody(){
-    return form;
+  public void genBody(OutputStream os) throws IOException{
+    os.write(form);
   }
 }

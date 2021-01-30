@@ -1,5 +1,7 @@
 package b.ds;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -76,15 +78,12 @@ public class HandlerRSS extends Handler{
   }
 
   @Override
-  public byte[] genHead(Auth.User user){
-    return head;
+  public void genHead(OutputStream os, Auth.User user) throws IOException{
+    os.write(head);
   }
 
   @Override
-  public byte[] genBody(){
-    /* TODO: Better derivation of this value. */
-    /* NOTE: 1024 bytes (post) x number of posts, plus rough page overhead. */
-    StringBuilder res = new StringBuilder(1024 * (len + 1));
+  public void genBody(OutputStream os) throws IOException{
     /* Check if this is a valid page */
     if(subject != null){
       /* Check for latest comment */
@@ -93,21 +92,28 @@ public class HandlerRSS extends Handler{
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
-          res
-            .append("<item>")
-            .append(  "<title>").append(subject.username).append("</title>")
-            .append(  "<link>").append(url).append(sub).append(USER_SUB).append(subject.id).append("</link>")
-            .append(  "<description>").append(post.message).append("</description>")
-            .append("</item>");
+          os.write("<item>".getBytes());
+          os.write(  "<title>".getBytes());
+            os.write(subject.username.getBytes());
+            os.write("</title>".getBytes());
+          os.write(  "<link>".getBytes());
+            os.write(url.getBytes());
+            os.write(sub.getBytes());
+            os.write(USER_SUB.getBytes());
+            os.write(subject.id.toString().getBytes());
+            os.write("</link>".getBytes());
+          os.write(  "<description>".getBytes());
+            os.write(post.message.getBytes());
+            os.write("</description>".getBytes());
+          os.write("</item>".getBytes());
           post = Post.readPost(pstDir, post.previous.toString());
         }
       }
     }
-    return res.toString().getBytes();
   }
 
   @Override
-  public byte[] genFoot(){
-    return foot;
+  public void genFoot(OutputStream os) throws IOException{
+    os.write(foot);
   }
 }

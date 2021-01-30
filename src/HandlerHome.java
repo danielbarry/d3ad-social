@@ -1,5 +1,7 @@
 package b.ds;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,17 +42,16 @@ public class HandlerHome extends Handler{
   }
 
   @Override
-  public byte[] genBody(){
-    StringBuilder res = new StringBuilder("<h2>latest posts</h2>");
+  public void genBody(OutputStream os) throws IOException{
+    os.write("<h2>latest posts</h2>".getBytes());
     /* Generate post form */
-    HandlerUser.genPostForm(res, viewer);
+    HandlerUser.genPostForm(os, viewer);
     /* TODO: Show a more relevant page if user is logged in. */
     /* Grab latest list of posts */
     ArrayList<Post> posts = Post.getRecent();
     /* Begin loading posts from most recent (last) */
     for(int x = posts.size() - 1; x >= 0; x--){
-      res = HandlerUser.genPostEntry(res, posts.get(x), auth);
+      HandlerUser.genPostEntry(os, posts.get(x), auth);
     }
-    return res.toString().getBytes();
   }
 }
