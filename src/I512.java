@@ -14,6 +14,19 @@ public final class I512 extends Number implements Comparable<I512>{
   public static final int SIZE = 512;
 //  public static final Class<I512> TYPE;
 
+  private static final int STR_BYTE_LUT_OFF = 48;
+  private static final int[] STR_BYTE_LUT = new int[]{
+  /* 0  1  2  3  4  5  6  7  8  9 */
+     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+  /* :   ;   <   =   >   ?   @ */
+    -1, -1, -1, -1, -1, -1, -1,
+  /* A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z */
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+  /* [   \   ]   ^   _   ` */
+    -1, -1, -1, -1, -1, -1,
+  /* a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z */
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+  };
   private static final char[] HEX =
     {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
   private static final int MAX_ARR_LEN = 64;
@@ -84,7 +97,22 @@ public final class I512 extends Number implements Comparable<I512>{
   }
 
   public static byte[] parseInt(String s, int radix) throws NumberFormatException{
-    return ((new BigInteger(s, radix)).abs()).toByteArray();
+    /* Check if we can perform faster conversion */
+    switch(radix){
+      case 16 :
+        /* NOTE: We assume the length is correct and the format is simple. */
+        byte[] r = new byte[(s.length() / 2) + (s.length() % 2)];
+        int i = r.length - 1;
+        int z = 0;
+        int x = s.length();
+        while(--x >= 0){
+          r[i] |= (byte)(STR_BYTE_LUT[s.charAt(x) - STR_BYTE_LUT_OFF] << ((z % 2) << 2));
+          i -= z++ % 2;
+        }
+        return r;
+      default :
+        return ((new BigInteger(s, radix)).abs()).toByteArray();
+    }
   }
 
   public static byte[] parseInt(String s) throws NumberFormatException{
