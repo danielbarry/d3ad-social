@@ -9,10 +9,7 @@ import java.math.BigInteger;
  * purpose of storing hashes.
  **/
 public final class I512 extends Number implements Comparable<I512>{
-//  public static final byte[] MAX_VALUE = new byte[]{  };
-//  public static final byte[] MIN_VALUE = new byte[]{  };
   public static final int SIZE = 512;
-//  public static final Class<I512> TYPE;
 
   private static final int STR_BYTE_LUT_OFF = 48;
   private static final int[] STR_BYTE_LUT = new int[]{
@@ -227,22 +224,6 @@ public final class I512 extends Number implements Comparable<I512>{
         ==  (y[60] << 24 | y[61] << 16 | y[62] << 8 | y[63]));
   }
 
-//  public static I512 getInteger(String nm){
-//    return null; // TODO
-//  }
-
-//  public static I512 getInteger(String nm, byte[] val){
-//    return null; // TODO
-//  }
-
-//  public static I512 getInteger(String nm, I512 val){
-//    return null; // TODO
-//  }
-
-//  public static I512 decode(String nm) throws NumberFormatException{
-//    return null; // TODO
-//  }
-
   @Override
   public int compareTo(I512 anotherInteger){
     return compare(val, anotherInteger.toByteArray());
@@ -263,46 +244,6 @@ public final class I512 extends Number implements Comparable<I512>{
       return (new BigInteger(x)).compareTo(new BigInteger(y));
     }
   }
-
-//  public static int highestOneBit(byte[] i){
-//    return 0; // TODO
-//  }
-
-//  public static int lowestOneBit(byte[] i){
-//    return 0; // TODO
-//  }
-
-//  public static int numberOfLeadingZeros(byte[] i){
-//    return 0; // TODO
-//  }
-
-//  public static int numberOfTrailingZeros(byte[] i){
-//    return 0; // TODO
-//  }
-
-//  public static int bitCount(byte[] i){
-//    return 0; // TODO
-//  }
-
-//  public static int rotateLeft(byte[] i, int distance){
-//    return 0; // TODO
-//  }
-
-//  public static int rotateRight(byte[] i, int distance){
-//    return 0; // TODO
-//  }
-
-//  public static byte[] reverse(byte[] i){
-//    return null; // TODO
-//  }
-
-//  public static int signum(byte[] i){
-//    return 0; // TODO
-//  }
-
-//  public static byte[] reverseBytes(byte[] i){
-//    return null;
-//  }
 
   /**
    * toByteArray()
