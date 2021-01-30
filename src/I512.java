@@ -94,6 +94,17 @@ public final class I512 extends Number implements Comparable<I512>{
     return toString(i, 10);
   }
 
+  /**
+   * parseInt()
+   *
+   * Parse an integer from string to a byte array, with a given radix. Base 16
+   * hex conversion is sped up by avoiding branching. This function uses
+   * BigInteger for other conversions.
+   *
+   * @param s The string to be converted.
+   * @param radix The base to convert the string from.
+   * @return A byte array containing the converted data.
+   **/
   public static byte[] parseInt(String s, int radix) throws NumberFormatException{
     /* Check if we can perform faster conversion */
     switch(radix){
