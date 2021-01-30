@@ -91,16 +91,16 @@ public class HandlerUser extends Handler{
   public void genBody(OutputStream os) throws IOException{
     /* Check if this is a valid page */
     if(subject != null){
-      os.write((new StringBuilder("<h2>"))
+      Str res = (new Str(256))
+        .append("<h2>")
         .append(subject.username)
         .append("'s posts <a href=\"")
         .append(sub)
         .append("rss/")
         .append(subject.id.toString())
-        .append("\">RSS</a></h2>")
-      .toString().getBytes());
+        .append("\">RSS</a></h2>");
       /* Generate post form */
-      genPostForm(os, viewer);
+      res = genPostForm(res, viewer);
       /* Check for latest comment */
       if(subject.latest != null){
         Post post = Post.readPost(
@@ -116,21 +116,22 @@ public class HandlerUser extends Handler{
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
-          genPostEntry(os, post, auth);
+          res = genPostEntry(res, post, auth);
           post = Post.readPost(pstDir, post.previous.toString());
         }
         /* Provide a link to find out more */
         if(post != null && post.previous != null){
-          os.write((new StringBuilder("<h2><a href=\""))
+          res
+            .append("<h2><a href=\"")
             .append(sub)
             .append(USER_SUB)
             .append(subject.id.toString())
             .append("/")
             .append(post.id.toString())
-            .append("\">more</a></h2>")
-          .toString().getBytes());
+            .append("\">more</a></h2>");
         }
       }
+      os.write(res.toByteArray());
     }else{
       os.write(error);
     }
@@ -141,19 +142,20 @@ public class HandlerUser extends Handler{
    *
    * Generate a user post form to add messages if they are logged in.
    *
-   * @param os The OutputStream to write the data to.
+   * @param res The string building structure for this object.
    * @param viewer The logged in viewer of the content, otherwise NULL.
+   * @return The resulting string object.
    **/
-  public static void genPostForm(OutputStream os, Auth.User viewer) throws IOException{
+  public static Str genPostForm(Str res, Auth.User viewer) throws IOException{
     if(viewer != null){
-      os.write((new StringBuilder("<form action=\""))
+      res
+        .append("<form action=\"")
         .append(sub)
         .append(USER_SUB)
         .append(viewer.id.toString())
-        .append("\" method=\"post\">")
-      .toString().getBytes());
-      os.write(form);
+        .append("\" method=\"post\">");
     }
+    return res;
   }
 
   /**
@@ -161,12 +163,14 @@ public class HandlerUser extends Handler{
    *
    * Generate a formatted post entry.
    *
-   * @param os The OutputStream to write the data to.
+   * @param res The string building structure for this object.
    * @param post The post to be formatted.
    * @param auth Access to the authentication object.
+   * @return The resulting string object.
    **/
-  public static void genPostEntry(OutputStream os, Post post, Auth auth) throws IOException{
-    os.write((new StringBuilder("<p><b><a href=\""))
+  public static Str genPostEntry(Str res, Post post, Auth auth) throws IOException{
+    res
+      .append("<p><b><a href=\"")
       .append(sub)
       .append(USER_SUB)
       .append(post.user.id.toString())
@@ -174,10 +178,10 @@ public class HandlerUser extends Handler{
       .append(post.user.username)
       .append("</a></b> on ")
       .append((new Date(post.creation)).toString())
-      .append(" said:<br><quote>")
-    .toString().getBytes());
-    HandlerUser.postProcessMessage(os, post.message, auth);
-    os.write("</quote></p>".getBytes());
+      .append(" said:<br><quote>");
+    res = HandlerUser.postProcessMessage(res, post.message, auth);
+    res.append("</quote></p>");
+    return res;
   }
 
   /**
@@ -186,11 +190,12 @@ public class HandlerUser extends Handler{
    * Post-process the message String just before being served up to add social
    * elements.
    *
-   * @param os The OutputStream to write the data to.
+   * @param res The string building structure for this object.
    * @param m The message to be formatted.
    * @param auth Access to the authentication object.
+   * @return The resulting string object.
    **/
-  public static void postProcessMessage(OutputStream os, String m, Auth auth) throws IOException{
+  public static Str postProcessMessage(Str res, String m, Auth auth) throws IOException{
     String[] p = m.split("\\s+");
     /* Process each part */
     int b = 0;
@@ -203,37 +208,37 @@ public class HandlerUser extends Handler{
           case '@' :
             Auth.User user = auth.getUserByName(p[x].substring(1));
             if(user != null){
-              os.write((new StringBuilder("<a href=\""))
+              res
+                .append("<a href=\"")
                 .append(sub)
                 .append(USER_SUB)
                 .append(user.id.toString())
                 .append("\">@")
                 .append(user.username)
-                .append("</a>")
-              .toString().getBytes());
+                .append("</a>");
             }else{
-              os.write(p[x].getBytes());
+              res.append(p[x]);
             }
             break;
           case '*' :
             if(b % 2 == 0){
-              os.write("<b>".getBytes());
+              res.append("<b>");
             }
             ++b;
-            os.write(p[x].getBytes());
+            res.append(p[x]);
             break;
           case '[' :
             u = true;
             break;
           default :
-            os.write(p[x].getBytes());
+            res.append(p[x]);
             break;
         }
         /* Process last character */
         switch(p[x].charAt(p[x].length() - 1)){
           case '*' :
             if(b % 2 == 1){
-              os.write("</b>".getBytes());
+              res.append("</b>");
             }
             ++b;
             break;
@@ -250,34 +255,35 @@ public class HandlerUser extends Handler{
                   uName += "..";
                 }
                 uName.replaceAll("&", "&amp;");
-                os.write((new StringBuilder("<a href=\""))
+                res
+                  .append("<a href=\"")
                   .append(uStr)
                   .append("\">")
                   .append(uName)
-                  .append("</a>")
-                .toString().getBytes());
+                  .append("</a>");
               }catch(MalformedURLException e){
-                os.write(p[x].getBytes());
+                res.append(p[x]);
               }
             }else{
-              os.write(p[x].getBytes());
+              res.append(p[x]);
             }
             break;
           default :
             /* If we never completed the URL, print what we have */
             if(u){
-              os.write(p[x].getBytes());
+              res.append(p[x]);
             }
             break;
         }
       }else{
-        os.write(p[x].getBytes());
+        res.append(p[x]);
       }
-      os.write(" ".getBytes());
+      res.append(" ");
     }
     /* Close off bold tag if not done */
     if(b % 2 == 1){
-      os.write("</b>".getBytes());
+      res.append("</b>");
     }
+    return res;
   }
 }

@@ -91,8 +91,10 @@ public class HandlerRSS extends Handler{
         Post post = Post.readPost(pstDir, subject.latest.toString());
         int postCount = 0;
         /* Begin loading posts */
+        Str res = new Str(256);
         while(++postCount <= len && post != null){
-          os.write((new StringBuilder("<item>"))
+          res
+            .append("<item>")
               .append("<title>")
                 .append(subject.username)
               .append("</title>")
@@ -105,10 +107,10 @@ public class HandlerRSS extends Handler{
               .append("<description>")
                 .append(post.message)
               .append("</description>")
-            .append("</item>")
-          .toString().getBytes());
+            .append("</item>");
           post = Post.readPost(pstDir, post.previous.toString());
         }
+        os.write(res.toByteArray());
       }
     }
   }

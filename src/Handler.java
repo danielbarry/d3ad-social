@@ -79,25 +79,27 @@ public abstract class Handler{
    * @param user The logged in user, otherwise NULL.
    **/
   public void genHead(OutputStream os, Auth.User user) throws IOException{
+    Str res = new Str(32);
     os.write(head);
-    os.write((new StringBuilder("<h1><a href=\""))
+    res
+      .append("<h1><a href=\"")
       .append(sub)
       .append("\">")
       .append(title)
       .append("</a> social ")
       .append("<a href=\"")
-      .append(sub)
-    .toString().getBytes());
+      .append(sub);
     if(user == null){
-      os.write("login\">login".getBytes());
+      res.append("login\">login");
     }else{
-      os.write((new StringBuilder(USER_SUB))
+      res
+        .append(USER_SUB)
         .append(user.id.toString())
         .append("\">@")
-        .append(user.username)
-      .toString().getBytes());
+        .append(user.username);
     }
-    os.write("</a></h1>".getBytes());
+    res.append("</a></h1>");
+    os.write(res.toByteArray());
   }
 
   /**
