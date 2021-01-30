@@ -479,11 +479,40 @@ public final class I512 extends Number implements Comparable<I512>{
       }
     }
     compareCustom = System.currentTimeMillis() - compareCustom;
+    /* equals() - BigInteger */
+    long equalsBigInt = System.currentTimeMillis();
+    for(int x = 0; x < TARGET_RUNS; x++){
+      BigInteger ai = (new BigInteger(512, r)).abs();
+      I512 az = new I512(ai.toByteArray());
+      BigInteger bi = ai.flipBit(64);
+      I512 bz = new I512(bi.toByteArray());
+      if((ai.equals(bi))
+      ||!(ai.equals(ai))
+      ||!(bi.equals(bi))){
+        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+      }
+    }
+    equalsBigInt = System.currentTimeMillis() - equalsBigInt;
+    /* equals() - custom */
+    long equalsCustom = System.currentTimeMillis();
+    for(int x = 0; x < TARGET_RUNS; x++){
+      BigInteger ai = (new BigInteger(512, r)).abs();
+      I512 az = new I512(ai.toByteArray());
+      BigInteger bi = ai.flipBit(64);
+      I512 bz = new I512(bi.toByteArray());
+      if((az.equals(bz))
+      ||!(az.equals(az))
+      ||!(bz.equals(bz))){
+        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+      }
+    }
+    equalsCustom = System.currentTimeMillis() - equalsCustom;
     /* Print results */
     System.err.println("Default"      + "\t|" + "Custom"       + "\t|Description");
     System.err.println("--------"     +   "|" + "-------"      +   "|----------------");
     System.err.println(parseIntBigInt + "\t|" + parseIntCustom + "\t|parseInt()");
     System.err.println(compareBigInt  + "\t|" + compareCustom  + "\t|compare()");
+    System.err.println(equalsBigInt   + "\t|" + equalsCustom   + "\t|equals()");
     System.err.println("[[ FINISHED ]]");
   }
 }
