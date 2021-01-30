@@ -1,6 +1,7 @@
 package b.ds;
 
 import java.math.BigInteger;
+import java.util.Random;
 
 /**
  * I512.java
@@ -394,5 +395,68 @@ public final class I512 extends Number implements Comparable<I512>{
     System.err.println("Passed " + stats[1] + " out of " + stats[0] + " tests");
     System.err.println(stats[0] == stats[1] ? "[[ SUCCESS ]]" : "[[ FAILURE ]]");
     return stats[0] == stats[1];
+  }
+
+  /**
+   * perf()
+   *
+   * Check the performance of some key functions to ensure they are as fast as
+   * we believe they are.
+   **/
+  public static void perf(){
+    int TARGET_RUNS = 1000000;
+    Random r = new Random();
+    /* parseInt() - BigInteger */
+    long parseIntBigInt = System.currentTimeMillis();
+    for(int x = 0; x < TARGET_RUNS; x++){
+      BigInteger bi = (new BigInteger(512, r)).abs();
+      String bs = bi.toString(16);
+      byte[] a = ((new BigInteger(bs, 16)).abs()).toByteArray();
+      if(compare(a, bi.toByteArray()) != 0){
+        throw new NumberFormatException(toHexString(a) + " != " + bi.toString(16));
+      }
+    }
+    parseIntBigInt = System.currentTimeMillis() - parseIntBigInt;
+    /* parseInt() - custom */
+    long parseIntCustom = System.currentTimeMillis();
+    for(int x = 0; x < TARGET_RUNS; x++){
+      BigInteger bi = (new BigInteger(512, r)).abs();
+      String bs = bi.toString(16);
+      byte[] a = parseInt(bs, 16);
+      if(compare(a, bi.toByteArray()) != 0){
+        throw new NumberFormatException(toHexString(a) + " != " + bi.toString(16));
+      }
+    }
+    parseIntCustom = System.currentTimeMillis() - parseIntCustom;
+    /* compare() - BigInteger */
+    long compareBigInt = System.currentTimeMillis();
+    for(int x = 0; x < TARGET_RUNS; x++){
+      BigInteger ai = (new BigInteger(512, r)).abs();
+      BigInteger bi = (new BigInteger(512, r)).abs();
+      if((new BigInteger(ai.toByteArray())).compareTo(new BigInteger(bi.toByteArray())) == 0
+      || (new BigInteger(ai.toByteArray())).compareTo(new BigInteger(ai.toByteArray())) != 0
+      || (new BigInteger(bi.toByteArray())).compareTo(new BigInteger(bi.toByteArray())) != 0){
+        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+      }
+    }
+    compareBigInt = System.currentTimeMillis() - compareBigInt;
+    /* compare() - custom */
+    long compareCustom = System.currentTimeMillis();
+    for(int x = 0; x < TARGET_RUNS; x++){
+      BigInteger ai = (new BigInteger(512, r)).abs();
+      BigInteger bi = (new BigInteger(512, r)).abs();
+      if(compare(ai.toByteArray(), bi.toByteArray()) == 0
+      || compare(ai.toByteArray(), ai.toByteArray()) != 0
+      || compare(bi.toByteArray(), bi.toByteArray()) != 0){
+        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+      }
+    }
+    compareCustom = System.currentTimeMillis() - compareCustom;
+    /* Print results */
+    System.err.println("Default"      + "\t|" + "Custom"       + "\t|Description");
+    System.err.println("--------"     +   "|" + "-------"      +   "|----------------");
+    System.err.println(parseIntBigInt + "\t|" + parseIntCustom + "\t|parseInt()");
+    System.err.println(compareBigInt  + "\t|" + compareCustom  + "\t|compare()");
+    System.err.println("[[ FINISHED ]]");
   }
 }
