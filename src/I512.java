@@ -230,19 +230,42 @@ public final class I512 extends Number implements Comparable<I512>{
   }
 
   public static int compare(byte[] x, byte[] y){
-    if(x.length == MAX_ARR_LEN && y.length == MAX_ARR_LEN){
-      for(int i = 0; i < MAX_ARR_LEN; i += 4){
-        /* NOTE: Prevent too much branching by doing single op check */
-        int a = x[i] << 24 | x[i + 1] << 16 | x[i + 2] << 8 | x[i + 3];
-        int b = y[i] << 24 | y[i + 1] << 16 | y[i + 2] << 8 | y[i + 3];
-        if(a != b){
-          return a < b ? -1 : 1;
+    int sx = 0;
+    int sy = 0;
+    /* If one is larger than the other, make sure it starts with zeros */
+    if(x.length != y.length){
+      if(x.length > y.length){
+        while(sx < x.length - y.length){
+          if(x[sx++] != 0){
+            return 1;
+          }
+        }
+      }else{
+        while(sy < y.length - x.length){
+          if(y[sy++] != 0){
+            return -1;
+          }
         }
       }
-      return 0;
-    }else{
-      return (new BigInteger(x)).compareTo(new BigInteger(y));
     }
+    /* Check and align to four bytes */
+    while((x.length - sx) % 4 != 0 && sx < x.length){
+      if(x[sx] != y[sy]){
+        return x[sx] < y[sy] ? -1 : 1;
+      }
+      ++sx;
+      ++sy;
+    }
+    /* Now check aligned bulk */
+    while(sx < x.length){
+      /* NOTE: Prevent too much branching by doing single op check */
+      int a = x[sx++] << 24 | x[sx++] << 16 | x[sx++] << 8 | x[sx++];
+      int b = y[sy++] << 24 | y[sy++] << 16 | y[sy++] << 8 | y[sy++];
+      if(a != b){
+        return a < b ? -1 : 1;
+      }
+    }
+    return 0;
   }
 
   /**
