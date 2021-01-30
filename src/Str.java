@@ -150,8 +150,13 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
    * @param capacity The new value of the capacity.
    **/
   public void expand(int capacity){
+    /* Make sure it is actually expanding */
+    if(capacity < cap){
+      return;
+    }
+    /* Perform expansion */
     char[][] d = new char[capacity][];
-    System.arraycopy(d, 0, this.data, 0, cap);
+    System.arraycopy(data, 0, d, 0, idx);
     data = d;
     cap = capacity;
   }
