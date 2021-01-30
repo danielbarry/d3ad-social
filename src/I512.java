@@ -230,6 +230,18 @@ public final class I512 extends Number implements Comparable<I512>{
     return compare(val, anotherInteger.toByteArray());
   }
 
+  /**
+   * compare()
+   *
+   * Compare to byte arrays and determine if less than, equal or greater than
+   * one another. This function attempts to use alignment to speed-up searching
+   * by limiting checks branching.
+   *
+   * @param x The first array to be checked.
+   * @param y The second array to be checked.
+   * @return -1 if x is less than y, 0 is x is equal to y and 1 if x is greater
+   * than y.
+   **/
   public static int compare(byte[] x, byte[] y){
     int sx = 0;
     int sy = 0;
