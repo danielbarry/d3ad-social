@@ -91,7 +91,7 @@ public class HandlerUser extends Handler{
   public void genBody(OutputStream os) throws IOException{
     /* Check if this is a valid page */
     if(subject != null){
-      Str res = (new Str(256))
+      Str res = (new Str(512))
         .append("<h2>")
         .append(subject.username)
         .append("'s posts <a href=\"")
