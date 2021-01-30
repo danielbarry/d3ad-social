@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 /**
  * Str.java
  *
- * A super simple and fast string implementation.
+ * A super simple and fast string implementation. It assumes ASCII (7 bit
+ * characters) are used and makes uses of Java reflection to speed-up the
+ * retrieval of String data.
  **/
 public final class Str implements java.io.Serializable, Comparable<Str>, CharSequence{
   private static Field stringField;
