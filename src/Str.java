@@ -60,7 +60,8 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   public Str append(String s){
     /* Check capacity */
     if(idx >= cap){
-      throw new IndexOutOfBoundsException("Out of capacity");
+      System.err.println("Out of capacity, generating more");
+      expand(cap * 2);
     }
     /* Add the array */
     try{
@@ -76,7 +77,8 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   public Str append(char[] s){
     /* Check capacity */
     if(idx >= cap){
-      throw new IndexOutOfBoundsException("Out of capacity");
+      System.err.println("Out of capacity, generating more");
+      expand(cap * 2);
     }
     /* Add the array */
     data[idx] = s;
@@ -138,6 +140,20 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
       }
     }
     throw new IndexOutOfBoundsException("Index " + index + " is out of bounds!");
+  }
+
+  /**
+   * expand()
+   *
+   * Expand the capacity of the array to a new value.
+   *
+   * @param capacity The new value of the capacity.
+   **/
+  public void expand(int capacity){
+    char[][] d = new char[capacity][];
+    System.arraycopy(d, 0, this.data, 0, cap);
+    data = d;
+    cap = capacity;
   }
 
   /**
