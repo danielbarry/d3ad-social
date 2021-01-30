@@ -205,7 +205,7 @@ public final class I512 extends Number implements Comparable<I512>{
       return false;
     }
     byte[] x = val;
-    byte[] y = (I512)obj.toByteArray();
+    byte[] y = ((I512)obj).toByteArray();
     return ((x[ 0] << 24 | x[ 1] << 16 | x[ 2] << 8 | x[ 3])
         ==  (y[ 0] << 24 | y[ 1] << 16 | y[ 2] << 8 | y[ 3]))
         && ((x[ 4] << 24 | x[ 5] << 16 | x[ 6] << 8 | x[ 7])
