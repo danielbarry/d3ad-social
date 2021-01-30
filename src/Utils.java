@@ -19,10 +19,11 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 public class Utils{
   private static final int DISK_BUFF_MAX = 4096;
+  private static final int DISK_BUFF_CAP = DISK_BUFF_MAX / 32;
 
   private static BufferedWriter bw;
   private static Lock logLock;
-  private static StringBuilder diskBuff = new StringBuilder(DISK_BUFF_MAX + 1024);
+  private static Str diskBuff = new Str(DISK_BUFF_CAP);
 
   static{
     bw = null;
@@ -59,33 +60,35 @@ public class Utils{
    **/
   private static void write(String type, String msg, boolean force){
     StackTraceElement ste = Thread.currentThread().getStackTrace()[3];
-    StringBuilder sb = new StringBuilder("[");
-    sb.append(timestamp());
-    sb.append("] (");
-    sb.append(Thread.currentThread().getId());
-    sb.append(") ");
-    sb.append(ste.getClassName());
-    sb.append("->");
-    sb.append(ste.getMethodName());
-    sb.append("()::");
-    sb.append(ste.getLineNumber());
-    sb.append(" [");
-    sb.append(type);
-    sb.append("] ");
-    sb.append(msg);
-    sb.append(System.lineSeparator());
+    Str sb = (new Str(16))
+      .append("[")
+      .append(Long.toString(timestamp()))
+      .append("] (")
+      .append(Long.toString(Thread.currentThread().getId()))
+      .append(") ")
+      .append(ste.getClassName())
+      .append("->")
+      .append(ste.getMethodName())
+      .append("()::")
+      .append(Integer.toString(ste.getLineNumber()))
+      .append(" [")
+      .append(type)
+      .append("] ")
+      .append(msg)
+      .append(System.lineSeparator());
     logLock.lock();
     /* Write error stream so program output can be separated from logs */
-    System.err.print(sb.toString());
+    String s = sb.toString();
+    System.err.print(s);
     if(bw != null){
       /* Append to disk buffer */
-      diskBuff.append(sb);
+      diskBuff.append(s);
       /* Only write to disk if force or buffer is filled */
       if(force || diskBuff.length() > DISK_BUFF_MAX){
         try{
           bw.append(diskBuff.toString());
           bw.flush();
-          diskBuff = new StringBuilder(DISK_BUFF_MAX + 1024);
+          diskBuff = new Str(DISK_BUFF_CAP);
         }catch(IOException e){
           /* Don't log, we could end up in an infinite loop */
         }
