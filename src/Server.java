@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Server.java
@@ -14,6 +16,7 @@ public class Server extends Thread{
   private JSON config;
   private Auth auth;
   private ServerSocket ss;
+  private ExecutorService pool;
   private int recBuffSize;
   private int subDirLen;
   private String pstDir;
@@ -29,6 +32,7 @@ public class Server extends Thread{
   public Server(JSON config){
     this.config = config;
     this.auth = new Auth(config);
+    int poolSize = 8;
     int port = 8080;
     recBuffSize = 2048;
     String subDir = "/";
@@ -37,6 +41,11 @@ public class Server extends Thread{
     usrDir = "dat/usr";
     boolean reuseAddr = false;
     int timeout = 10000;
+    try{
+      poolSize = Integer.parseInt(config.get("pool-size").value(poolSize + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find pool size value");
+    }
     try{
       port = Integer.parseInt(config.get("port").value(port + ""));
     }catch(NumberFormatException e){
@@ -62,6 +71,7 @@ public class Server extends Thread{
     pstDir = config.get("data").get("post-dir").value("dat/pst");
     usrDir = config.get("data").get("user-dir").value("dat/usr");
     /* Log out server values */
+    Utils.log("Requested pool size is '"           + poolSize    + "'");
     Utils.log("Requested port is '"                + port        + "'");
     Utils.log("Requested receive buffer size is '" + recBuffSize + "'");
     Utils.log("Requested reuse address is '"       + reuseAddr   + "'");
@@ -96,6 +106,8 @@ public class Server extends Thread{
         Utils.warn("Unable to set timeout");
       }
     }
+    /* Setup thread pool */
+    pool = Executors.newFixedThreadPool(poolSize);
     /* Initialise shared variables */
     Post.init(auth);
     Handler.init(config);
@@ -124,7 +136,7 @@ public class Server extends Thread{
         /* Inner server main loop */
         for(;;){
           try{
-            (
+            pool.execute(
               new Process(
                 ss.accept(),
                 System.currentTimeMillis(),
@@ -134,7 +146,7 @@ public class Server extends Thread{
                 pstDir,
                 usrDir
               )
-            ).start();
+            );
           }catch(SocketTimeoutException ste){
             Utils.log("Socket timeout, client may have be disconnected");
           }
