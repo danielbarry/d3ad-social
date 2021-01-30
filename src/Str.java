@@ -60,7 +60,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   public Str append(String s){
     /* Check capacity */
     if(idx >= cap){
-      System.err.println("Out of capacity, generating more");
+      Utils.warn("Out of capacity, generating more");
       expand(cap * 2);
     }
     /* Add the array */
@@ -77,7 +77,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   public Str append(char[] s){
     /* Check capacity */
     if(idx >= cap){
-      System.err.println("Out of capacity, generating more");
+      Utils.warn("Out of capacity, generating more");
       expand(cap * 2);
     }
     /* Add the array */
