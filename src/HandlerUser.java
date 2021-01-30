@@ -16,7 +16,7 @@ public class HandlerUser extends Handler{
   private static int len;
   private static int maxWordLen;
   private static byte[] error;
-  private static byte[] form;
+  private static String form;
 
   private Auth.User viewer;
   private Auth.User subject;
@@ -60,7 +60,7 @@ public class HandlerUser extends Handler{
         "<br>" +
         "<input type=\"submit\" value=\"submit\">" +
       "</form>"
-    ).getBytes();
+    );
   }
 
   /**
@@ -153,7 +153,8 @@ public class HandlerUser extends Handler{
         .append(sub)
         .append(USER_SUB)
         .append(viewer.id.toString())
-        .append("\" method=\"post\">");
+        .append("\" method=\"post\">")
+        .append(form);
     }
     return res;
   }
