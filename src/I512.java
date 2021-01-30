@@ -163,13 +163,13 @@ public final class I512 extends Number implements Comparable<I512>{
 
   @Override
   public float floatValue(){
-    /* TODO: Possibly a bad conversion. */
-    return (float)intValue();
+    /* NOTE: Meaningless conversion anyway. */
+    return (float)longValue();
   }
 
   @Override
   public double doubleValue(){
-    /* TODO: Possibly a bad conversion. */
+    /* NOTE: Meaningless conversion anyway. */
     return (double)longValue();
   }
 
