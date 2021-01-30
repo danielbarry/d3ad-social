@@ -92,20 +92,22 @@ public class HandlerRSS extends Handler{
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
-          os.write("<item>".getBytes());
-          os.write(  "<title>".getBytes());
-            os.write(subject.username.getBytes());
-            os.write("</title>".getBytes());
-          os.write(  "<link>".getBytes());
-            os.write(url.getBytes());
-            os.write(sub.getBytes());
-            os.write(USER_SUB.getBytes());
-            os.write(subject.id.toString().getBytes());
-            os.write("</link>".getBytes());
-          os.write(  "<description>".getBytes());
-            os.write(post.message.getBytes());
-            os.write("</description>".getBytes());
-          os.write("</item>".getBytes());
+          os.write((
+            "<item>" +
+              "<title>" +
+                subject.username +
+              "</title>" +
+              "<link>" +
+                url +
+                sub +
+                USER_SUB +
+                subject.id.toString() +
+              "</link>" +
+              "<description>" +
+                post.message +
+              "</description>" +
+            "</item>"
+          ).getBytes());
           post = Post.readPost(pstDir, post.previous.toString());
         }
       }

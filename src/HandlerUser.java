@@ -91,13 +91,15 @@ public class HandlerUser extends Handler{
   public void genBody(OutputStream os) throws IOException{
     /* Check if this is a valid page */
     if(subject != null){
-      os.write("<h2>".getBytes());
-      os.write(subject.username.getBytes());
-      os.write("'s posts <a href=\"".getBytes());
-      os.write(sub.getBytes());
-      os.write("rss/".getBytes());
-      os.write(subject.id.toString().getBytes());
-      os.write("\">RSS</a></h2>".getBytes());
+      os.write((
+        "<h2>" +
+        subject.username +
+        "'s posts <a href=\"" +
+        sub +
+        "rss/" +
+        subject.id.toString() +
+        "\">RSS</a></h2>"
+      ).getBytes());
       /* Generate post form */
       genPostForm(os, viewer);
       /* Check for latest comment */
@@ -120,13 +122,15 @@ public class HandlerUser extends Handler{
         }
         /* Provide a link to find out more */
         if(post != null && post.previous != null){
-          os.write("<h2><a href=\"".getBytes());
-          os.write(sub.getBytes());
-          os.write(USER_SUB.getBytes());
-          os.write(subject.id.toString().getBytes());
-          os.write("/".getBytes());
-          os.write(post.id.toString().getBytes());
-          os.write("\">more</a></h2>".getBytes());
+          os.write((
+            "<h2><a href=\"" +
+            sub +
+            USER_SUB +
+            subject.id.toString() +
+            "/" +
+            post.id.toString() +
+            "\">more</a></h2>"
+          ).getBytes());
         }
       }
     }else{
@@ -144,11 +148,13 @@ public class HandlerUser extends Handler{
    **/
   public static void genPostForm(OutputStream os, Auth.User viewer) throws IOException{
     if(viewer != null){
-      os.write("<form action=\"".getBytes());
-        os.write(sub.getBytes());
-        os.write(USER_SUB.getBytes());
-        os.write(viewer.id.toString().getBytes());
-        os.write("\" method=\"post\">".getBytes());
+      os.write((
+        "<form action=\"" +
+        sub +
+        USER_SUB +
+        viewer.id.toString() +
+        "\" method=\"post\">"
+      ).getBytes());
       os.write(form);
     }
   }
@@ -163,15 +169,19 @@ public class HandlerUser extends Handler{
    * @param auth Access to the authentication object.
    **/
   public static void genPostEntry(OutputStream os, Post post, Auth auth) throws IOException{
-    os.write("<p><b><a href=\"".getBytes());
-      os.write(sub.getBytes());
-      os.write(USER_SUB.getBytes());
-      os.write(post.user.id.toString().getBytes());
-      os.write("\">@".getBytes());
-      os.write(post.user.username.getBytes());
-    os.write(  "</a></b> on ".getBytes());
-      os.write((new Date(post.creation)).toString().getBytes());
-      os.write(" said:<br><quote>".getBytes());
+    os.write((
+      "<p><b><a href=\"" +
+      sub +
+      USER_SUB +
+      post.user.id.toString() +
+      "\">@" +
+      post.user.username
+    ).getBytes());
+    os.write((
+      "</a></b> on " +
+      (new Date(post.creation)).toString() +
+      " said:<br><quote>"
+    ).getBytes());
     HandlerUser.postProcessMessage(os, post.message, auth);
     os.write("</quote></p>".getBytes());
   }
@@ -199,13 +209,15 @@ public class HandlerUser extends Handler{
           case '@' :
             Auth.User user = auth.getUserByName(p[x].substring(1));
             if(user != null){
-              os.write("<a href=\"".getBytes());
-                os.write(sub.getBytes());
-                os.write(USER_SUB.getBytes());
-                os.write(user.id.toString().getBytes());
-                os.write("\">@".getBytes());
-                os.write(user.username.getBytes());
-                os.write("</a>".getBytes());
+              os.write((
+                "<a href=\"" +
+                sub +
+                USER_SUB +
+                user.id.toString() +
+                "\">@" +
+                user.username +
+                "</a>"
+              ).getBytes());
             }else{
               os.write(p[x].getBytes());
             }
@@ -245,11 +257,13 @@ public class HandlerUser extends Handler{
                   uName += "..";
                 }
                 uName.replaceAll("&", "&amp;");
-                os.write("<a href=\"".getBytes());
-                  os.write(uStr.getBytes());
-                  os.write("\">".getBytes());
-                  os.write(uName.getBytes());
-                  os.write("</a>".getBytes());
+                os.write((
+                  "<a href=\"" +
+                  uStr +
+                  "\">" +
+                  uName +
+                  "</a>"
+                ).getBytes());
               }catch(MalformedURLException e){
                 os.write(p[x].getBytes());
               }

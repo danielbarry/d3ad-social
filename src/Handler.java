@@ -80,24 +80,26 @@ public abstract class Handler{
    **/
   public void genHead(OutputStream os, Auth.User user) throws IOException{
     os.write(head);
-    os.write("<h1>".getBytes());
-    os.write(  "<a href=\"".getBytes());
-      os.write(sub.getBytes());
-      os.write("\">".getBytes());
-      os.write(title.getBytes());
-      os.write("</a> social ".getBytes());
-    os.write(    "<a href=\"".getBytes());
-      os.write(sub.getBytes());
+    os.write((
+      "<h1><a href=\"" +
+      sub +
+      "\">" +
+      title +
+      "</a> social " +
+      "<a href=\"" +
+      sub
+    ).getBytes());
     if(user == null){
-      os.write(    "login\">login".getBytes());
+      os.write("login\">login".getBytes());
     }else{
-      os.write(    USER_SUB.getBytes());
-        os.write(user.id.toString().getBytes());
-        os.write("\">@".getBytes());
-        os.write(user.username.getBytes());
+      os.write((
+        USER_SUB +
+        user.id.toString() +
+        "\">@" +
+        user.username
+      ).getBytes());
     }
-    os.write(  "</a>".getBytes());
-    os.write("</h1>".getBytes());
+    os.write(  "</a></h1>".getBytes());
   }
 
   /**
