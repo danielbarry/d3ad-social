@@ -484,7 +484,7 @@ public final class I512 extends Number implements Comparable<I512>{
     for(int x = 0; x < TARGET_RUNS; x++){
       BigInteger ai = (new BigInteger(512, r)).abs();
       I512 az = new I512(ai.toByteArray());
-      BigInteger bi = ai.flipBit(64);
+      BigInteger bi = (new BigInteger(256, r)).abs().add(ai);
       I512 bz = new I512(bi.toByteArray());
       if((ai.equals(bi))
       ||!(ai.equals(ai))
@@ -498,7 +498,7 @@ public final class I512 extends Number implements Comparable<I512>{
     for(int x = 0; x < TARGET_RUNS; x++){
       BigInteger ai = (new BigInteger(512, r)).abs();
       I512 az = new I512(ai.toByteArray());
-      BigInteger bi = ai.flipBit(64);
+      BigInteger bi = (new BigInteger(256, r)).abs().add(ai);
       I512 bz = new I512(bi.toByteArray());
       if((az.equals(bz))
       ||!(az.equals(az))
