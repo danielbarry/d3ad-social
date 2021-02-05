@@ -44,6 +44,15 @@ public class HandlerAbout extends Handler{
   public void genBody(OutputStream os) throws IOException{
     Str res = new Str(256);
     res.append("<h2>about server</h2>");
+    /* Generate build stats */
+    res.append("<p><b>build</b>")
+      .append("<quote>Hash: ")
+        .append(Utils.getGitHash().toString())
+        .append("</quote>")
+      .append("<quote>Build: ")
+        .append(Utils.getBuildDate().toString())
+        .append("</quote>")
+      .append("</p>");
     /* Generate system stats */
     OperatingSystemMXBean osb = ManagementFactory.getOperatingSystemMXBean();
     res.append("<p><b>system</b>")
