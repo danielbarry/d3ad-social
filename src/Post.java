@@ -180,4 +180,15 @@ public class Post{
   public static ArrayList<Post> getRecent(){
     return (ArrayList<Post>)(recent.clone());
   }
+
+  /**
+   * getNumActive()
+   *
+   * Get the number of posts currently in the cache.
+   *
+   * @return The number of posts currently loaded in the cache.
+   **/
+  public static int getNumActive(){
+    return idMap.size();
+  }
 }
