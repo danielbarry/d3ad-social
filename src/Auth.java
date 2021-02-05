@@ -24,6 +24,7 @@ public class Auth{
     public String username = null;
     /* The password the user has chosen (encrypted) */
     public I512 password = null;
+    /* TODO: Remove old user token if issuing another or is old. */
     /* The current user token */
     public I512 token = null;
     /* The time at which the token comes invalid */
