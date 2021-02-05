@@ -322,6 +322,7 @@ public class Process implements Runnable{
       }
       /* Sanitize the input */
       post.message = Utils.sanitizeString(post.message);
+      /* TODO: Add message to user's feeds if they are tagged. */
       /* Save post */
       if(Post.writePost(pstDir, post.id.toString(), post) != post){
         Utils.warn("Unable to save new post");
