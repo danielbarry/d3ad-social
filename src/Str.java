@@ -8,6 +8,9 @@ import java.lang.reflect.Field;
  * A super simple and fast string implementation. It assumes ASCII (7 bit
  * characters) are used and makes uses of Java reflection to speed-up the
  * retrieval of String data.
+ *
+ * NOTE: This class requires Java 9 or above due to some changes in the way in
+ * which Strings are handled internally.
  **/
 public final class Str implements java.io.Serializable, Comparable<Str>, CharSequence{
   private static Field stringField;
@@ -21,13 +24,13 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     stringField.setAccessible(true);
   }
 
-  private char[][] data;
+  private byte[][] data;
   private int cap;
   private int idx;
   private int len;
 
   public Str(int capacity){
-    data = new char[capacity][];
+    data = new byte[capacity][];
     cap = capacity;
     idx = 0;
     len = 0;
@@ -36,7 +39,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   public Str(String s){
     this(1);
     try{
-      data[idx] = (char[])(stringField.get(s));
+      data[idx] = (byte[])(stringField.get(s));
     }catch(IllegalAccessException e){
       e.printStackTrace();
     }
@@ -44,17 +47,17 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     ++idx;
   }
 
-  public Str(char[] data){
+  public Str(byte[] data){
     this(1);
     this.data[idx] = data;
     len = this.data[idx].length;
     ++idx;
   }
 
-  public Str(char[] data, int beginIndex, int endIndex){
+  public Str(byte[] data, int beginIndex, int endIndex){
     this(1);
     len = endIndex - beginIndex;
-    this.data[idx] = new char[len];
+    this.data[idx] = new byte[len];
     System.arraycopy(data, beginIndex, this.data[idx], 0, len);
     ++idx;
   }
@@ -67,7 +70,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     }
     /* Add the array */
     try{
-      data[idx] = (char[])(stringField.get(s));
+      data[idx] = (byte[])(stringField.get(s));
     }catch(IllegalAccessException e){
       e.printStackTrace();
     }
@@ -76,7 +79,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     return this;
   }
 
-  public Str append(char[] s){
+  public Str append(byte[] s){
     /* Check capacity */
     if(idx >= cap){
       Utils.warn("Out of capacity, generating more");
@@ -125,9 +128,9 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   }
 
   public Str substring(int beginIndex, int endIndex){
-    char[] val = new char[endIndex - beginIndex];
+    byte[] val = new byte[endIndex - beginIndex];
     for(int i = 0; i < endIndex - beginIndex; i++){
-      val[i] = charAt(i);
+      val[i] = (byte)(charAt(i));
     }
     return new Str(val, beginIndex, endIndex);
   }
@@ -136,7 +139,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     int c = 0;
     for(int i = 0; i < idx; i++){
       if(c + data[i].length > index){
-        return data[i][index - c];
+        return (char)(data[i][index - c]);
       }else{
         c += data[i].length;
       }
@@ -157,7 +160,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
       return;
     }
     /* Perform expansion */
-    char[][] d = new char[capacity][];
+    byte [][] d = new byte[capacity][];
     System.arraycopy(data, 0, d, 0, idx);
     data = d;
     cap = capacity;
@@ -209,22 +212,14 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     byte[] r = new byte[len];
     for(int i = 0; i < idx; i++){
       for(int x = 0; x < data[i].length; x++){
-        r[z++] = (byte)(data[i][x] & 0b01111111);
+        r[z++] = data[i][x];
       }
     }
     return r;
   }
 
-  public StringBuilder toStringBuilder(){
-    StringBuilder sb = new StringBuilder(len);
-    for(int i = 0; i < idx; i++){
-      sb.append(data[i]);
-    }
-    return sb;
-  }
-
   @Override
   public String toString(){
-    return toStringBuilder().toString();
+    return new String(toByteArray());
   }
 }
