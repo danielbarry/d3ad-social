@@ -23,7 +23,19 @@
     </javac>
   </target>
 
-  <target name="jar" depends="compile" description="Create Jar File">
+  <target name="date" depends="compile" description="Generate build date">
+    <exec executable="date" output="${build.dir}/build-date">
+    </exec>
+  </target>
+
+  <target name="git" depends="date" description="Generate Git Hash">
+    <exec executable="git" output="${build.dir}/git-hash">
+      <arg value="rev-parse" />
+      <arg value="HEAD" />
+    </exec>
+  </target>
+
+  <target name="jar" depends="git" description="Create Jar File">
     <mkdir dir="${jar.dir}" />
     <jar destfile="${jar.dir}/${main.jar}" basedir="${build.dir}">
       <manifest>
