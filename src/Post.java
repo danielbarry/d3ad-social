@@ -49,6 +49,10 @@ public class Post{
    * @return The post object, otherwise NULL.
    **/
   public static Post readPost(String loc, String id){
+    /* Make sure request seems valid */
+    if(loc == null || id == null){
+      return null;
+    }
     I512 i = new I512(id);
     /* Try to load from cache */
     Post post = idMap.get(i);
@@ -98,6 +102,10 @@ public class Post{
    * @return The post object, otherwise NULL.
    **/
   public static Post writePost(String loc, String id, Post post){
+    /* Make sure request seems valid */
+    if(loc == null || id == null){
+      return null;
+    }
     /* Save the post to disk */
     JSON data = null;
     try{
