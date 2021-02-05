@@ -100,6 +100,16 @@ public class Process implements Runnable{
         Handler h = new HandlerHome(kv, user, auth);
         Utils.logUnsafe("User requesting from location", hand);
         switch(hand){
+          case "about" :
+            /* TODO: Restrict this information to admins only. */
+            if(user != null){
+              h = new HandlerAbout(kv, auth);
+            }
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
           case "" :
           case "index" :
           case "index.htm" :

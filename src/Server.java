@@ -111,6 +111,7 @@ public class Server extends Thread{
     /* Initialise shared variables */
     Post.init(auth);
     Handler.init(config);
+    HandlerAbout.init(config);
     HandlerHome.init(config);
     HandlerLogin.init(config);
     HandlerRegister.init(config);
