@@ -105,7 +105,8 @@ public class HandlerUser extends Handler{
       if(subject.latest != null){
         Post post = Post.readPost(
           pstDir,
-          postId != null ? postId : subject.latest.toString()
+          postId != null ? postId :
+            (subject.latest != null ? subject.latest.toString() : null)
         );
         /* Make sure this is a valid post to display for this user */
         if(post == null || !post.user.id.equals(subject.id)){
@@ -117,7 +118,8 @@ public class HandlerUser extends Handler{
         /* Begin loading posts */
         while(++postCount <= len && post != null){
           res = genPostEntry(res, post, auth);
-          post = Post.readPost(pstDir, post.previous.toString());
+          post = Post.readPost(pstDir,
+            post.previous != null ? post.previous.toString() : null);
         }
         /* Provide a link to find out more */
         if(post != null && post.previous != null){
