@@ -329,4 +329,26 @@ public class Auth{
     }
     return true;
   }
+
+  /**
+   * getNumUsers()
+   *
+   * Get the number of registered users by checking how many are loaded.
+   *
+   * @return The number of registered users.
+   **/
+  public int getNumUsers(){
+    return idMap.size();
+  }
+
+  /**
+   * getActiveUsers()
+   *
+   * Get the number of active users by checking how many tokens are active.
+   *
+   * @return The number of active users.
+   **/
+  public int getActiveUsers(){
+    return tokenMap.size();
+  }
 }
