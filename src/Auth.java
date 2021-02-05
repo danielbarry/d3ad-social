@@ -349,6 +349,7 @@ public class Auth{
    * @return The number of active users.
    **/
   public int getActiveUsers(){
+    /* TODO: Should more accurately reflect active users by checking token times. */
     return tokenMap.size();
   }
 }
