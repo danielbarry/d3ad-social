@@ -88,7 +88,10 @@ public class HandlerRSS extends Handler{
     if(subject != null){
       /* Check for latest comment */
       if(subject.latest != null){
-        Post post = Post.readPost(pstDir, subject.latest.toString());
+        Post post = Post.readPost(
+          pstDir,
+          subject.latest != null ? subject.latest.toString() : null
+        );
         int postCount = 0;
         /* Begin loading posts */
         Str res = new Str(256);
@@ -108,7 +111,8 @@ public class HandlerRSS extends Handler{
                 .append(post.message)
               .append("</description>")
             .append("</item>");
-          post = Post.readPost(pstDir, post.previous.toString());
+          post = Post.readPost(pstDir,
+            post.previous != null ? post.previous.toString() : null);
         }
         os.write(res.toByteArray());
       }
