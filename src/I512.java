@@ -12,8 +12,10 @@ import java.util.Random;
 public final class I512 extends Number implements Comparable<I512>{
   public static final int SIZE = 512;
 
-  private static final int STR_BYTE_LUT_OFF = 48;
-  private static final int[] STR_BYTE_LUT = new int[]{
+  private static final int STR_LUT_OFF = 33;
+  private static final int[] STR_HEX_LUT = new int[]{
+  /* !   "   #   $   %   &    '  (   )   *   +   ,   -   .   / */
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   /* 0  1  2  3  4  5  6  7  8  9 */
      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
   /* :   ;   <   =   >   ?   @ */
@@ -25,11 +27,35 @@ public final class I512 extends Number implements Comparable<I512>{
   /* a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z */
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
   };
+  private static final int[] STR_BASE64_LUT = new int[]{
+  /* !   "   #   $   %   &    '  (   )   *   +   ,   -   .   / */
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1,
+  /* 0   1   2   3   4   5   6   7   8   9 */
+    52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+  /* :   ;   <   =   >   ?   @ */
+    -1, -1, -1,  0, -1, -1, -1,
+  /* A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z */
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+  /* [   \   ]   ^   _   ` */
+    -1, -1, -1, -1, 64, -1,
+  /* a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z */
+    26, 27, 28, 29, 30, 32, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+  };
   private static final char[] HEX =
     {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-  private static final int MAX_ARR_LEN = 64;
+  /* BASE64 using RFC3501 encoding */
+  private static final char[] BASE64 = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'
+  };
+  private static final int MAX_BYTE_ARR_LEN = SIZE / 8;
+  private static final int MAX_STR_HEX_LEN = SIZE / 16;
+  private static final int MAX_STR_BASE64_LEN = SIZE / 64;
 
-  private byte[] val = new byte[MAX_ARR_LEN];
+  private byte[] val = new byte[MAX_BYTE_ARR_LEN];
 
   /**
    * I512()
@@ -39,17 +65,16 @@ public final class I512 extends Number implements Comparable<I512>{
    * @param value The value to be represented by the I512 object.
    **/
   public I512(byte[] value) throws NumberFormatException{
-    /* NOTE: BigInteger adds an additional 0x00 to front of array. */
-    if(value == null || value.length > MAX_ARR_LEN + 1){
+    if(value == null || value.length > MAX_BYTE_ARR_LEN){
       throw new NumberFormatException("Unable to create I512 from supplied value");
     }else{
-      int len = value.length <= MAX_ARR_LEN ? value.length : MAX_ARR_LEN;
-      if(value.length <= MAX_ARR_LEN){
+      int len = value.length <= MAX_BYTE_ARR_LEN ? value.length : MAX_BYTE_ARR_LEN;
+      if(value.length <= MAX_BYTE_ARR_LEN){
         /* Copy array into lower bytes */
-        System.arraycopy(value, 0, val, MAX_ARR_LEN - value.length, len);
+        System.arraycopy(value, 0, val, MAX_BYTE_ARR_LEN - value.length, len);
       }else{
         /* Skip additional byte(s) */
-        System.arraycopy(value, value.length - MAX_ARR_LEN, val, 0, len);
+        System.arraycopy(value, value.length - MAX_BYTE_ARR_LEN, val, 0, len);
       }
     }
   }
@@ -58,18 +83,28 @@ public final class I512 extends Number implements Comparable<I512>{
    * I512()
    *
    * Constructs a newly allocated Integer object that represents the byte[]
-   * value indicated by the String parameter. The string is converted to an
-   * byte[] value in exactly the manner used by the parseInt method for radix
-   * 16.
+   * value indicated by the String parameter. The string is converted based on
+   * the length.
    *
    * @param s The String to be converted to an I512.
    **/
   public I512(String s) throws NumberFormatException{
-    this(parseInt(s, 16));
+    switch(s.lenght()){
+      case MAX_STR_HEX_LEN :
+        this(parseInt(s, 16));
+      case MAX_STR_BAE64_LEN :
+        this(parseInt(s, 64));
+      default :
+        break;
+    }
   }
 
   public static String toString(byte[] i, int radix){
     return ((new BigInteger(i)).abs()).toString(radix);
+  }
+
+  public static String toBase64String(byte[] i){
+    /* TODO: Implement this. */
   }
 
   public static String toHexString(byte[] i){
@@ -115,8 +150,25 @@ public final class I512 extends Number implements Comparable<I512>{
         int z = 0;
         int x = s.length();
         while(--x >= 0){
-          r[i] |= (byte)(STR_BYTE_LUT[s.charAt(x) - STR_BYTE_LUT_OFF] << ((z % 2) << 2));
+          r[i] |= (byte)(STR_HEX_LUT[s.charAt(x) - STR_LUT_OFF] << ((z % 2) << 2));
           i -= z++ % 2;
+        }
+        return r;
+      case 64 :
+        /* NOTE: We assume the length is correct and the format is simple. */
+        byte[] r = new byte[s.length() * 8];
+        int i = r.length;
+        int x = s.length();
+        while(--x >= 0){
+          int v = STR_BASE64_LUT[s.charAt(x) - STR_LUT_OFF];
+          r[--i] = (byte)(v       & 0xFF);
+          r[--i] = (byte)(v >>  8 & 0xFF);
+          r[--i] = (byte)(v >> 16 & 0xFF);
+          r[--i] = (byte)(v >> 24 & 0xFF);
+          r[--i] = (byte)(v >> 32 & 0xFF);
+          r[--i] = (byte)(v >> 40 & 0xFF);
+          r[--i] = (byte)(v >> 48 & 0xFF);
+          r[--i] = (byte)(v >> 56 & 0xFF);
         }
         return r;
       default :
@@ -142,35 +194,35 @@ public final class I512 extends Number implements Comparable<I512>{
 
   @Override
   public byte byteValue(){
-    return (byte)val[MAX_ARR_LEN - 1];
+    return (byte)val[MAX_BYTE_ARR_LEN - 1];
   }
 
   @Override
   public short shortValue(){
     return (short)(
-               ((short)val[MAX_ARR_LEN - 4] <<  8)
-             | ((short)val[MAX_ARR_LEN - 1]      )
+               ((short)val[MAX_BYTE_ARR_LEN - 4] <<  8)
+             | ((short)val[MAX_BYTE_ARR_LEN - 1]      )
            );
   }
 
   @Override
   public int intValue(){
-    return ((int)val[MAX_ARR_LEN - 4] << 24)
-         | ((int)val[MAX_ARR_LEN - 3] << 16)
-         | ((int)val[MAX_ARR_LEN - 4] <<  8)
-         | ((int)val[MAX_ARR_LEN - 1]      );
+    return ((int)val[MAX_BYTE_ARR_LEN - 4] << 24)
+         | ((int)val[MAX_BYTE_ARR_LEN - 3] << 16)
+         | ((int)val[MAX_BYTE_ARR_LEN - 4] <<  8)
+         | ((int)val[MAX_BYTE_ARR_LEN - 1]      );
   }
 
   @Override
   public long longValue(){
-    return ((long)val[MAX_ARR_LEN - 8] << 56)
-         | ((long)val[MAX_ARR_LEN - 7] << 48)
-         | ((long)val[MAX_ARR_LEN - 6] << 40)
-         | ((long)val[MAX_ARR_LEN - 5] << 32)
-         | ((long)val[MAX_ARR_LEN - 4] << 24)
-         | ((long)val[MAX_ARR_LEN - 3] << 16)
-         | ((long)val[MAX_ARR_LEN - 4] <<  8)
-         | ((long)val[MAX_ARR_LEN - 1]      );
+    return ((long)val[MAX_BYTE_ARR_LEN - 8] << 56)
+         | ((long)val[MAX_BYTE_ARR_LEN - 7] << 48)
+         | ((long)val[MAX_BYTE_ARR_LEN - 6] << 40)
+         | ((long)val[MAX_BYTE_ARR_LEN - 5] << 32)
+         | ((long)val[MAX_BYTE_ARR_LEN - 4] << 24)
+         | ((long)val[MAX_BYTE_ARR_LEN - 3] << 16)
+         | ((long)val[MAX_BYTE_ARR_LEN - 4] <<  8)
+         | ((long)val[MAX_BYTE_ARR_LEN - 1]      );
   }
 
   @Override
