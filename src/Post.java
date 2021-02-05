@@ -70,7 +70,8 @@ public class Post{
       }catch(NumberFormatException e){
         post.creation = -1;
       }
-      post.previous = new I512(postData.get("previous").value(null));
+      String prev = postData.get("previous").value(null);
+      post.previous = prev != null ? new I512(prev) : null;
       post.message = postData.get("message").value(null);
       if(
         post.id != null    &&
