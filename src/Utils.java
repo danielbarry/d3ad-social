@@ -3,6 +3,7 @@ package b.ds;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -23,7 +24,9 @@ public class Utils{
 
   private static BufferedWriter bw;
   private static Lock logLock;
-  private static Str diskBuff = new Str(DISK_BUFF_CAP);
+  private static Str diskBuff;
+  private static Str gitHash;
+  private static Str buildDate;
 
   static{
     bw = null;
@@ -34,6 +37,21 @@ public class Utils{
       warn("Failed to open log file");
     }
     logLock = new ReentrantLock();
+    diskBuff = new Str(DISK_BUFF_CAP);
+    gitHash = new Str("Unknown");
+    buildDate = new Str("Unknown");
+    try{
+      InputStream is = Main.class.getResourceAsStream("/git-hash");
+      byte[] data = new byte[is.available()];
+      is.read(data);
+      gitHash = new Str(new String(data));
+      is = Main.class.getResourceAsStream("/build-date");
+      data = new byte[is.available()];
+      is.read(data);
+      buildDate = new Str(new String(data));
+    }catch(Exception e){
+      /* Do nothing */
+    }
   }
 
   /**
@@ -211,5 +229,27 @@ public class Utils{
               .replaceAll("\"", "&quot;")
               .getBytes(StandardCharsets.US_ASCII)
            );
+  }
+
+  /**
+   * getGitHash()
+   *
+   * Get the git hash for this build.
+   *
+   * &return The git hash if it was possible to retrieve.
+   **/
+  public static Str getGitHash(){
+    return gitHash;
+  }
+
+  /**
+   * getBuildDate()
+   *
+   * Get the build date for this binary.
+   *
+   * &return The build date if it was possible to retrieve.
+   **/
+  public static Str getBuildDate(){
+    return buildDate;
   }
 }
