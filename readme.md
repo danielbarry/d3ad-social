@@ -40,6 +40,9 @@ These items are yet to be completed:
 
 * [ ] Login delay (prevent brute force approaches)
 * [ ] Implement HashMap that is more robust to collisions.
+* [ ] Check hash Strings are valid before using them for disk lookups
+* [ ] Define ASCII only in HTML document header
+* [ ] Converted URLs should only be HTTPS
 
 ### Performance
 
@@ -49,10 +52,16 @@ These items are yet to be completed:
 already failed once.
 * [ ] JSON set should offer the ability to add objects in the place of values
 * [ ] Use JSON data structure in RAM instead of classes for quicker saving, etc
+* [ ] Compress the JSON files saved on disk (https://github.com/lz4/lz4-java)
 
 ### Usability
 
+* [ ] Label user inputs with input validation requirements
 * [ ] Tagging other users should add the post to their timeline
-* [ ] Post edit button
+* [ ] Self moderation:
+  * [ ] Post edit (own)
+  * [ ] Post delete (own)
+  * [ ] Post flag (any)
 * [ ] Admin role moderation:
-  * [ ] Delete posts
+  * [ ] Delete post (any)
+* [ ] Very last comment missing from pages
