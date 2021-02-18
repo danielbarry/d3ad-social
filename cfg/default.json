@@ -8,7 +8,7 @@
     "css": [
       "html{background-color:#111;color:#EEE;font-family:monospace;font-size:16px;}",
       "h1,h2{text-align:center;}",
-      "a{color:#888;}a:before{content:\"[\"}a:after{content:\"]\"}",
+      "a{color:#888;}a:before{content:\"[\";}a:after{content:\"]\";}",
       "form,p{background-color:#333;margin:auto;max-width:640px;padding:4px;}",
       "quote{background-color:#FFF;color:#222;display:block;}"
     ],
