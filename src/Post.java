@@ -61,7 +61,14 @@ public class Post{
     }
     /* Load from disk */
     try{
-      JSON postData = JSON.build(loc + "/" + id);
+      JSON postData = null;
+      try{
+        /* Try new loading method */
+        postData = JSON.build(loc + "/" + i.toString());
+      }catch(Exception e){
+        /* Try old loading method */
+        postData = JSON.build(loc + "/" + I512.toString(i.toByteArray(), 16));
+      }
       post = new Post();
       post.id = new I512(postData.get("id").value(null));
       post.user = auth.getUserById(postData.get("userid").value(null));
