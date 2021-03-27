@@ -180,6 +180,7 @@ public class Auth{
         }
       }
     }
+    Utils.log("Invalid or inactive token used");
     return null;
   }
 
