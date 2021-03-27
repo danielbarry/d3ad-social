@@ -6,8 +6,8 @@ import java.util.Random;
 /**
  * I512.java
  *
- * A class designed to handle 512 bit integers as fast as possible, for the
- * purpose of storing hashes.
+ * A class designed to handle unsigned 512 bit integers as fast as possible,
+ * for the purpose of storing and processing hashes.
  **/
 public final class I512 extends Number implements Comparable<I512>{
   public static final int SIZE = 512;
@@ -37,9 +37,9 @@ public final class I512 extends Number implements Comparable<I512>{
   /* A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z */
      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
   /* [   \   ]   ^   _   ` */
-    -1, -1, -1, -1, 64, -1,
+    -1, -1, -1, -1, 63, -1,
   /* a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z */
-    26, 27, 28, 29, 30, 32, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
   };
   private static final char[] HEX =
     {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -51,9 +51,13 @@ public final class I512 extends Number implements Comparable<I512>{
     'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'
   };
-  private static final int MAX_BYTE_ARR_LEN = SIZE / 8;
-  private static final int MAX_STR_HEX_LEN = SIZE / 16;
-  private static final int MAX_STR_BASE64_LEN = SIZE / 64;
+  private static final int BITS_BYTE   = 8;
+  private static final int BITS_HEX    = 4;
+  private static final int BITS_BASE64 = 6;
+
+  public static final int MAX_BYTE_ARR_LEN   = (SIZE / BITS_BYTE  ) + (SIZE % BITS_BYTE   > 0 ? 1 : 0);
+  public static final int MAX_STR_HEX_LEN    = (SIZE / BITS_HEX   ) + (SIZE % BITS_HEX    > 0 ? 1 : 0);
+  public static final int MAX_STR_BASE64_LEN = (SIZE / BITS_BASE64) + (SIZE % BITS_BASE64 > 0 ? 1 : 0);
 
   private byte[] val = new byte[MAX_BYTE_ARR_LEN];
 
@@ -65,8 +69,12 @@ public final class I512 extends Number implements Comparable<I512>{
    * @param value The value to be represented by the I512 object.
    **/
   public I512(byte[] value) throws NumberFormatException{
-    if(value == null || value.length > MAX_BYTE_ARR_LEN){
-      throw new NumberFormatException("Unable to create I512 from supplied value");
+    /* NOTE: BigInteger adds an extra byte on the front sometimes. */
+    if(value == null || value.length > MAX_BYTE_ARR_LEN + 1){
+      throw new NumberFormatException(
+        "Unable to create I512 from supplied value of length " +
+        (value != null ? value.length : -1)
+      );
     }else{
       int len = value.length <= MAX_BYTE_ARR_LEN ? value.length : MAX_BYTE_ARR_LEN;
       if(value.length <= MAX_BYTE_ARR_LEN){
@@ -89,22 +97,87 @@ public final class I512 extends Number implements Comparable<I512>{
    * @param s The String to be converted to an I512.
    **/
   public I512(String s) throws NumberFormatException{
-    switch(s.lenght()){
+    this(parseInt(s, detectBase(s)));
+  }
+
+  /**
+   * detectBase()
+   *
+   * Detect the base for a given String.
+   *
+   * @param s The String to detect the base for. NOTE: This is currently a very
+   * simple base detection.
+   * @return The detected base.
+   **/
+  private static int detectBase(String s){
+    switch(s.length()){
       case MAX_STR_HEX_LEN :
-        this(parseInt(s, 16));
-      case MAX_STR_BAE64_LEN :
-        this(parseInt(s, 64));
+      case MAX_STR_HEX_LEN + 1 :
+        return 16;
+      case MAX_STR_BASE64_LEN :
+      case MAX_STR_BASE64_LEN + 1 :
       default :
-        break;
+        return 64;
     }
   }
 
   public static String toString(byte[] i, int radix){
-    return ((new BigInteger(i)).abs()).toString(radix);
+    switch(radix){
+      case 16 :
+        return toHexString(i);
+      case 64 :
+        return toBase64String(i);
+      default :
+        return ((new BigInteger(i)).abs()).toString(radix);
+    }
   }
 
   public static String toBase64String(byte[] i){
-    /* TODO: Implement this. */
+    char[] s = new char[(int)(((((double)i.length * 8.0)) / 6.0) + 0.9999999999999999)];
+    /* String destination pointer */
+    int z = s.length;
+    /* Byte array source pointer */
+    int x = i.length;
+    /* Pre-declare used variables */
+    int v0, v1, v2;
+    /* Quad source for triple target set */
+    while(z >= 4){
+      v0 = i[--x] & 0xFF;
+      v1 = i[--x] & 0xFF;
+      v2 = i[--x] & 0xFF;
+      s[--z] = BASE64[(            (v0     )) & 0b111111];
+      s[--z] = BASE64[((v1 << 2) | (v0 >> 6)) & 0b111111];
+      s[--z] = BASE64[((v2 << 4) | (v1 >> 4)) & 0b111111];
+      s[--z] = BASE64[((v2 >> 2)            ) & 0b111111];
+    }
+    /* Handle last parts */
+    switch(z){
+      case 0 :
+        /* Do nothing */
+        break;
+      case 1 :
+        v0 = x > 0 ? i[--x] & 0xFF : 0;
+        s[--z] = BASE64[(            (v0     )) & 0b111111];
+        break;
+      case 2 :
+        v0 = x > 0 ? i[--x] & 0xFF : 0;
+        v1 = x > 0 ? i[--x] & 0xFF : 0;
+        s[--z] = BASE64[(            (v0     )) & 0b111111];
+        s[--z] = BASE64[((v1 << 2) | (v0 >> 6)) & 0b111111];
+        break;
+      case 3 :
+        v0 = x > 0 ? i[--x] & 0xFF : 0;
+        v1 = x > 0 ? i[--x] & 0xFF : 0;
+        v2 = x > 0 ? i[--x] & 0xFF : 0;
+        s[--z] = BASE64[(            (v0     )) & 0b111111];
+        s[--z] = BASE64[((v1 << 2) | (v0 >> 6)) & 0b111111];
+        s[--z] = BASE64[((v2 << 4) | (v1 >> 4)) & 0b111111];
+        break;
+      default :
+        Utils.warn("Unhandled parse case for " + z);
+        break;
+    }
+    return new String(s);
   }
 
   public static String toHexString(byte[] i){
@@ -125,7 +198,7 @@ public final class I512 extends Number implements Comparable<I512>{
     return toString(i, 2);
   }
 
-  public static String toString(byte[] i){
+  public static String toDecimalString(byte[] i){
     return toString(i, 10);
   }
 
@@ -141,38 +214,73 @@ public final class I512 extends Number implements Comparable<I512>{
    * @return A byte array containing the converted data.
    **/
   public static byte[] parseInt(String s, int radix) throws NumberFormatException{
+    /* Check for NULL */
+    if(s == null){
+      return null;
+    }
+    /* Pre-declare variables because Java doesn't understand scope */
+    int sLen = s.length();
+    byte[] r;
+    int i;
+    int x;
+    int z;
     /* Check if we can perform faster conversion */
     switch(radix){
       case 16 :
         /* NOTE: We assume the length is correct and the format is simple. */
-        byte[] r = new byte[(s.length() / 2) + (s.length() % 2)];
-        int i = r.length - 1;
-        int z = 0;
-        int x = s.length();
+        r = new byte[(sLen / 2) + (sLen % 2)];
+        i = r.length - 1;
+        z = 0;
+        x = sLen;
         while(--x >= 0){
           r[i] |= (byte)(STR_HEX_LUT[s.charAt(x) - STR_LUT_OFF] << ((z % 2) << 2));
           i -= z++ % 2;
         }
         return r;
       case 64 :
-        /* NOTE: We assume the length is correct and the format is simple. */
-        byte[] r = new byte[s.length() * 8];
-        int i = r.length;
-        int x = s.length();
-        while(--x >= 0){
-          int v = STR_BASE64_LUT[s.charAt(x) - STR_LUT_OFF];
-          r[--i] = (byte)(v       & 0xFF);
-          r[--i] = (byte)(v >>  8 & 0xFF);
-          r[--i] = (byte)(v >> 16 & 0xFF);
-          r[--i] = (byte)(v >> 24 & 0xFF);
-          r[--i] = (byte)(v >> 32 & 0xFF);
-          r[--i] = (byte)(v >> 40 & 0xFF);
-          r[--i] = (byte)(v >> 48 & 0xFF);
-          r[--i] = (byte)(v >> 56 & 0xFF);
+        r = new byte[(int)(((double)(sLen * BITS_BASE64) + 7.9999999999999999) / BITS_BYTE)];
+        /* String source pointer */
+        i = sLen;
+        /* Byte array target pointer */
+        x = r.length;
+        /* Pre-declare used variables */
+        int v0, v1, v2, v3;
+        /* Quad source for triple target set */
+        while(i >= 4){
+          v0 = STR_BASE64_LUT[s.charAt(--i) - STR_LUT_OFF];
+          v1 = STR_BASE64_LUT[s.charAt(--i) - STR_LUT_OFF];
+          v2 = STR_BASE64_LUT[s.charAt(--i) - STR_LUT_OFF];
+          v3 = STR_BASE64_LUT[s.charAt(--i) - STR_LUT_OFF];
+          r[--x] = (byte)((v1 << 6) | (v0     ));
+          r[--x] = (byte)((v2 << 4) | (v1 >> 2));
+          r[--x] = (byte)((v3 << 2) | (v2 >> 4));
+        }
+        /* Handle last parts */
+        switch(i){
+          case 0 :
+            /* Do nothing */
+            break;
+          case 1 :
+            v0 = STR_BASE64_LUT[s.charAt(--i) - STR_LUT_OFF];
+            r[--x] = (byte)(v0);
+            break;
+          case 2 :
+            v0 = STR_BASE64_LUT[s.charAt(--i) - STR_LUT_OFF];
+            v1 = STR_BASE64_LUT[s.charAt(--i) - STR_LUT_OFF];
+            r[--x] = (byte)((v1 << 6) | (v0     ));
+            r[--x] = (byte)(            (v1 >> 2));
+            break;
+          default :
+            Utils.warn("Unhandled parse case for " + i);
+            break;
         }
         return r;
       default :
-        return ((new BigInteger(s, radix)).abs()).toByteArray();
+        try{
+          return ((new BigInteger(s, radix)).abs()).toByteArray();
+        }catch(NumberFormatException e){
+          return new byte[]{};
+        }
     }
   }
 
@@ -239,7 +347,7 @@ public final class I512 extends Number implements Comparable<I512>{
 
   @Override
   public String toString(){
-    return toHexString(val);
+    return toBase64String(val);
   }
 
   @Override
@@ -405,13 +513,13 @@ public final class I512 extends Number implements Comparable<I512>{
    * @return The updated statistics from running the tests.
    **/
   private static int[] assurt(boolean equal, int[] stats, String msg){
-    System.err.print("[" + stats[0] + "]  ");
+    System.err.print("[" + stats[0] + "]\t");
     stats[0]++;
     if(equal){
       stats[1]++;
-      System.err.print("[ OK ]        ");
+      System.err.print("[ OK ]      \t");
     }else{
-      System.err.print("      [FAIL]  ");
+      System.err.print("      [FAIL]\t");
     }
     System.err.println(msg);
     return stats;
@@ -454,21 +562,63 @@ public final class I512 extends Number implements Comparable<I512>{
       new byte[]{
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-      }, new I512("1"), stats, "One from string"
+      }, new I512("B"), stats, "One from string"
     );
     stats = assurt(
-      (new I512("1")).compareTo(new I512("1")) == 0, stats, "Compare equal"
+      (new I512("B")).compareTo(new I512("B")) == 0, stats, "Compare equal"
     );
     stats = assurt(
-      (new I512("2")).compareTo(new I512("1")) != 0, stats, "Compare not equal"
+      (new I512("B")).compareTo(new I512("C")) != 0, stats, "Compare not equal"
     );
     stats = assurt(
-      (new I512("1")).hashCode() == (new I512("1")).hashCode(),
+      (new I512("B")).hashCode() == (new I512("B")).hashCode(),
       stats, "Compare equal hashes"
     );
     stats = assurt(
-      (new I512("1")).hashCode() != (new I512("2")).hashCode(),
+      (new I512("B")).hashCode() != (new I512("C")).hashCode(),
       stats, "Compare not equal hashes"
+    );
+    stats = assurt(
+      I512.toString(new byte[]{ 0 }, 64).equals("AA"),
+      stats, "Zero string (BASE64)"
+    );
+    stats = assurt(
+      I512.toString(new byte[]{ 1 }, 64).equals("AB"),
+      stats, "One string (BASE64)"
+    );
+    stats = assurt(
+      I512.toString(new byte[]{ 32 }, 64).equals("Ag"),
+      stats, "Upper bit string (BASE64)"
+    );
+    stats = assurt(
+      I512.toString(new byte[]{ 64 }, 64).equals("BA"),
+      stats, "Next bit string (BASE64)"
+    );
+    stats = assurt(
+      I512.toString(new byte[]{ 1, 1 }, 64).equals("AEB"),
+      stats, "Dual bytes string (BASE64)"
+    );
+    stats = assurt(
+      new byte[]{
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      }, new I512("A"), stats, "Blank test (BASE64)"
+    );
+    stats = assurt(
+      new byte[]{
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      }, new I512("AAAAAAAA"), stats, "Blank redundant test (BASE64)"
+    );
+    stats = assurt(
+      new byte[]{
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+      }, new I512("B"), stats, "One test (BASE64)"
+    );
+    String s = "AwRRHXnSNk_XaP2lLTFnc5D5QWsOZjrUa_yNxhRDKCH05iDvI6QLY33Tt8sUGmvGAyJ9ybfnOCqNHZNqODx-V7";
+    stats = assurt(
+      I512.compare((new I512(s)).toString().getBytes(), s.getBytes()) == 0, stats, "Random test (BASE64)"
     );
     /* Deal with results */
     System.err.println("Passed " + stats[1] + " out of " + stats[0] + " tests");
@@ -483,16 +633,17 @@ public final class I512 extends Number implements Comparable<I512>{
    * we believe they are.
    **/
   public static void perf(){
+    int BASE = 16;
     int TARGET_RUNS = 1000000;
     Random r = new Random();
     /* parseInt() - BigInteger */
     long parseIntBigInt = System.currentTimeMillis();
     for(int x = 0; x < TARGET_RUNS; x++){
       BigInteger bi = (new BigInteger(512, r)).abs();
-      String bs = bi.toString(16);
-      byte[] a = ((new BigInteger(bs, 16)).abs()).toByteArray();
+      String bs = bi.toString(BASE);
+      byte[] a = ((new BigInteger(bs, BASE)).abs()).toByteArray();
       if(compare(a, bi.toByteArray()) != 0){
-        throw new NumberFormatException(toHexString(a) + " != " + bi.toString(16));
+        throw new NumberFormatException(toBase64String(a) + " != " + bi.toString(BASE));
       }
     }
     parseIntBigInt = System.currentTimeMillis() - parseIntBigInt;
@@ -500,10 +651,10 @@ public final class I512 extends Number implements Comparable<I512>{
     long parseIntCustom = System.currentTimeMillis();
     for(int x = 0; x < TARGET_RUNS; x++){
       BigInteger bi = (new BigInteger(512, r)).abs();
-      String bs = bi.toString(16);
-      byte[] a = parseInt(bs, 16);
+      String bs = bi.toString(BASE);
+      byte[] a = parseInt(bs, BASE);
       if(compare(a, bi.toByteArray()) != 0){
-        throw new NumberFormatException(toHexString(a) + " != " + bi.toString(16));
+        throw new NumberFormatException(toBase64String(a) + " != " + bi.toString(BASE));
       }
     }
     parseIntCustom = System.currentTimeMillis() - parseIntCustom;
@@ -515,7 +666,7 @@ public final class I512 extends Number implements Comparable<I512>{
       if((new BigInteger(ai.toByteArray())).compareTo(new BigInteger(bi.toByteArray())) == 0
       || (new BigInteger(ai.toByteArray())).compareTo(new BigInteger(ai.toByteArray())) != 0
       || (new BigInteger(bi.toByteArray())).compareTo(new BigInteger(bi.toByteArray())) != 0){
-        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+        throw new NumberFormatException(ai.toString(BASE) + " != " + bi.toString(BASE));
       }
     }
     compareBigInt = System.currentTimeMillis() - compareBigInt;
@@ -527,7 +678,7 @@ public final class I512 extends Number implements Comparable<I512>{
       if(compare(ai.toByteArray(), bi.toByteArray()) == 0
       || compare(ai.toByteArray(), ai.toByteArray()) != 0
       || compare(bi.toByteArray(), bi.toByteArray()) != 0){
-        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+        throw new NumberFormatException(ai.toString(BASE) + " != " + bi.toString(BASE));
       }
     }
     compareCustom = System.currentTimeMillis() - compareCustom;
@@ -541,7 +692,7 @@ public final class I512 extends Number implements Comparable<I512>{
       if((ai.equals(bi))
       ||!(ai.equals(ai))
       ||!(bi.equals(bi))){
-        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+        throw new NumberFormatException(ai.toString(BASE) + " != " + bi.toString(BASE));
       }
     }
     equalsBigInt = System.currentTimeMillis() - equalsBigInt;
@@ -555,7 +706,7 @@ public final class I512 extends Number implements Comparable<I512>{
       if((az.equals(bz))
       ||!(az.equals(az))
       ||!(bz.equals(bz))){
-        throw new NumberFormatException(ai.toString(16) + " != " + bi.toString(16));
+        throw new NumberFormatException(ai.toString(BASE) + " != " + bi.toString(BASE));
       }
     }
     equalsCustom = System.currentTimeMillis() - equalsCustom;
