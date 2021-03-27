@@ -163,7 +163,12 @@ public class Auth{
     if(token == null){
       return null;
     }
-    I512 t = new I512(token);
+    I512 t = null;
+    try{
+      t = new I512(token);
+    }catch(NumberFormatException e){
+      Utils.warn("Badly formatted token " + token);
+    }
     /* Check that we do have a token */
     if(tokenMap.containsKey(t)){
       User user = tokenMap.get(t);
