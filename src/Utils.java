@@ -182,7 +182,7 @@ public class Utils{
    **/
   public static I512 genRandHash(){
     SecureRandom sr = new SecureRandom();
-    byte[] hash = new byte[64];
+    byte[] hash = new byte[I512.MAX_BYTE_ARR_LEN];
     sr.nextBytes(hash);
     return new I512(hash);
   }
@@ -236,7 +236,7 @@ public class Utils{
    *
    * Get the git hash for this build.
    *
-   * &return The git hash if it was possible to retrieve.
+   * @return The git hash if it was possible to retrieve.
    **/
   public static Str getGitHash(){
     return gitHash;
@@ -247,7 +247,7 @@ public class Utils{
    *
    * Get the build date for this binary.
    *
-   * &return The build date if it was possible to retrieve.
+   * @return The build date if it was possible to retrieve.
    **/
   public static Str getBuildDate(){
     return buildDate;
