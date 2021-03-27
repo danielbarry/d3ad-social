@@ -170,7 +170,7 @@ public class Auth{
       Utils.warn("Badly formatted token " + token);
     }
     /* Check that we do have a token */
-    if(tokenMap.containsKey(t)){
+    if(t != null && tokenMap.containsKey(t)){
       User user = tokenMap.get(t);
       /* Make sure it is for sure a token match and not just a hash match */
       if(user.token != null && t.equals(user.token)){
