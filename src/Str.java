@@ -24,7 +24,8 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     }
     stringField.setAccessible(true);
     try{
-      armhfFix = ((byte[])(stringField.get("#")))[0] == '\0';
+      byte[] d = (byte[])(stringField.get("#"));
+      armhfFix = d.length == 2;
     }catch(IllegalAccessException e){
       e.printStackTrace();
     }
@@ -227,7 +228,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
       int z = 0;
       byte[] r = new byte[len / 2];
       for(int i = 0; i < idx; i++){
-        for(int x = 1; x < data[i].length; x += 2){
+        for(int x = 0; x < data[i].length; x += 2){
           r[z++] = data[i][x];
         }
       }
