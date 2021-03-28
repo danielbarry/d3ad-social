@@ -59,6 +59,16 @@ public class Auth{
     for(int x = 0; x < users.length; x++){
       if(users[x].isFile() && !users[x].isDirectory() && users[x].length() > 0){
         User user = readUser(users[x].getPath(), new User());
+        /* Check if old user type */
+        if(users[x].getPath().length() - (userDir.length() + 1) > I512.MAX_STR_BASE64_LEN){
+          Utils.log("Upgrading user -> " + user.id);
+          /* Create new type */
+          if(writeUser(userDir + "/" + user.id, user) != null){
+            Utils.log("Removing old user -> " + user.id);
+            /* Remove old type if */
+            (new File(userDir + "/" + I512.toHexString(user.id.toByteArray()))).delete();
+          }
+        }
       }
     }
   }
