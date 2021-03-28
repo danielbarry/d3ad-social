@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
  **/
 public final class Str implements java.io.Serializable, Comparable<Str>, CharSequence{
   private static Field stringField;
-  private static boolean armhfFix;
+  private static int padSkip;
 
   static{
     try{
@@ -25,7 +25,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     stringField.setAccessible(true);
     try{
       byte[] d = (byte[])(stringField.get("#"));
-      armhfFix = d.length == 2;
+      padSkip = d.length;
     }catch(IllegalAccessException e){
       e.printStackTrace();
     }
@@ -215,25 +215,14 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
    * @return The convert byte array.
    **/
   public byte[] toByteArray(){
-    if(!armhfFix){
-      int z = 0;
-      byte[] r = new byte[len];
-      for(int i = 0; i < idx; i++){
-        for(int x = 0; x < data[i].length; x++){
-          r[z++] = data[i][x];
-        }
+    int z = 0;
+    byte[] r = new byte[len / padSkip];
+    for(int i = 0; i < idx; i++){
+      for(int x = 0; x < data[i].length; x += padSkip){
+        r[z++] = data[i][x];
       }
-      return r;
-    }else{
-      int z = 0;
-      byte[] r = new byte[len / 2];
-      for(int i = 0; i < idx; i++){
-        for(int x = 0; x < data[i].length; x += 2){
-          r[z++] = data[i][x];
-        }
-      }
-      return r;
     }
+    return r;
   }
 
   @Override
