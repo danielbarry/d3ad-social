@@ -19,6 +19,7 @@ public class Server extends Thread{
   private ExecutorService pool;
   private int recBuffSize;
   private int subDirLen;
+  private int inputMaxLen;
   private String pstDir;
   private String usrDir;
 
@@ -36,6 +37,7 @@ public class Server extends Thread{
     int port = 8080;
     recBuffSize = 2048;
     String subDir = "/";
+    inputMaxLen = 512;
     subDirLen = 1;
     pstDir = "dat/pst";
     usrDir = "dat/usr";
@@ -62,6 +64,11 @@ public class Server extends Thread{
       subDirLen = subDir.length();
     }catch(NumberFormatException e){
       Utils.warn("Unable to find sub directory value");
+    }
+    try{
+      inputMaxLen = Integer.parseInt(config.get("input").get("max-length").value(inputMaxLen + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find input maximum length value");
     }
     try{
       timeout = Integer.parseInt(config.get("timeout-ms").value(timeout + ""));
@@ -143,6 +150,7 @@ public class Server extends Thread{
                 System.currentTimeMillis(),
                 recBuffSize,
                 subDirLen,
+                inputMaxLen,
                 auth,
                 pstDir,
                 usrDir

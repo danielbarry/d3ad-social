@@ -26,6 +26,7 @@ public class Process implements Runnable{
   private long start;
   private int recBuffSize;
   private int subDirLen;
+  private int inputMaxLen;
   private Auth auth;
   private String pstDir;
   private String usrDir;
@@ -39,6 +40,7 @@ public class Process implements Runnable{
    * @param start The start time for the process.
    * @param recBuffSize The receiver buffer size.
    * @param subDirLen The subdirectory length.
+   * @param inputMaxLen The maximum post input length.
    * @param auth Access to the authentication mechanism.
    * @param pstDir The post directory.
    * @param usrDir The user directory.
@@ -48,6 +50,7 @@ public class Process implements Runnable{
     long start,
     int recBuffSize,
     int subDirLen,
+    int inputMaxLen,
     Auth auth,
     String pstDir,
     String usrDir
@@ -56,6 +59,7 @@ public class Process implements Runnable{
     this.start = start;
     this.recBuffSize = recBuffSize;
     this.subDirLen = subDirLen;
+    this.inputMaxLen = inputMaxLen;
     this.auth = auth;
     this.pstDir = pstDir;
     this.usrDir = usrDir;
@@ -80,7 +84,7 @@ public class Process implements Runnable{
     /* Authenticate (if required) */
     Auth.User user = parseAuth(kv, auth);
     /* Handle user POST */
-    if(!parsePost(kv, user, pstDir, usrDir)){
+    if(!parsePost(kv, user, pstDir, usrDir, inputMaxLen)){
       /* Delete location to force a bad message */
       kv.remove("location");
     }
@@ -296,13 +300,15 @@ public class Process implements Runnable{
    * @param user The authenticated user, otherwise NULL.
    * @param pstDir The post directory.
    * @param usrDir The user directory.
+   * @param inputMaxLen The maximum input length.
    * @return True if there are no errors to be reported, otherwise false.
    **/
   private static boolean parsePost(
     HashMap<String, String> kv,
     Auth.User user,
     String pstDir,
-    String usrDir
+    String usrDir,
+    int inputMaxLen
   ){
     /* Make sure we handle a logged in user */
     if(user == null){
@@ -322,11 +328,10 @@ public class Process implements Runnable{
         return false;
       }
       /* Validate the input */
-      /* TODO: Get length limit from configuration. */
       if(
         post.message == null       ||
         post.message.length() <= 0 ||
-        post.message.length() > 512
+        post.message.length() > inputMaxLen
       ){
         return false;
       }

@@ -15,6 +15,9 @@
     "length": "16",
     "max-word-length": "40"
   },
+  "input": {
+    "max-length": "512"
+  },
   "name": "d3ad",
   "pool-size": "8",
   "port": "8080",
