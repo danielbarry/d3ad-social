@@ -105,8 +105,7 @@ public class Process implements Runnable{
         Utils.logUnsafe("User requesting from location", hand);
         switch(hand){
           case "about" :
-            /* TODO: Restrict this information to admins only. */
-            if(user != null){
+            if(user != null && user.role == Auth.Role.ADMIN){
               h = new HandlerAbout(kv, auth);
             }
             writeHead(os, h.genMime(), user);
