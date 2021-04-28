@@ -49,6 +49,7 @@ public abstract class Handler{
     }
     h +=
           "</style>" +
+          "<meta name=\"robots\" content=\"index\" />" +
         "</head>" +
         "<body>";
     head = h.getBytes();
