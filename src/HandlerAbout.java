@@ -43,6 +43,19 @@ public class HandlerAbout extends Handler{
   @Override
   public void genBody(OutputStream os) throws IOException{
     Str res = new Str(256);
+    res = genAbout(res);
+    os.write(res.toByteArray());
+  }
+
+  /**
+   * genAbout()
+   *
+   * Generate information about the server.
+   *
+   * @param res The current string builder result.
+   * @return The updated string builder result.
+   **/
+  private Str genAbout(Str res){
     res.append("<h2>about server</h2>");
     /* Generate build stats */
     res.append("<p><b>build</b>")
@@ -82,7 +95,7 @@ public class HandlerAbout extends Handler{
       .append("</quote>");
     res.append("</p>");
     /* Generate CPU stats */
-    res.append("<p><b>CPU</b>")
+    res.append("<p><b>cpu</b>")
       .append("<quote>Processors: ")
         .append(Integer.toString(osb.getAvailableProcessors()))
         .append("</quote>")
@@ -105,7 +118,7 @@ public class HandlerAbout extends Handler{
         .append(Integer.toString(Post.getNumActive()))
         .append("</quote>")
       .append("</p>");
-    os.write(res.toByteArray());
+    return res;
   }
 
   /**
@@ -114,7 +127,7 @@ public class HandlerAbout extends Handler{
    * Format the size to something meaningful.
    *
    * @param size The size to be formatted.
-   * &return The formatted size string representing the data.
+   * @return The formatted size string representing the data.
    **/
   private static String formatSize(long size){
     if(size < 1024){
