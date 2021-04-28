@@ -10,6 +10,16 @@ import java.util.HashMap;
  **/
 public class Auth{
   /**
+   * Role.Auth.java
+   *
+   * The role for a given user.
+   **/
+  public enum Role{
+    NONE,
+    ADMIN
+  }
+
+  /**
    * User.Auth.java
    *
    * An abstract user held in RAM, containing essential data regarding the user
@@ -24,6 +34,8 @@ public class Auth{
     public String username = null;
     /* The password the user has chosen (encrypted) */
     public I512 password = null;
+    /* The role of the user */
+    public Role role = Role.NONE;
     /* TODO: Remove old user token if issuing another or is old. */
     /* The current user token */
     public I512 token = null;
@@ -266,6 +278,7 @@ public class Auth{
       }
       user.username = userData.get("username").value(null);
       user.password = new I512(userData.get("password").value(null));
+      user.role = Role.valueOf(userData.get("role").value("NONE"));
       user.token = null;
       user.revoke = System.currentTimeMillis();
       user.latest = new I512(userData.get("latest").value(null));
@@ -307,6 +320,7 @@ public class Auth{
       data.set(new JSON("usalt", user.usalt.toString()));
       data.set(new JSON("username", user.username));
       data.set(new JSON("password", user.password.toString()));
+      data.set(new JSON("role", user.role.toString()));
       /* NOTE: Do not store token. */
       /* NOTE: Do not store revoke. */
       if(user.latest != null){
