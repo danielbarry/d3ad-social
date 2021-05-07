@@ -17,6 +17,7 @@ public class Main{
    * @param args The command line arguments.
    **/
   public static void main(String[] args){
+    Utils.init();
     Utils.log("Program started");
     new Main(args);
     Utils.log("Program ended");
