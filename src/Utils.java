@@ -28,7 +28,7 @@ public class Utils{
   private static Str gitHash;
   private static Str buildDate;
 
-  public void static init(){
+  public static void init(){
     bw = null;
     try{
       bw = new BufferedWriter(new FileWriter(new File("d3ad.log"), true));
