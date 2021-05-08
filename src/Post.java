@@ -10,6 +10,16 @@ import java.util.Random;
  * A thin wrapper for handling posts.
  **/
 public class Post{
+  /**
+   * State.Post.java
+   *
+   * The state of the post.
+   **/
+  public enum State{
+    NONE,
+    HIDE
+  }
+
   private static Auth auth;
   private static HashMap<I512, Post> idMap;
   private static ArrayList<Post> recent;
@@ -24,6 +34,8 @@ public class Post{
   public I512 previous = null;
   /* The escaped (safe) message string */
   public String message = null;
+  /* The state of the message */
+  public State state = State.NONE;
 
   /**
    * init()
@@ -80,6 +92,7 @@ public class Post{
       String prev = postData.get("previous").value(null);
       post.previous = prev != null ? new I512(prev) : null;
       post.message = postData.get("message").value(null);
+      post.state = State.valueOf(postData.get("state").value("NONE"));
       if(
         post.id != null    &&
         post.user != null  &&
@@ -125,6 +138,7 @@ public class Post{
         data.set(new JSON("previous", post.previous.toString()));
       }
       data.set(new JSON("message", post.message));
+      data.set(new JSON("state", post.state.toString()));
     }catch(Exception e){
       data = null;
     }
