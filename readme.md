@@ -38,7 +38,6 @@ These items are yet to be completed:
 
 ### Security
 
-* [ ] Login delay (prevent brute force approaches)
 * [ ] Implement HashMap that is more robust to collisions.
 * [ ] Check hash Strings are valid before using them for disk lookups
 * [ ] Define ASCII only in HTML document header
@@ -49,7 +48,6 @@ These items are yet to be completed:
 ### Performance
 
 * [ ] Post cool-down (should take some seconds at least between posts)
-* [ ] Prevent double post (with something like refresh)
 * [ ] JSON parser should use a global HashMap to save on memory - this approach
 already failed once.
 * [ ] JSON set should offer the ability to add objects in the place of values
@@ -61,11 +59,13 @@ already failed once.
 
 ### Usability
 
-* [ ] Label user inputs with input validation requirements
-* [ ] Tagging other users should add the post to their timeline
+* [ ] Reply to post
+  * [ ] Reply button
+  * [ ] Quote post being replied to
+    * [ ] Whilst writing reply
+    * [ ] Whilst displaying reply
 * [ ] Self moderation:
-  * [ ] Post edit (own)
-  * [ ] Post delete (own)
   * [ ] Post flag (any)
-* [ ] Admin role moderation:
-  * [ ] Delete post (any)
+* [ ] Admin:
+  * [ ] View list of flags
+  * [ ] Disable user account
