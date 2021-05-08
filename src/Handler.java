@@ -210,8 +210,8 @@ public abstract class Handler{
       .append(sub)
       .append(EMBED_SUB)
       .append(post.id.toString())
-      /* TODO: Pull iframe values from configuration. */
-      .append("\">link</a> <a target=\"_blank\" href=\"data:text/html,<embed width='680' height='128' src='")
+      /* TODO: Pull embed values from configuration. */
+      .append("\">link</a> <a target=\"_blank\" href=\"data:text/html,<embed width='680' height='200' src='")
       .append(url)
       .append(sub)
       .append(EMBED_SUB)
