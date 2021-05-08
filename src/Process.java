@@ -107,7 +107,6 @@ public class Process implements Runnable{
         }
         Handler h = new HandlerHome(kv, user, auth);
         Utils.logUnsafe("User requesting from location", hand);
-        String postId = null;
         switch(hand){
           case "about" :
             if(user != null && user.role == Auth.Role.ADMIN){
@@ -124,6 +123,24 @@ public class Process implements Runnable{
             h.genHead(os, user);
             h.genBody(os);
             h.genFoot(os);
+            break;
+          case "hide" :
+            /* Try to find a valid post */
+            Post post = Post.readPost(pstDir, loc[0]);
+            /* If we have a valid post, lets process it */
+            if(post != null){
+              /* Set the post to be hidden */
+              hidePost(user, post, pstDir);
+              /* Redirect to homepage */
+              writeHead(os, h.genMime(), user);
+              h.genHead(os, user);
+              h.genBody(os);
+              h.genFoot(os);
+            }else{
+              writeHead(os, HTTP_TYPE, user);
+              writeBad(os);
+              Utils.log("Invalid post to hide");
+            }
             break;
           case "" :
           case "index" :
@@ -160,6 +177,7 @@ public class Process implements Runnable{
             h.genFoot(os);
             break;
           case "user" :
+            String postId = null;
             if(loc.length > 1){
               postId = loc[1];
             }
@@ -371,6 +389,30 @@ public class Process implements Runnable{
     }
     return true;
   }
+
+  /**
+   * hidePost()
+   *
+   * Handle a request to hide the post.
+   *
+   * @param user The user that claims to own the post.
+   * @param post The post to be hidden.
+   * @param pstDir The post directory.
+   **/
+ private static void hidePost(Auth.User user, Post post, String pstDir){
+   /* Check user is authenticated */
+   if(
+     user != null &&
+     post != null && (
+       post.user.id.equals(user.id) ||
+       user.role == Auth.Role.ADMIN
+   )){
+     /* Remove the post */
+     post.state = Post.State.HIDE;
+     /* Save the new post configuration */
+     Post.writePost(pstDir, post.id.toString(), post);
+   }
+ }
 
   /**
    * writeHead()
