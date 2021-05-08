@@ -27,6 +27,8 @@ public abstract class Handler{
 
   private static int inputMaxLen;
   private static int maxWordLen;
+  private static int embedWidth;
+  private static int embedHeight;
   private static String form;
 
   /**
@@ -76,6 +78,18 @@ public abstract class Handler{
       maxWordLen = Integer.parseInt(config.get("html").get("max-word-length").value(maxWordLen + ""));
     }catch(NumberFormatException e){
       Utils.warn("Unable to find max word length value");
+    }
+    embedWidth = 680;
+    try{
+      embedWidth = Integer.parseInt(config.get("embed").get("width").value(embedWidth + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find embed width value");
+    }
+    embedHeight = 200;
+    try{
+      embedHeight = Integer.parseInt(config.get("embed").get("height").value(embedHeight + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find embed height value");
     }
     form = (
         "<textarea" +
@@ -210,8 +224,11 @@ public abstract class Handler{
       .append(sub)
       .append(EMBED_SUB)
       .append(post.id.toString())
-      /* TODO: Pull embed values from configuration. */
-      .append("\">link</a> <a target=\"_blank\" href=\"data:text/html,<embed width='680' height='200' src='")
+      .append("\">link</a> <a target=\"_blank\" href=\"data:text/html,<embed width='")
+      .append(Integer.toString(embedWidth))
+      .append("' height='")
+      .append(Integer.toString(embedHeight))
+      .append("' src='")
       .append(url)
       .append(sub)
       .append(EMBED_SUB)
