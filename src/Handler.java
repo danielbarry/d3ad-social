@@ -245,14 +245,18 @@ public abstract class Handler{
       /* Add option to delete post */
       res
         .append(" <a href=\"")
-        .append(url)
         .append(sub)
         .append(HIDE_SUB)
         .append(post.id.toString())
         .append("\">x</a>");
     }
     res.append("<br><quote>");
-    res = HandlerUser.postProcessMessage(res, post.message, auth);
+    /* Check if message deleted */
+    if(post.state != Post.State.HIDE){
+      res = HandlerUser.postProcessMessage(res, post.message, auth);
+    }else{
+      res.append("<i>Message deleted</i>");
+    }
     res.append("</quote></p>");
     return res;
   }

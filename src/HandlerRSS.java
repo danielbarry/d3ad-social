@@ -107,8 +107,13 @@ public class HandlerRSS extends Handler{
                 .append(EMBED_SUB)
                 .append(post.id.toString())
               .append("</link>")
-              .append("<description>")
-                .append(post.message)
+              .append("<description>");
+              if(post.state != Post.State.HIDE){
+                res.append(post.message);
+              }else{
+                res.append("Message deleted");
+              }
+            res
               .append("</description>")
             .append("</item>");
           post = Post.readPost(pstDir,
