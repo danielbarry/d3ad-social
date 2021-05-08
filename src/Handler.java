@@ -132,7 +132,10 @@ public abstract class Handler{
         .append(user.username);
       /* If an admin, add a link the admin panel */
       if(user.role == Auth.Role.ADMIN){
-        res.append("</a> <a href=\"/about\">*");
+        res
+          .append("</a> <a href=\"")
+          .append(sub)
+          .append("about\">*");
       }
     }
     res.append("</a></h1>");
