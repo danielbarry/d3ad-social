@@ -285,7 +285,6 @@ public class Process implements Runnable{
     /* Check if login or registration */
     if(kv.containsKey("username")){
       /* Do authentication delay to prevent brute force */
-      System.out.println("authDelay -> " + authDelay); // TODO
       try{
         Thread.sleep(authDelay);
       }catch(InterruptedException e){
