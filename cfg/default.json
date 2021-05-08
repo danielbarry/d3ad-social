@@ -21,7 +21,7 @@
   "name": "d3ad",
   "pool-size": "8",
   "port": "8080",
-  "rec-buff-size": "2048",
+  "rec-buff-size": "4096",
   "reuse-addr": "false",
   "rss": {
     "length": "8",
