@@ -55,8 +55,6 @@ already failed once.
 * [ ] JSON set should offer the ability to add objects in the place of values
 * [ ] Use JSON data structure in RAM instead of classes for quicker saving, etc
 * [ ] Compress the JSON files saved on disk (https://github.com/lz4/lz4-java)
-* [ ] Integer class
-  * [ ] Use BASE64 strings
 * [ ] String class
   * [ ] 7-bit ASCII look-up table parse
   * [ ] Single parse in-place formatter
@@ -71,6 +69,3 @@ already failed once.
   * [ ] Post flag (any)
 * [ ] Admin role moderation:
   * [ ] Delete post (any)
-* [ ] Single post view
-  * [ ] Embed link
-  * [ ] Embed code
