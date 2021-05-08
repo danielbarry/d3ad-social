@@ -41,6 +41,13 @@ public class HandlerRegister extends Handler{
         "<input type=\"submit\" value=\"submit\">" +
         "<br>" +
         "<br>" +
+        "Registration hints:" +
+        "<br>" +
+        "1. 'username' must be between 6 and 64 characters, letter and numbers only." +
+        "<br>" +
+        "2. 'password' must be between 8 and 64 characters." +
+        "<br>" +
+        "<br>" +
         "By registering, you agree to the site rules:" +
         "<br>" +
         "1. Don't contribute content you wouldn't show your mother." +
