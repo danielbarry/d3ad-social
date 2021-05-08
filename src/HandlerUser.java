@@ -91,7 +91,7 @@ public class HandlerUser extends Handler{
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
-          res = genPostEntry(res, post, auth);
+          res = genPostEntry(res, post, auth, viewer);
           post = Post.readPost(pstDir,
             post.previous != null ? post.previous.toString() : null);
         }

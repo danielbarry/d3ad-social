@@ -52,7 +52,7 @@ public class HandlerHome extends Handler{
     ArrayList<Post> posts = Post.getRecent();
     /* Begin loading posts from most recent (last) */
     for(int x = posts.size() - 1; x >= 0; x--){
-      res = genPostEntry(res, posts.get(x), auth);
+      res = genPostEntry(res, posts.get(x), auth, viewer);
     }
     os.write(res.toByteArray());
   }

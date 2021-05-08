@@ -119,7 +119,7 @@ public class Process implements Runnable{
             h.genFoot(os);
             break;
           case "embed" :
-            h = new HandlerEmbed(kv, auth, loc[0]);
+            h = new HandlerEmbed(kv, user, auth, loc[0]);
             writeHead(os, h.genMime(), user);
             h.genHead(os, user);
             h.genBody(os);

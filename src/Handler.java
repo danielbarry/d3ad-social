@@ -14,6 +14,7 @@ import java.util.Date;
 public abstract class Handler{
   public static final String USER_SUB = "user/";
   public static final String EMBED_SUB = "embed/";
+  public static final String HIDE_SUB = "hide/";
 
   public static String title;
   public static String url;
@@ -208,9 +209,10 @@ public abstract class Handler{
    * @param res The string building structure for this object.
    * @param post The post to be formatted.
    * @param auth Access to the authentication object.
+   * @param viewer The viewer of the object, otherwise NULL.
    * @return The resulting string object.
    **/
-  public static Str genPostEntry(Str res, Post post, Auth auth) throws IOException{
+  public static Str genPostEntry(Str res, Post post, Auth auth, Auth.User viewer) throws IOException{
     res
       .append("<p><b><a target=\"_blank\" href=\"")
       .append(sub)
@@ -224,7 +226,7 @@ public abstract class Handler{
       .append(sub)
       .append(EMBED_SUB)
       .append(post.id.toString())
-      .append("\">link</a> <a target=\"_blank\" href=\"data:text/html,<embed width='")
+      .append("\">&amp;</a> <a target=\"_blank\" href=\"data:text/html,<embed width='")
       .append(Integer.toString(embedWidth))
       .append("' height='")
       .append(Integer.toString(embedHeight))
@@ -233,7 +235,23 @@ public abstract class Handler{
       .append(sub)
       .append(EMBED_SUB)
       .append(post.id.toString())
-      .append("'></embed>\">embed</a><br><quote>");
+      .append("'></embed>\">embed</a>");
+    /* Is this the post owner or admin? */
+    if(
+      viewer != null && (
+        viewer.id.equals(post.user.id) ||
+        viewer.role == Auth.Role.ADMIN
+    )){
+      /* Add option to delete post */
+      res
+        .append(" <a href=\"")
+        .append(url)
+        .append(sub)
+        .append(HIDE_SUB)
+        .append(post.id.toString())
+        .append("\">x</a>");
+    }
+    res.append("<br><quote>");
     res = HandlerUser.postProcessMessage(res, post.message, auth);
     res.append("</quote></p>");
     return res;

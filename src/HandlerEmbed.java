@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class HandlerEmbed extends Handler{
   private static byte[] error;
 
+  private Auth.User viewer;
   private Auth auth;
   private String postId;
 
@@ -46,14 +47,17 @@ public class HandlerEmbed extends Handler{
    * Initialise the variables required to deliver a embed page.
    *
    * @param kv The key value data from the header.
+   * @param viewer The logged in user, otherwise NULL.
    * @param auth Access to the authentication object.
    * @param postId The post to be displayed for this user.
    **/
   public HandlerEmbed(
     HashMap<String, String> kv,
+    Auth.User viewer,
     Auth auth,
     String postId
   ){
+    this.viewer = viewer;
     this.auth = auth;
     this.postId = postId;
   }
@@ -65,7 +69,7 @@ public class HandlerEmbed extends Handler{
       Post post = Post.readPost(pstDir, postId);
       /* Ensure we have a valid post */
       if(post != null){
-        os.write(genPostEntry(new Str(256), post, auth).toByteArray());
+        os.write(genPostEntry(new Str(256), post, auth, viewer).toByteArray());
         return;
       }
     }
