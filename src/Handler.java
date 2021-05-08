@@ -13,17 +13,18 @@ import java.util.Date;
  **/
 public abstract class Handler{
   public static final String USER_SUB = "user/";
+  public static final String EMBED_SUB = "embed/";
 
   public static String title;
   public static String url;
   public static String sub;
   public static String pstDir;
   public static String usrDir;
+  public static byte[] mime;
+  public static byte[] head;
+  public static byte[] error;
+  public static byte[] foot;
 
-  private static byte[] mime;
-  private static byte[] head;
-  private static byte[] error;
-  private static byte[] foot;
   private static int inputMaxLen;
   private static int maxWordLen;
   private static String form;
@@ -202,7 +203,17 @@ public abstract class Handler{
       .append(post.user.username)
       .append("</a></b> on ")
       .append((new Date(post.creation)).toString())
-      .append(" said:<br><quote>");
+      .append(" said: <a href=\"")
+      .append(sub)
+      .append(EMBED_SUB)
+      .append(post.id.toString())
+      /* TODO: Pull iframe values from configuration. */
+      .append("\">link</a> <a href=\"data:text/html,<iframe width='680' height='128' src='")
+      .append(url)
+      .append(sub)
+      .append(EMBED_SUB)
+      .append(post.id.toString())
+      .append("'></iframe>\">embed</a><br><quote>");
     res = HandlerUser.postProcessMessage(res, post.message, auth);
     res.append("</quote></p>");
     return res;

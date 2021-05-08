@@ -103,11 +103,19 @@ public class Process implements Runnable{
         }
         Handler h = new HandlerHome(kv, user, auth);
         Utils.logUnsafe("User requesting from location", hand);
+        String postId = null;
         switch(hand){
           case "about" :
             if(user != null && user.role == Auth.Role.ADMIN){
               h = new HandlerAbout(kv, auth);
             }
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
+          case "embed" :
+            h = new HandlerEmbed(kv, auth, loc[0]);
             writeHead(os, h.genMime(), user);
             h.genHead(os, user);
             h.genBody(os);
@@ -148,7 +156,6 @@ public class Process implements Runnable{
             h.genFoot(os);
             break;
           case "user" :
-            String postId = null;
             if(loc.length > 1){
               postId = loc[1];
             }
