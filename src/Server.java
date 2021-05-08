@@ -20,6 +20,7 @@ public class Server extends Thread{
   private int recBuffSize;
   private int subDirLen;
   private int inputMaxLen;
+  private int authDelay;
   private String pstDir;
   private String usrDir;
 
@@ -38,6 +39,7 @@ public class Server extends Thread{
     recBuffSize = 2048;
     String subDir = "/";
     inputMaxLen = 512;
+    authDelay = 1000;
     subDirLen = 1;
     pstDir = "dat/pst";
     usrDir = "dat/usr";
@@ -60,30 +62,35 @@ public class Server extends Thread{
     }
     reuseAddr = config.get("reuse-addr").value("false").equals("true");
     try{
-      subDir = config.get("sub-dir").value("/");
-      subDirLen = subDir.length();
-    }catch(NumberFormatException e){
-      Utils.warn("Unable to find sub directory value");
-    }
-    try{
       inputMaxLen = Integer.parseInt(config.get("input").get("max-length").value(inputMaxLen + ""));
     }catch(NumberFormatException e){
       Utils.warn("Unable to find input maximum length value");
+    }
+    try{
+      authDelay = Integer.parseInt(config.get("authentication").get("delay-ms").value(authDelay + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find authentication delay value");
     }
     try{
       timeout = Integer.parseInt(config.get("timeout-ms").value(timeout + ""));
     }catch(NumberFormatException e){
       Utils.warn("Unable to find timeout value");
     }
+    subDir = config.get("sub-dir").value("/");
+    subDirLen = subDir.length();
     pstDir = config.get("data").get("post-dir").value("dat/pst");
     usrDir = config.get("data").get("user-dir").value("dat/usr");
     /* Log out server values */
-    Utils.log("Requested pool size is '"           + poolSize    + "'");
-    Utils.log("Requested port is '"                + port        + "'");
-    Utils.log("Requested receive buffer size is '" + recBuffSize + "'");
-    Utils.log("Requested reuse address is '"       + reuseAddr   + "'");
-    Utils.log("Requested sub directory is '"       + subDir      + "'");
-    Utils.log("Requested timeout is '"             + timeout     + "'");
+    Utils.log("Requested pool size is '"            + poolSize    + "'");
+    Utils.log("Requested port is '"                 + port        + "'");
+    Utils.log("Requested receive buffer size is '"  + recBuffSize + "'");
+    Utils.log("Requested reuse address is '"        + reuseAddr   + "'");
+    Utils.log("Requested input maximum length is '" + inputMaxLen + "'");
+    Utils.log("Requested authentication delay is '" + authDelay   + "'");
+    Utils.log("Requested timeout is '"              + timeout     + "'");
+    Utils.log("Requested sub directory is '"        + subDir      + "'");
+    Utils.log("Requested post directory is '"       + pstDir      + "'");
+    Utils.log("Requested user directory is '"       + usrDir      + "'");
     /* Setup server socket */
     try{
       ss = new ServerSocket(port);
@@ -152,6 +159,7 @@ public class Server extends Thread{
                 recBuffSize,
                 subDirLen,
                 inputMaxLen,
+                authDelay,
                 auth,
                 pstDir,
                 usrDir

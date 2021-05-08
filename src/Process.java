@@ -27,6 +27,7 @@ public class Process implements Runnable{
   private int recBuffSize;
   private int subDirLen;
   private int inputMaxLen;
+  private int authDelay;
   private Auth auth;
   private String pstDir;
   private String usrDir;
@@ -41,6 +42,7 @@ public class Process implements Runnable{
    * @param recBuffSize The receiver buffer size.
    * @param subDirLen The subdirectory length.
    * @param inputMaxLen The maximum post input length.
+   * @param authDelay Artificial delay for authentication.
    * @param auth Access to the authentication mechanism.
    * @param pstDir The post directory.
    * @param usrDir The user directory.
@@ -51,6 +53,7 @@ public class Process implements Runnable{
     int recBuffSize,
     int subDirLen,
     int inputMaxLen,
+    int authDelay,
     Auth auth,
     String pstDir,
     String usrDir
@@ -60,6 +63,7 @@ public class Process implements Runnable{
     this.recBuffSize = recBuffSize;
     this.subDirLen = subDirLen;
     this.inputMaxLen = inputMaxLen;
+    this.authDelay = authDelay;
     this.auth = auth;
     this.pstDir = pstDir;
     this.usrDir = usrDir;
@@ -82,7 +86,7 @@ public class Process implements Runnable{
     /* Parse the header */
     HashMap<String, String> kv = parseHead(raw);
     /* Authenticate (if required) */
-    Auth.User user = parseAuth(kv, auth);
+    Auth.User user = parseAuth(kv, auth, authDelay);
     /* Handle user POST */
     if(!parsePost(kv, user, pstDir, usrDir, inputMaxLen)){
       /* Delete location to force a bad message */
@@ -272,12 +276,21 @@ public class Process implements Runnable{
    *
    * @param kv The key value mappings from the header.
    * @param auth The server authentication mechanism.
+   * @param authDelay Create an artificial delay to prevent brute force
+   * attacks.
    * @return The logged in user, otherwise NULL.
    **/
-  private static Auth.User parseAuth(HashMap<String, String> kv, Auth auth){
+  private static Auth.User parseAuth(HashMap<String, String> kv, Auth auth, int authDelay){
     Auth.User user = null;
     /* Check if login or registration */
     if(kv.containsKey("username")){
+      /* Do authentication delay to prevent brute force */
+      System.out.println("authDelay -> " + authDelay); // TODO
+      try{
+        Thread.sleep(authDelay);
+      }catch(InterruptedException e){
+        /* Do nothing */
+      }
       /* Is login */
       if(kv.containsKey("password")){
         return auth.login(kv.get("username"), kv.get("password"));

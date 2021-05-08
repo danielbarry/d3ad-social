@@ -1,5 +1,8 @@
 {
   "active": "true",
+  "authentication": {
+    "delay-ms": "5000"
+  },
   "data": {
     "post-dir": "dat/pst",
     "user-dir": "dat/usr"
