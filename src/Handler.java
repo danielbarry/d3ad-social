@@ -208,12 +208,12 @@ public abstract class Handler{
       .append(EMBED_SUB)
       .append(post.id.toString())
       /* TODO: Pull iframe values from configuration. */
-      .append("\">link</a> <a href=\"data:text/html,<iframe width='680' height='128' src='")
+      .append("\">link</a> <a href=\"data:text/html,<embed width='680' height='128' src='")
       .append(url)
       .append(sub)
       .append(EMBED_SUB)
       .append(post.id.toString())
-      .append("'></iframe>\">embed</a><br><quote>");
+      .append("'></embed>\">embed</a><br><quote>");
     res = HandlerUser.postProcessMessage(res, post.message, auth);
     res.append("</quote></p>");
     return res;
