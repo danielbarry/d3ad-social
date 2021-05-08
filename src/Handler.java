@@ -198,7 +198,7 @@ public abstract class Handler{
    **/
   public static Str genPostEntry(Str res, Post post, Auth auth) throws IOException{
     res
-      .append("<p><b><a href=\"")
+      .append("<p><b><a target=\"_blank\" href=\"")
       .append(sub)
       .append(USER_SUB)
       .append(post.user.id.toString())
@@ -211,7 +211,7 @@ public abstract class Handler{
       .append(EMBED_SUB)
       .append(post.id.toString())
       /* TODO: Pull iframe values from configuration. */
-      .append("\">link</a> <a href=\"data:text/html,<embed width='680' height='128' src='")
+      .append("\">link</a> <a target=\"_blank\" href=\"data:text/html,<embed width='680' height='128' src='")
       .append(url)
       .append(sub)
       .append(EMBED_SUB)
