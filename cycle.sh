@@ -2,8 +2,6 @@
 
 # String for process
 PROC="d3ad"
-# The user who has permission to pull the code
-USER="user"
 
 # restart_process()
 #
@@ -27,11 +25,11 @@ restart_process
 while :
 do
   # Fetch the latest changes
-  sudo -u $USER git fetch
+  git fetch
   # Check whether pull required
   if ! git diff --quiet remotes/origin/HEAD; then
     # Pull the latest changes
-    sudo -u $USER git pull
+    git pull
     # Rebuild the files
     ant
     # Restart the process
