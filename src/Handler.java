@@ -211,6 +211,34 @@ public abstract class Handler{
   }
 
   /**
+   * getNextPost()
+   *
+   * Given a post, get the next post for the user. This method considers also
+   * the quotes for a given user and includes them in the correct context.
+   *
+   * @param post The post to be incremented upon.
+   * @param user The user to find the next post for.
+   * @return The next post, otherwise NULL.
+   **/
+  public static Post getNextPost(Post post, Auth.User user){
+    Post next = null;
+    /* Check if there is anything to be read */
+    if(post.previous != null){
+      /* Check if the current post is a quote */
+      if(post.user == user){
+        next = Post.readPost(pstDir, post.previous.toString());
+      }else{
+        /* Make sure there is a quote */
+        if(post.qprevious != null){
+          next = Post.readPost(pstDir, post.qprevious.toString());
+        }
+      }
+    }
+    /* Return what we have */
+    return next;
+  }
+
+  /**
    * genPostEntry()
    *
    * Generate a formatted post entry.
