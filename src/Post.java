@@ -38,6 +38,8 @@ public class Post{
   public State state = State.NONE;
   /* Post being quoted if any */
   public I512 quote = null;
+  /* The previous post by the quoted user */
+  public I512 qprevious = null;
 
   /**
    * init()
@@ -97,6 +99,8 @@ public class Post{
       post.state = State.valueOf(postData.get("state").value("NONE"));
       String quote = postData.get("quote").value(null);
       post.quote = quote != null ? new I512(quote) : null;
+      String qprevious = postData.get("qprevious").value(null);
+      post.qprevious = qprevious != null ? new I512(qprevious) : null;
       if(
         post.id != null    &&
         post.user != null  &&
@@ -145,6 +149,9 @@ public class Post{
       data.set(new JSON("state", post.state.toString()));
       if(post.quote != null){
         data.set(new JSON("quote", post.quote.toString()));
+      }
+      if(post.qprevious != null){
+        data.set(new JSON("qprevious", post.qprevious.toString()));
       }
     }catch(Exception e){
       data = null;
