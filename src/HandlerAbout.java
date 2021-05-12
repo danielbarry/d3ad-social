@@ -58,17 +58,17 @@ public class HandlerAbout extends Handler{
   private Str genAbout(Str res){
     res.append("<h2>about server</h2>");
     /* Generate build stats */
-    res.append("<p><b>build</b>")
+    res.append("<div><b>build</b>")
       .append("<quote>Hash: ")
         .append(Utils.getGitHash().toString())
         .append("</quote>")
       .append("<quote>Build: ")
         .append(Utils.getBuildDate().toString())
         .append("</quote>")
-      .append("</p>");
+      .append("</div>");
     /* Generate system stats */
     OperatingSystemMXBean osb = ManagementFactory.getOperatingSystemMXBean();
-    res.append("<p><b>system</b>")
+    res.append("<div><b>system</b>")
       .append("<quote>Arch: ")
         .append(osb.getArch())
         .append("</quote>")
@@ -78,9 +78,9 @@ public class HandlerAbout extends Handler{
       .append("<quote>Version: ")
         .append(osb.getVersion())
         .append("</quote>")
-      .append("</p>");
+      .append("</div>");
     /* Generate memory stats */
-    res.append("<p><b>memory</b>");
+    res.append("<div><b>memory</b>");
     long memTotal = Runtime.getRuntime().totalMemory();
     res.append("<quote>Total: ")
       .append(formatSize(memTotal))
@@ -93,31 +93,31 @@ public class HandlerAbout extends Handler{
     res.append("<quote>Used: ")
       .append(formatSize(memUsed))
       .append("</quote>");
-    res.append("</p>");
+    res.append("</div>");
     /* Generate CPU stats */
-    res.append("<p><b>cpu</b>")
+    res.append("<div><b>cpu</b>")
       .append("<quote>Processors: ")
         .append(Integer.toString(osb.getAvailableProcessors()))
         .append("</quote>")
       .append("<quote>Load average: ")
         .append(Double.toString(osb.getSystemLoadAverage() * 100))
         .append("%</quote>")
-      .append("</p>");
+      .append("</div>");
     /* Generate user stats */
-    res.append("<p><b>users</b>")
+    res.append("<div><b>users</b>")
       .append("<quote>Registered: ")
         .append(Integer.toString(auth.getNumUsers()))
         .append("</quote>")
       .append("<quote>Active: ")
         .append(Integer.toString(auth.getActiveUsers()))
         .append("</quote>")
-      .append("</p>");
+      .append("</div>");
     /* Generate post stats */
-    res.append("<p><b>posts</b>")
+    res.append("<div><b>posts</b>")
       .append("<quote>Cached: ")
         .append(Integer.toString(Post.getNumActive()))
         .append("</quote>")
-      .append("</p>");
+      .append("</div>");
     return res;
   }
 
