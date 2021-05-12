@@ -49,7 +49,9 @@ in the configuration and reboot the server to load the user into cache.
 
 ## Contributing
 
-**Source:** Please fork the project and submit a Merge Request.
+**Source:** Please fork the project and submit a Merge Request. Please discuss
+the contribution you want to make (unless it's a small change/fix) and maintain
+the coding style as you see it.
 
 **Issues:** Please open a ticket with the relevant details for recreating the
 issue.
