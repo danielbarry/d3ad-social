@@ -130,6 +130,7 @@ public class Server extends Thread{
     HandlerHome.init(config);
     HandlerLogin.init(config);
     HandlerRegister.init(config);
+    HandlerReply.init(config);
     HandlerRSS.init(config);
     HandlerUser.init(config);
   }

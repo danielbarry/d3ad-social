@@ -169,6 +169,17 @@ public class Process implements Runnable{
             h.genBody(os);
             h.genFoot(os);
             break;
+          case "reply" :
+            if(user == null){
+              h = new HandlerLogin(kv);
+            }else{
+              h = new HandlerReply(kv, user, auth, loc[0]);
+            }
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
           case "rss" :
             h = new HandlerRSS(kv, user, auth.getUserById(loc[0]));
             writeHead(os, h.genMime(), user);
