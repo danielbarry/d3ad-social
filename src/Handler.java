@@ -300,7 +300,20 @@ public abstract class Handler{
           .append(sub)
           .append(HIDE_SUB)
           .append(post.id.toString())
-          .append("\">x</a>");
+          .append("\">");
+        switch(post.state){
+          case NONE :
+            res.append("x");
+            break;
+          case HIDE :
+            res.append("+");
+            break;
+          default :
+            /* Display at least something for an unknown state */
+            res.append("?");
+            break;
+        }
+        res.append("</a>");
       }
     }
     res.append("<br><quote>");
