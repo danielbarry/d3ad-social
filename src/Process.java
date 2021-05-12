@@ -437,8 +437,13 @@ public class Process implements Runnable{
        post.user.id.equals(user.id) ||
        user.role == Auth.Role.ADMIN
    )){
-     /* Remove the post */
-     post.state = Post.State.HIDE;
+     /* Invert hidden state */
+     /* NOTE: We explicitly check for entry states for future support. */
+     if(post.state == Post.State.NONE){
+       post.state = Post.State.HIDE;
+     }else if(post.state == Post.State.HIDE){
+       post.state = Post.State.NONE;
+     }
      /* Save the new post configuration */
      Post.writePost(pstDir, post.id.toString(), post);
    }
