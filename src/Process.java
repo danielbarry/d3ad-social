@@ -392,6 +392,12 @@ public class Process implements Runnable{
         quote = Post.readPost(pstDir, quoteId.toString());
         if(quote != null){
           post.quote = quote.id;
+          /* Update quoted user's feed */
+          Auth.User qUser = quote.user;
+          post.qprevious = qUser.latest;
+          qUser.latest = post.id;
+          /* Save quoted user */
+          Auth.writeUser(usrDir + "/" + qUser.id.toString(), qUser);
         }else{
           Utils.warn("User tried to quote a non-existing post");
           return false;
@@ -407,10 +413,6 @@ public class Process implements Runnable{
       if(Auth.writeUser(usrDir + "/" + user.id.toString(), user) != user){
         Utils.warn("Unable to save updated user");
         return false;
-      }
-      /* Is this person replying? */
-      if(quote != null){
-        /* TODO: Notify the person being quoted that they were quoted. */
       }
       return true;
     }
