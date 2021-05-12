@@ -369,6 +369,7 @@ public class Process implements Runnable{
       post.user = user;
       post.creation = System.currentTimeMillis();
       post.previous = user.latest;
+      /* Grab user message */
       try{
         post.message = URLDecoder.decode(kv.get("post"), "UTF-8");
       }catch(UnsupportedEncodingException e){
@@ -384,7 +385,18 @@ public class Process implements Runnable{
       }
       /* Sanitize the input */
       post.message = Utils.sanitizeString(post.message);
-      /* TODO: Add message to user's feeds if they are tagged. */
+      /* Grab user quote ID */
+      Post quote = null;
+      if(kv.get("quote") != null){
+        I512 quoteId = new I512(kv.get("quote"));
+        quote = Post.readPost(pstDir, quoteId.toString());
+        if(quote != null){
+          post.quote = quote.id;
+        }else{
+          Utils.warn("User tried to quote a non-existing post");
+          return false;
+        }
+      }
       /* Save post */
       if(Post.writePost(pstDir, post.id.toString(), post) != post){
         Utils.warn("Unable to save new post");
@@ -395,6 +407,10 @@ public class Process implements Runnable{
       if(Auth.writeUser(usrDir + "/" + user.id.toString(), user) != user){
         Utils.warn("Unable to save updated user");
         return false;
+      }
+      /* Is this person replying? */
+      if(quote != null){
+        /* TODO: Notify the person being quoted that they were quoted. */
       }
       return true;
     }
