@@ -7,8 +7,8 @@
 You'll need:
 
 * Ant (build script)
-* Java JRE (runtime)
-* Java JDK (development kit)
+* Java JRE (runtime - currently tested with Java 11)
+* Java JDK (development kit - currently tested with Java 11)
 
 To build you should then be able to run `ant` in the root directory.
 
