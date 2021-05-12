@@ -125,6 +125,7 @@ public class Process implements Runnable{
             h.genFoot(os);
             break;
           case "hide" :
+            h = new HandlerUser(kv, user, user, auth, null);
             /* Try to find a valid post */
             Post post = Post.readPost(pstDir, loc[0]);
             /* If we have a valid post, lets process it */
