@@ -36,6 +36,8 @@ public class Post{
   public String message = null;
   /* The state of the message */
   public State state = State.NONE;
+  /* Post being quoted if any */
+  public I512 quote = null;
 
   /**
    * init()
@@ -93,6 +95,8 @@ public class Post{
       post.previous = prev != null ? new I512(prev) : null;
       post.message = postData.get("message").value(null);
       post.state = State.valueOf(postData.get("state").value("NONE"));
+      String quote = postData.get("quote").value(null);
+      post.quote = quote != null ? new I512(quote) : null;
       if(
         post.id != null    &&
         post.user != null  &&
@@ -139,6 +143,9 @@ public class Post{
       }
       data.set(new JSON("message", post.message));
       data.set(new JSON("state", post.state.toString()));
+      if(post.quote != null){
+        data.set(new JSON("quote", post.quote.toString()));
+      }
     }catch(Exception e){
       data = null;
     }
