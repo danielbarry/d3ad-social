@@ -2,6 +2,15 @@
 
 > A small, lightweight, Java-based alternative to Twitter.
 
+![v1.0 example user page](doc/v1.0.jpg)
+
+Functionality and features include:
+
+* Zero JavaScript or tracking
+* No database or external libraries (other than core Java libraries)
+* Users can post and reply to one another
+* Lightweight post markup
+
 ## Building
 
 You'll need:
@@ -17,6 +26,8 @@ To build you should then be able to run `ant` in the root directory.
 This can be achieved by simply running:
 
     java -jar dist/d3ad.jar -c cfg/default.json
+
+You can now point a browser at `127.0.0.1:8080` to start experimenting!
 
 ### Configuration
 
