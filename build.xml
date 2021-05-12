@@ -43,8 +43,4 @@
       </manifest>
     </jar>
   </target>
-
-  <target name="run" depends="jar" description="Run Java App">
-    <java jar="${jar.dir}/${main.jar}" fork="true" />
-  </target>
 </project>
