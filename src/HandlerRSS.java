@@ -99,7 +99,7 @@ public class HandlerRSS extends Handler{
           res
             .append("<item>")
               .append("<title>")
-                .append(subject.username)
+                .append(post.user.username)
               .append("</title>")
               .append("<link>")
                 .append(url)
@@ -116,8 +116,7 @@ public class HandlerRSS extends Handler{
             res
               .append("</description>")
             .append("</item>");
-          post = Post.readPost(pstDir,
-            post.previous != null ? post.previous.toString() : null);
+            post = Handler.getNextPost(post, subject);
         }
         os.write(res.toByteArray());
       }
