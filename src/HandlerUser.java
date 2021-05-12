@@ -74,7 +74,7 @@ public class HandlerUser extends Handler{
         .append(subject.id.toString())
         .append("\">RSS</a></h2>");
       /* Generate post form */
-      res = genPostForm(res, viewer);
+      res = genPostForm(res, viewer, null);
       /* Check for latest comment */
       if(subject.latest != null){
         Post post = Post.readPost(
@@ -91,7 +91,7 @@ public class HandlerUser extends Handler{
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
-          res = genPostEntry(res, post, auth, viewer);
+          res = genPostEntry(res, post, auth, viewer, 0);
           post = Post.readPost(pstDir,
             post.previous != null ? post.previous.toString() : null);
         }

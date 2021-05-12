@@ -16,7 +16,7 @@
       "html{background-color:#EEE;color:#000;font-family:monospace;font-size:16px;}",
       "h1,h2{text-align:center;}",
       "a{color:#888;}a:before{content:\"[\";}a:after{content:\"]\";}",
-      "form,p{background-color:#CCC;margin:auto;max-width:640px;padding:4px;}",
+      "form,div{background-color:#CCC;margin:auto;max-width:640px;padding:4px;}",
       "quote{background-color:#FFF;color:#222;display:block;}"
     ],
     "length": "16",

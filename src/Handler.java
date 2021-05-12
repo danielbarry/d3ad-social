@@ -14,6 +14,7 @@ import java.util.Date;
 public abstract class Handler{
   public static final String USER_SUB = "user/";
   public static final String EMBED_SUB = "embed/";
+  public static final String REPLY_SUB = "reply/";
   public static final String HIDE_SUB = "hide/";
 
   public static String title;
@@ -186,17 +187,25 @@ public abstract class Handler{
    *
    * @param res The string building structure for this object.
    * @param viewer The logged in viewer of the content, otherwise NULL.
+   * @param quoteId The post being quoted, otherwise NULL.
    * @return The resulting string object.
    **/
-  public static Str genPostForm(Str res, Auth.User viewer) throws IOException{
+  public static Str genPostForm(Str res, Auth.User viewer, String quoteId) throws IOException{
     if(viewer != null){
       res
         .append("<form action=\"")
         .append(sub)
         .append(USER_SUB)
         .append(viewer.id.toString())
-        .append("\" method=\"post\">")
-        .append(form);
+        .append("\" method=\"post\">");
+      /* Check if we want to quote a post */
+      if(quoteId != null){
+        res
+          .append("<input type=\"hidden\" id=\"quote\" name=\"quote\" value=\"")
+          .append(quoteId)
+          .append("\">");
+      }
+      res.append(form);
     }
     return res;
   }
@@ -210,11 +219,17 @@ public abstract class Handler{
    * @param post The post to be formatted.
    * @param auth Access to the authentication object.
    * @param viewer The viewer of the object, otherwise NULL.
+   * @param entry This counts the number of times this method is entered into,
+   * the default being zero. The purpose it prevent endless recursion.
    * @return The resulting string object.
    **/
-  public static Str genPostEntry(Str res, Post post, Auth auth, Auth.User viewer) throws IOException{
+  public static Str genPostEntry(Str res, Post post, Auth auth, Auth.User viewer, int entry) throws IOException{
+    /* Make sure we're not in too deep */
+    if(entry > 1){
+      return res;
+    }
     res
-      .append("<p><b><a target=\"_blank\" href=\"")
+      .append("<div><b><a target=\"_blank\" href=\"")
       .append(sub)
       .append(USER_SUB)
       .append(post.user.id.toString())
@@ -226,7 +241,7 @@ public abstract class Handler{
       .append(sub)
       .append(EMBED_SUB)
       .append(post.id.toString())
-      .append("\">&amp;</a> <a target=\"_blank\" href=\"data:text/html,<embed width='")
+      .append("\">&amp;</a><a target=\"_blank\" href=\"data:text/html,<embed width='")
       .append(Integer.toString(embedWidth))
       .append("' height='")
       .append(Integer.toString(embedHeight))
@@ -235,29 +250,46 @@ public abstract class Handler{
       .append(sub)
       .append(EMBED_SUB)
       .append(post.id.toString())
-      .append("'></embed>\">embed</a>");
-    /* Is this the post owner or admin? */
-    if(
-      viewer != null && (
-        viewer.id.equals(post.user.id) ||
-        viewer.role == Auth.Role.ADMIN
-    )){
-      /* Add option to delete post */
+      .append("'></embed>\">e</a>");
+    /* Is this a logged in user? */
+    if(viewer != null){
+      /* Offer the option to quote reply */
       res
-        .append(" <a href=\"")
+        .append("<a href=\"")
         .append(sub)
-        .append(HIDE_SUB)
+        .append(REPLY_SUB)
         .append(post.id.toString())
-        .append("\">x</a>");
+        .append("\">&gt;</a>");
+      /* Is this the post owner or admin? */
+      if(
+        viewer != null && (
+          viewer.id.equals(post.user.id) ||
+          viewer.role == Auth.Role.ADMIN
+      )){
+        /* Add option to delete post */
+        res
+          .append("<a href=\"")
+          .append(sub)
+          .append(HIDE_SUB)
+          .append(post.id.toString())
+          .append("\">x</a>");
+      }
     }
     res.append("<br><quote>");
     /* Check if message deleted */
     if(post.state != Post.State.HIDE){
+      /* Are we quoting somebody? */
+      if(post.quote != null){
+        Post quote = Post.readPost(pstDir, post.quote.toString());
+        if(quote != null){
+          res = genPostEntry(res, quote, auth, viewer, entry + 1);
+        }
+      }
       res = HandlerUser.postProcessMessage(res, post.message, auth);
     }else{
       res.append("<i>Message deleted</i>");
     }
-    res.append("</quote></p>");
+    res.append("</quote></div>");
     return res;
   }
 

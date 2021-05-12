@@ -69,7 +69,7 @@ public class HandlerEmbed extends Handler{
       Post post = Post.readPost(pstDir, postId);
       /* Ensure we have a valid post */
       if(post != null){
-        os.write(genPostEntry(new Str(256), post, auth, viewer).toByteArray());
+        os.write(genPostEntry(new Str(256), post, auth, viewer, 0).toByteArray());
         return;
       }
     }
