@@ -77,23 +77,35 @@ public class HandlerUser extends Handler{
       res = genPostForm(res, viewer, null);
       /* Check for latest comment */
       if(subject.latest != null){
-        Post post = Post.readPost(
-          pstDir,
-          postId != null ? postId :
-            (subject.latest != null ? subject.latest.toString() : null)
-        );
-        /* Make sure this is a valid post to display for this user */
-        if(post == null || !post.user.id.equals(subject.id)){
-          Utils.warn("Requested post under wrong user");
-          os.write(error);
-          return;
+        Post post = null;
+        if(postId != null){
+          post = Post.readPost(pstDir, postId);
+          if(post != null){
+            /* As we were given a post, ensure it's valid for this user */
+            if(!post.user.id.equals(subject.id)){
+              /* Check if we have a quote */
+              if(post.quote != null){
+                Post qpost = Post.readPost(pstDir, post.quote.toString());
+                if(qpost == null || !qpost.user.id.equals(subject.id)){
+                  Utils.warn("Requested post under wrong user");
+                  os.write(error);
+                  return;
+                }
+              }
+            }
+          }else{
+            Utils.warn("Requested post under wrong user");
+            os.write(error);
+            return;
+          }
+        }else if(subject.latest != null){
+          post = Post.readPost(pstDir, subject.latest.toString());
         }
         int postCount = 0;
         /* Begin loading posts */
         while(++postCount <= len && post != null){
           res = genPostEntry(res, post, auth, viewer, 0);
-          post = Post.readPost(pstDir,
-            post.previous != null ? post.previous.toString() : null);
+          post = Handler.getNextPost(post, subject);
         }
         /* Provide a link to find out more */
         if(post != null && post.previous != null){
