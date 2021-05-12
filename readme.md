@@ -59,11 +59,6 @@ already failed once.
 
 ### Usability
 
-* [ ] Reply to post
-  * [ ] Reply button
-  * [ ] Quote post being replied to
-    * [ ] Whilst writing reply
-    * [ ] Whilst displaying reply
 * [ ] Self moderation:
   * [ ] Post flag (any)
 * [ ] Admin:
