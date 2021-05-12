@@ -18,12 +18,34 @@ This can be achieved by simply running:
 
     java -jar dist/d3ad.jar -c cfg/default.json
 
-**Note:** You should set your own 512 bit (64 character hex) salt in the
+### Configuration
+
+You should copy `cfg/default.json` to `cfg/custom.cfg` and make your changes
+there.
+
+Firstly, you should set your own 512 bit (64 character hex) salt in the
 configuration for the server. This of course is a secret and should not be
 added to git.
 
+### Auto-update
+
 For running on a server, you may also use the bash script contain in
 `cycle.sh`, please read this small script to understand how it works.
+
+Essentially it monitors the head of a given branch and auto-pulls in changes,
+rebooting the server. It is recommended that you fork the main repository and
+pull in changes after testing them.
+
+### Backups
+
+By default all the data is stored in `dat/`. All the files in here are human
+readable JSON. A simple form of backup you can perform is to simply copy all of
+these files to another location.
+
+### Roles
+
+To set a user to the `ADMIN` role, currently you need to change this manually
+in the configuration and reboot the server to load the user into cache.
 
 ## Contributing
 
