@@ -1,5 +1,6 @@
 package b.ds;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -156,6 +157,7 @@ public class Post{
     }catch(Exception e){
       data = null;
     }
+    boolean pexist = (new File(loc + "/" + id)).exists();
     if(data != null && Data.write(loc + "/" + id, data.toString())){
       Utils.log("Post configuration saved " + post.id);
       /* TODO: Get length of post buffer from configuration. */
@@ -163,7 +165,11 @@ public class Post{
       if(recent.size() >= 16){
         recent.remove(0);
       }
-      recent.add(post);
+      /* Only add to home page if it didn't already exist */
+      if(!pexist){
+        recent.add(post);
+      }
+      /* Add post to cache */
       addPost(post);
       return post;
     }else{
