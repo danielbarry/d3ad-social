@@ -33,7 +33,6 @@ public class Server extends Thread{
    **/
   public Server(JSON config){
     this.config = config;
-    this.auth = new Auth(config);
     int poolSize = 8;
     int port = 8080;
     recBuffSize = 2048;
@@ -123,6 +122,8 @@ public class Server extends Thread{
     /* Setup thread pool */
     pool = Executors.newFixedThreadPool(poolSize);
     /* Initialise shared variables */
+    Data.init(config);
+    auth = new Auth(config);
     Post.init(auth);
     Handler.init(config);
     HandlerAbout.init(config);

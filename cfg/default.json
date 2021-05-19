@@ -7,6 +7,9 @@
     "post-dir": "dat/pst",
     "user-dir": "dat/usr"
   },
+  "disk": {
+    "max-read": "2048"
+  },
   "embed": {
     "height": "200",
     "width": "680"
