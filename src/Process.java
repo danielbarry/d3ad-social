@@ -189,7 +189,11 @@ public class Process implements Runnable{
             h.genFoot(os);
             break;
           case "tag" :
-            h = new HandlerTag(kv, loc[0]);
+            String tag = loc[0];
+            if(kv.containsKey("search")){
+              tag = kv.get("search");
+            }
+            h = new HandlerTag(kv, tag);
             writeHead(os, h.genMime(), user);
             h.genHead(os, user);
             h.genBody(os);
