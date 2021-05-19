@@ -133,6 +133,7 @@ public class Server extends Thread{
     HandlerRegister.init(config);
     HandlerReply.init(config);
     HandlerRSS.init(config);
+    HandlerTag.init(config);
     HandlerUser.init(config);
   }
 

@@ -188,6 +188,13 @@ public class Process implements Runnable{
             h.genBody(os);
             h.genFoot(os);
             break;
+          case "tag" :
+            h = new HandlerTag(kv, loc[0]);
+            writeHead(os, h.genMime(), user);
+            h.genHead(os, user);
+            h.genBody(os);
+            h.genFoot(os);
+            break;
           case "user" :
             String postId = null;
             if(loc.length > 1){
