@@ -28,18 +28,6 @@ public class HandlerTag extends Handler{
   }
 
   /**
-   * genHead()
-   *
-   * Generate the page header content.
-   *
-   * @param os The OutputStream to write the data to.
-   * @param user The logged in user, otherwise NULL.
-   **/
-  public void genHead(OutputStream os, Auth.User user) throws IOException{
-    os.write(head);
-  }
-
-  /**
    * HandlerTag()
    *
    * Initialise the variables required to deliver a tag page.
