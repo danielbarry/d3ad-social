@@ -110,7 +110,7 @@ public abstract class Handler{
     );
     search =
       "<form action=\"" + sub + TAG_SUB + "\" method=\"post\">" +
-        "<input type=\"text\" id=\"search\" value=\"search tags\">" +
+        "<input type=\"text\" id=\"search\" name=\"search\" value=\"search tags\">" +
         "<input type=\"submit\" value=\"submit\">" +
       "</form>";
   }
