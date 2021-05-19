@@ -16,6 +16,7 @@ public abstract class Handler{
   public static final String EMBED_SUB = "embed/";
   public static final String REPLY_SUB = "reply/";
   public static final String HIDE_SUB = "hide/";
+  public static final String TAG_SUB = "tag/";
 
   public static String title;
   public static String url;
@@ -32,6 +33,7 @@ public abstract class Handler{
   private static int embedWidth;
   private static int embedHeight;
   private static String form;
+  private static String search;
 
   /**
    * init()
@@ -106,6 +108,11 @@ public abstract class Handler{
         "<input type=\"submit\" value=\"submit\">" +
       "</form>"
     );
+    search =
+      "<form action=\"" + sub + TAG_SUB + "\" method=\"post\">" +
+        "<input type=\"text\" id=\"search\" value=\"search tags\">" +
+        "<input type=\"submit\" value=\"submit\">" +
+      "</form>";
   }
 
   /**
@@ -154,7 +161,10 @@ public abstract class Handler{
           .append("about\">*");
       }
     }
-    res.append("</a></h1>");
+    res
+      .append("</a>")
+      .append(search)
+      .append("</h1>");
     os.write(res.toByteArray());
   }
 
