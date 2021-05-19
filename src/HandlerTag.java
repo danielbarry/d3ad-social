@@ -37,6 +37,10 @@ public class HandlerTag extends Handler{
    **/
   public HandlerTag(HashMap<String, String> kv, String tag){
     this.tag = tag;
+    /* TODO: Check if tag is valid. */
+    if(kv.containsKey("search")){
+      this.tag = kv.get("search");
+    }
   }
 
   @Override
