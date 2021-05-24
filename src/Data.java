@@ -1,8 +1,8 @@
 package b.ds;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -40,27 +40,31 @@ public abstract class Data{
    * Read from file on the disk, returning NULL on error.
    *
    * @param path The location read from.
+   * @param offset The offset to begin reading the file from.
    * @param maxRead The maximum data to be read from disk.
    * @return The data on success, otherwise NULL.
    **/
-  private static String read(String path, int maxRead){
-    String data = null;
-    byte[] raw = new byte[maxRead];
+  private static byte[] read(String path, int offset, int maxRead){
     File file = new File(path);
     resources.putIfAbsent(path, new ReentrantReadWriteLock(true));
     ReentrantReadWriteLock rrwl = resources.get(path);
     rrwl.readLock().lock();
+    /* Adjust the file read length if required */
+    if(offset + maxRead > file.length()){
+      maxRead = (int)file.length() - offset;
+    }
+    byte[] raw = new byte[maxRead];
     /* Read file */
     try{
-      FileInputStream fis = new FileInputStream(file);
-      fis.read(raw);
-      fis.close();
+      RandomAccessFile raf = new RandomAccessFile(file, "r");
+      raf.seek(offset);
+      raf.read(raw);
+      raf.close();
     }catch(IOException e){
-      data = null;
+      raw = null;
     }
     rrwl.readLock().unlock();
-    data = new String(raw);
-    return data;
+    return raw;
   }
 
   /**
@@ -73,7 +77,8 @@ public abstract class Data{
    * @return The data on success, otherwise NULL.
    **/
   public static String read(String path){
-    return read(path, MAX_READ);
+    byte[] r = read(path, 0, MAX_READ);
+    return r != null ? new String(r) : null;
   }
 
   /**
@@ -86,7 +91,8 @@ public abstract class Data{
    * @return The data on success, otherwise NULL.
    **/
   public static String readLarge(String path, int maxRead){
-    return read(path, maxRead);
+    byte[] r = read(path, 0, maxRead);
+    return r != null ? new String(r) : null;
   }
 
   /**
