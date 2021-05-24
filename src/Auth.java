@@ -36,7 +36,6 @@ public class Auth{
     public I512 password = null;
     /* The role of the user */
     public Role role = Role.NONE;
-    /* TODO: Remove old user token if issuing another or is old. */
     /* The current user token */
     public I512 token = null;
     /* The time at which the token comes invalid */
@@ -189,6 +188,10 @@ public class Auth{
         /* Make sure the token is not timed out */
         if(System.currentTimeMillis() <= user.revoke){
           return user;
+        }else{
+          /* Revoke the token */
+          tokenMap.remove(user.token);
+          user.token = null;
         }
       }
     }
