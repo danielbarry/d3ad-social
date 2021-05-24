@@ -27,6 +27,7 @@ public class Process implements Runnable{
   private int recBuffSize;
   private int subDirLen;
   private int inputMaxLen;
+  private int tagMaxCount;
   private int authDelay;
   private Auth auth;
   private String pstDir;
@@ -43,6 +44,7 @@ public class Process implements Runnable{
    * @param recBuffSize The receiver buffer size.
    * @param subDirLen The subdirectory length.
    * @param inputMaxLen The maximum post input length.
+   * @param tagMaxCount The maximum number of tags to be counted.
    * @param authDelay Artificial delay for authentication.
    * @param auth Access to the authentication mechanism.
    * @param pstDir The post directory.
@@ -55,6 +57,7 @@ public class Process implements Runnable{
     int recBuffSize,
     int subDirLen,
     int inputMaxLen,
+    int tagMaxCount,
     int authDelay,
     Auth auth,
     String pstDir,
@@ -66,6 +69,7 @@ public class Process implements Runnable{
     this.recBuffSize = recBuffSize;
     this.subDirLen = subDirLen;
     this.inputMaxLen = inputMaxLen;
+    this.tagMaxCount = tagMaxCount;
     this.authDelay = authDelay;
     this.auth = auth;
     this.pstDir = pstDir;
@@ -92,7 +96,7 @@ public class Process implements Runnable{
     /* Authenticate (if required) */
     Auth.User user = parseAuth(kv, auth, authDelay);
     /* Handle user POST */
-    if(!parsePost(kv, user, pstDir, tagDir, usrDir, inputMaxLen)){
+    if(!parsePost(kv, user, pstDir, tagDir, usrDir, inputMaxLen, tagMaxCount)){
       /* Delete location to force a bad message */
       kv.remove("location");
     }
@@ -366,6 +370,7 @@ public class Process implements Runnable{
    * @param tagDir The tag directory.
    * @param usrDir The user directory.
    * @param inputMaxLen The maximum input length.
+   * @param tagMaxCount The maximum number of tags that can be in a post.
    * @return True if there are no errors to be reported, otherwise false.
    **/
   private static boolean parsePost(
@@ -374,7 +379,8 @@ public class Process implements Runnable{
     String pstDir,
     String tagDir,
     String usrDir,
-    int inputMaxLen
+    int inputMaxLen,
+    int tagMaxCount
   ){
     /* Make sure we handle a logged in user */
     if(user == null){
@@ -425,8 +431,7 @@ public class Process implements Runnable{
       /* Find tags in post */
       String[] parts = post.message.split(" ");
       int tagCount = 0;
-      /* TODO: Pull tag count out of configuration. */
-      for(int x = 0; x < parts.length && tagCount < 4; x++){
+      for(int x = 0; x < parts.length && tagCount < tagMaxCount; x++){
         /* Test whether it could possibly be a valid tag */
         if(parts[x] != null && parts[x].length() >= 2 && parts[x].charAt(0) == '#'){
           /* Grab tag and sanitize */

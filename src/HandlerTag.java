@@ -12,6 +12,7 @@ import java.util.HashMap;
  **/
 public class HandlerTag extends Handler{
   private static byte[] error;
+  private static int resLen;
 
   private Auth.User viewer;
   private Auth auth;
@@ -29,6 +30,13 @@ public class HandlerTag extends Handler{
   public static void init(JSON config){
     /* Pre-generate known strings */
     error = "<div><b>Unknown request</b></div>".getBytes();
+    /* Pull values from configuration */
+    resLen = 16;
+    try{
+      resLen = Integer.parseInt(config.get("tag").get("result-length").value(resLen + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find tags result length value");
+    }
   }
 
   /**
@@ -79,10 +87,10 @@ public class HandlerTag extends Handler{
         .append(tag)
         .append("'</h2>");
       /* Return list of tags */
-      /* TODO: Pull values out of configuration. */
-      ArrayList<Post> posts = Tag.readTag(tagDir, tag, page * 16, 16 + 1);
+      /* NOTE: We read an extra post to see if there are more. */
+      ArrayList<Post> posts = Tag.readTag(tagDir, tag, page * resLen, resLen + 1);
       /* Render list of tags */
-      for(int x = 0; x < Math.min(posts.size(), 16); x++){
+      for(int x = 0; x < Math.min(posts.size(), resLen); x++){
         Post post = posts.get(x);
         /* Make sure post is valid */
         if(post != null){
@@ -90,7 +98,7 @@ public class HandlerTag extends Handler{
         }
       }
       /* If we found more, display more */
-      if(posts.size() > 16){
+      if(posts.size() > resLen){
         res
           .append("<h2><a href=\"")
           .append(sub)

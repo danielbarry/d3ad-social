@@ -20,6 +20,7 @@ public class Server extends Thread{
   private int recBuffSize;
   private int subDirLen;
   private int inputMaxLen;
+  private int tagMaxCount;
   private int authDelay;
   private String pstDir;
   private String tagDir;
@@ -39,6 +40,7 @@ public class Server extends Thread{
     recBuffSize = 2048;
     String subDir = "/";
     inputMaxLen = 512;
+    tagMaxCount = 4;
     authDelay = 1000;
     subDirLen = 1;
     pstDir = "dat/pst";
@@ -68,6 +70,11 @@ public class Server extends Thread{
       Utils.warn("Unable to find input maximum length value");
     }
     try{
+      tagMaxCount = Integer.parseInt(config.get("tag").get("max-count").value(tagMaxCount + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find input maximum length value");
+    }
+    try{
       authDelay = Integer.parseInt(config.get("authentication").get("delay-ms").value(authDelay + ""));
     }catch(NumberFormatException e){
       Utils.warn("Unable to find authentication delay value");
@@ -88,6 +95,7 @@ public class Server extends Thread{
     Utils.log("Requested receive buffer size is '"  + recBuffSize + "'");
     Utils.log("Requested reuse address is '"        + reuseAddr   + "'");
     Utils.log("Requested input maximum length is '" + inputMaxLen + "'");
+    Utils.log("Requested tag maximum count is '"    + tagMaxCount + "'");
     Utils.log("Requested authentication delay is '" + authDelay   + "'");
     Utils.log("Requested timeout is '"              + timeout     + "'");
     Utils.log("Requested sub directory is '"        + subDir      + "'");
@@ -126,9 +134,10 @@ public class Server extends Thread{
     /* Setup thread pool */
     pool = Executors.newFixedThreadPool(poolSize);
     /* Initialise shared variables */
-    Data.init(config);
     auth = new Auth(config);
+    Data.init(config);
     Post.init(auth);
+    Tag.init(config);
     Handler.init(config);
     HandlerAbout.init(config);
     HandlerEmbed.init(config);
@@ -166,6 +175,7 @@ public class Server extends Thread{
                 recBuffSize,
                 subDirLen,
                 inputMaxLen,
+                tagMaxCount,
                 authDelay,
                 auth,
                 pstDir,

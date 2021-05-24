@@ -43,6 +43,12 @@
     "token-timeout-ms": "86400000"
   },
   "sub-dir": "/",
+  "tag": {
+    "max-count": "4",
+    "max-length": "64",
+    "min-length": "2",
+    "result-length": "16"
+  },
   "timeout-ms": "10000",
   "url": "http://127.0.0.1"
 }

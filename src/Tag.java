@@ -10,6 +10,36 @@ import java.util.ArrayList;
 public class Tag{
   private static final int ENTRY_LEN = ((new I512("0")).toString() + "\n").length();
 
+  private static String pstDir;
+  private static int maxTagLen;
+  private static int minTagLen;
+
+  /**
+   * init()
+   *
+   * Initialise the static variables.
+   *
+   * @param config The shared configuration.
+   **/
+  public static void init(JSON config){
+    /* Setup some sane default values */
+    pstDir = "dat/pst";
+    maxTagLen = 64;
+    minTagLen = 2;
+    /* Try to read each from the configuration */
+    pstDir = config.get("data").get("post-dir").value(pstDir);
+    try{
+      maxTagLen = Integer.parseInt(config.get("tag").get("max-length").value(Integer.toString(maxTagLen)));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find maximum tag length value");
+    }
+    try{
+      minTagLen = Integer.parseInt(config.get("tag").get("min-length").value(Integer.toString(minTagLen)));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find minimum tag length value");
+    }
+  }
+
   /**
    * readTag()
    *
@@ -37,8 +67,7 @@ public class Tag{
     if(entries != null){
       /* Try to convert each post */
       for(int x = 0; x < entries.length; x++){
-        /* TODO: Get post location from somewhere. */
-        Post post = Post.readPost("dat/pst", entries[x].trim());
+        Post post = Post.readPost(pstDir, entries[x].trim());
         if(post != null){
           results.add(post);
         }
@@ -83,8 +112,7 @@ public class Tag{
    **/
   public static String sanitize(String s){
     /* Make sure we were given something and of correct length */
-    /* TODO: Pull length out of configuration. */
-    if(s == null || s.length() < 2 || s.length() > 64){
+    if(s == null || s.length() < minTagLen || s.length() > maxTagLen){
       return null;
     }
     /* Setup array to be cloned into */
