@@ -137,6 +137,10 @@ public abstract class Handler{
    * @param user The logged in user, otherwise NULL.
    **/
   public void genHead(OutputStream os, Auth.User user) throws IOException{
+    /* Allow skipping of head writing optionally in abstractors */
+    if(os == null){
+      return;
+    }
     Str res = new Str(32);
     os.write(head);
     res
