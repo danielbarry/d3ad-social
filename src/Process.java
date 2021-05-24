@@ -414,7 +414,9 @@ public class Process implements Runnable{
       }
       /* Find tags in post */
       String[] parts = post.message.split(" ");
-      for(int x = 0; x < parts.length; x++){
+      int tagCount = 0;
+      /* TODO: Pull tag count out of configuration. */
+      for(int x = 0; x < parts.length && tagCount < 4; x++){
         /* Test whether it could possibly be a valid tag */
         if(parts[x] != null && parts[x].length() >= 2 && parts[x].charAt(0) == '#'){
           /* Grab tag and sanitize */
@@ -423,6 +425,7 @@ public class Process implements Runnable{
           if(tag != null){
             /* TODO: Grab value from configuration file. */
             Tag.writeTag("dat/tag", tag, post);
+            ++tagCount;
           }
         }
       }
