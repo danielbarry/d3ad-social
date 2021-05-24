@@ -89,6 +89,17 @@ public class HandlerTag extends Handler{
           res = genPostEntry(res, post, auth, viewer, 0);
         }
       }
+      /* If we found more, display more */
+      if(posts.size() > 16){
+        res
+          .append("<h2><a href=\"")
+          .append(sub)
+          .append(TAG_SUB)
+          .append(tag)
+          .append("/")
+          .append(Integer.toString(page + 1))
+          .append("\">more</a></h2>");
+      }
       os.write(res.toByteArray());
       return;
     }
