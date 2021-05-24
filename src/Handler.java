@@ -66,7 +66,7 @@ public abstract class Handler{
         "</head>" +
         "<body>";
     head = h.getBytes();
-    error = "<b>Error</b>".getBytes();
+    error = "<div><b>Error</b></div>".getBytes();
     foot = (
         "</body>" +
       "</html>"

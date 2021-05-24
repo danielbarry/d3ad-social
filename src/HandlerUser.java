@@ -28,7 +28,7 @@ public class HandlerUser extends Handler{
    **/
   public static void init(JSON config){
     /* Pre-generate known strings */
-    error = "<b>Invalid user</b>".getBytes();
+    error = "<div><b>Invalid user</b></div>".getBytes();
     len = 16;
     try{
       len = Integer.parseInt(config.get("html").get("length").value(len + ""));

@@ -24,7 +24,7 @@ public class HandlerTag extends Handler{
    **/
   public static void init(JSON config){
     /* Pre-generate known strings */
-    error = "<b>Unknown request</b>".getBytes();
+    error = "<div><b>Unknown request</b></div>".getBytes();
   }
 
   /**

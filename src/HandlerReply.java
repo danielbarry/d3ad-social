@@ -26,7 +26,7 @@ public class HandlerReply extends Handler{
    **/
   public static void init(JSON config){
     /* Pre-generate known strings */
-    error = "<b>Unknown post</b>".getBytes();
+    error = "<div><b>Unknown post</b></div>".getBytes();
   }
 
   /**
