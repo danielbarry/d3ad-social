@@ -190,7 +190,11 @@ public class Process implements Runnable{
             break;
           case "tag" :
             String tag = loc[0];
-            h = new HandlerTag(kv, user, auth, tag);
+            String page = null;
+            if(loc.length > 1){
+              page = loc[1];
+            }
+            h = new HandlerTag(kv, user, auth, tag, page);
             writeHead(os, h.genMime(), user);
             h.genHead(os, user);
             h.genBody(os);

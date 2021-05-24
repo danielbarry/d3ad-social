@@ -16,6 +16,7 @@ public class HandlerTag extends Handler{
   private Auth.User viewer;
   private Auth auth;
   private String tag;
+  private int page;
 
   /**
    * init()
@@ -39,21 +40,34 @@ public class HandlerTag extends Handler{
    * @param viewer The logged in user, otherwise NULL.
    * @param auth Access to the authentication object.
    * @param tag The tag to be searched for.
+   * @param page The page to be returned for the tag.
    **/
   public HandlerTag(
     HashMap<String, String> kv,
     Auth.User viewer,
     Auth auth,
-    String tag
+    String tag,
+    String page
   ){
     this.viewer = viewer;
     this.auth = auth;
     this.tag = tag;
-    /* TODO: Check if tag is valid. */
+    /* Check if tag is valid */
     if(kv.containsKey("search")){
       this.tag = kv.get("search");
     }
     this.tag = Tag.sanitize(this.tag);
+    if(page != null){
+      try{
+        this.page = Integer.parseInt(page);
+      }catch(NumberFormatException e){
+        this.page = 0;
+      }
+    }
+    /* Make sure page is non-zero */
+    if(this.page < 0){
+      this.page = 0;
+    }
   }
 
   @Override
@@ -66,9 +80,9 @@ public class HandlerTag extends Handler{
         .append("'</h2>");
       /* Return list of tags */
       /* TODO: Pull values out of configuration. */
-      ArrayList<Post> posts = Tag.readTag("dat/tag", tag, 0, 16);
+      ArrayList<Post> posts = Tag.readTag("dat/tag", tag, page * 16, 16 + 1);
       /* Render list of tags */
-      for(int x = 0; x < posts.size(); x++){
+      for(int x = 0; x < Math.min(posts.size(), 16); x++){
         Post post = posts.get(x);
         /* Make sure post is valid */
         if(post != null){
