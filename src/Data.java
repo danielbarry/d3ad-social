@@ -115,7 +115,12 @@ public abstract class Data{
     int readLen = numLines * lineLen;
     int offset = (int)file.length() - ((lineOffset + numLines) * lineLen);
     if(offset < 0){
+      readLen += offset;
       offset = 0;
+    }
+    if(readLen < 0){
+      /* Nothing to be read here */
+      return new String[0];
     }
     byte[] raw = read(path, offset, readLen);
     /* Make sure we made a read */
