@@ -18,6 +18,7 @@ public class HandlerTag extends Handler{
   private Auth auth;
   private String tag;
   private int page;
+  private boolean embed;
 
   /**
    * init()
@@ -76,6 +77,26 @@ public class HandlerTag extends Handler{
     if(this.page < 0){
       this.page = 0;
     }
+    /* Check if we got an embed request */
+    embed = false;
+    if(page != null){
+      embed = page.equals("embed");
+    }
+  }
+
+  /**
+   * genHead()
+   *
+   * Generate the page header content.
+   *
+   * @param os The OutputStream to write the data to.
+   * @param user The logged in user, otherwise NULL.
+   **/
+  public void genHead(OutputStream os, Auth.User user) throws IOException{
+    /* Skip writing the head if we got a request to embed */
+    super.genHead(!embed ? os : null, user);
+    /* Write the HTML header information */
+    os.write(head);
   }
 
   @Override
