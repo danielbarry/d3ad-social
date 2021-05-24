@@ -412,6 +412,20 @@ public class Process implements Runnable{
           return false;
         }
       }
+      /* Find tags in post */
+      String[] parts = post.message.split(" ");
+      for(int x = 0; x < parts.length; x++){
+        /* Test whether it could possibly be a valid tag */
+        if(parts[x] != null && parts[x].length() >= 2 && parts[x].charAt(0) == '#'){
+          /* Grab tag and sanitize */
+          String tag = Tag.sanitize(parts[x].substring(1));
+          /* Make sure the tag is valid */
+          if(tag != null){
+            /* TODO: Grab value from configuration file. */
+            Tag.writeTag("dat/tag", tag, post);
+          }
+        }
+      }
       /* Save post */
       if(Post.writePost(pstDir, post.id.toString(), post) != post){
         Utils.warn("Unable to save new post");
