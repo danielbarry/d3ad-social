@@ -103,10 +103,19 @@ public class HandlerTag extends Handler{
   public void genBody(OutputStream os) throws IOException{
     /* Make sure tag is okay */
     if(tag != null){
-      Str res = (new Str(2048))
-        .append("<h2>tags labelled '")
-        .append(tag)
-        .append("'</h2>");
+      Str res = (new Str(2048));
+      if(!embed){
+        res
+          .append("<h2>tags labelled '")
+          .append(tag)
+          .append("' <a href=\"data:text/html,<iframe src='")
+          .append(url)
+          .append(sub)
+          .append(TAG_SUB)
+          .append(tag)
+          .append("/embed")
+          .append("'><iframe>\">e</a></h2>");
+      }
       /* Return list of tags */
       /* NOTE: We read an extra post to see if there are more. */
       ArrayList<Post> posts = Tag.readTag(tagDir, tag, page * resLen, resLen + 1);
