@@ -33,8 +33,7 @@ public class Tag{
       return null;
     }
     /* Read the results */
-    /* TODO: Read variables from configuration. */
-    String[] entries = Data.readRearLines(loc + "/" + tag, ENTRY_LEN, 0, 16);
+    String[] entries = Data.readRearLines(loc + "/" + tag, ENTRY_LEN, offset, length);
     if(entries != null){
       /* Try to convert each post */
       for(int x = 0; x < entries.length; x++){
