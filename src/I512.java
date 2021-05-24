@@ -352,7 +352,6 @@ public final class I512 extends Number implements Comparable<I512>{
 
   @Override
   public int hashCode(){
-    /* TODO: Should probably hash the entire number. */
     return intValue();
   }
 
