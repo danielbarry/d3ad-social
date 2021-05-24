@@ -96,6 +96,42 @@ public abstract class Data{
   }
 
   /**
+   * readRearLines()
+   *
+   * Read the rear lines from a file and return them as strings. The strings
+   * will be returned by the last first. Note that this method only works if
+   * the lines are of constant length.
+   *
+   * @param path The location read from.
+   * @param lineLen The length of the newline, including the chosen separator.
+   * @param lineOffset The line offset to begin reading from.
+   * @param numLines The number of lines to be read from the given offset.
+   * @return The lines read from the disk.
+   **/
+  public static String[] readRearLines(String path, int lineLen, int lineOffset, int numLines){
+    File file = new File(path);
+    int readLen = numLines * lineLen;
+    int offset = (int)file.length() - ((lineOffset + numLines) * lineLen);
+    if(offset < 0){
+      offset = 0;
+    }
+    byte[] raw = read(path, offset, readLen);
+    /* Make sure we made a read */
+    if(raw != null){
+      /* NOTE: Must convert to String due to byte encoding. */
+      String s = new String(raw);
+      /* Parse the lines backwards */
+      String[] res = new String[s.length() / lineLen];
+      for(int x = 0; x < res.length; x++){
+        res[res.length - (x + 1)] = s.substring(x * lineLen, (x + 1) * lineLen);
+      }
+      return res;
+    }
+    /* Return empty by default */
+    return new String[0];
+  }
+
+  /**
    * write()
    *
    * Generic writing to a file on the disk, returning true on success and false
