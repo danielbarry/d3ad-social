@@ -57,7 +57,9 @@ public abstract class Data{
     /* Read file */
     try{
       RandomAccessFile raf = new RandomAccessFile(file, "r");
-      raf.seek(offset);
+      if(offset > 0){
+        raf.seek(offset);
+      }
       raf.read(raw);
       raf.close();
     }catch(IOException e){
