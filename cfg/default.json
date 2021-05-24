@@ -5,6 +5,7 @@
   },
   "data": {
     "post-dir": "dat/pst",
+    "tag-dir": "dat/tag",
     "user-dir": "dat/usr"
   },
   "disk": {

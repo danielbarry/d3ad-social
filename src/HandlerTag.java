@@ -80,7 +80,7 @@ public class HandlerTag extends Handler{
         .append("'</h2>");
       /* Return list of tags */
       /* TODO: Pull values out of configuration. */
-      ArrayList<Post> posts = Tag.readTag("dat/tag", tag, page * 16, 16 + 1);
+      ArrayList<Post> posts = Tag.readTag(tagDir, tag, page * 16, 16 + 1);
       /* Render list of tags */
       for(int x = 0; x < Math.min(posts.size(), 16); x++){
         Post post = posts.get(x);

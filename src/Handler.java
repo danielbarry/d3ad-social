@@ -22,6 +22,7 @@ public abstract class Handler{
   public static String url;
   public static String sub;
   public static String pstDir;
+  public static String tagDir;
   public static String usrDir;
   public static byte[] mime;
   public static byte[] head;
@@ -49,6 +50,7 @@ public abstract class Handler{
     url = config.get("url").value("127.0.0.1");
     sub = config.get("sub-dir").value("/");
     pstDir = config.get("data").get("post-dir").value("dat/pst");
+    tagDir = config.get("data").get("tag-dir").value("dat/tag");
     usrDir = config.get("data").get("user-dir").value("dat/usr");
     /* Setup private variables */
     mime = "Content-Type: text/html; charset=utf-8".getBytes();

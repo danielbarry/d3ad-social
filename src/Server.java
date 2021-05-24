@@ -22,6 +22,7 @@ public class Server extends Thread{
   private int inputMaxLen;
   private int authDelay;
   private String pstDir;
+  private String tagDir;
   private String usrDir;
 
   /**
@@ -41,6 +42,7 @@ public class Server extends Thread{
     authDelay = 1000;
     subDirLen = 1;
     pstDir = "dat/pst";
+    tagDir = "dat/tag";
     usrDir = "dat/usr";
     boolean reuseAddr = false;
     int timeout = 10000;
@@ -77,8 +79,9 @@ public class Server extends Thread{
     }
     subDir = config.get("sub-dir").value("/");
     subDirLen = subDir.length();
-    pstDir = config.get("data").get("post-dir").value("dat/pst");
-    usrDir = config.get("data").get("user-dir").value("dat/usr");
+    pstDir = config.get("data").get("post-dir").value(pstDir);
+    tagDir = config.get("data").get("tag-dir").value(tagDir);
+    usrDir = config.get("data").get("user-dir").value(usrDir);
     /* Log out server values */
     Utils.log("Requested pool size is '"            + poolSize    + "'");
     Utils.log("Requested port is '"                 + port        + "'");
@@ -89,6 +92,7 @@ public class Server extends Thread{
     Utils.log("Requested timeout is '"              + timeout     + "'");
     Utils.log("Requested sub directory is '"        + subDir      + "'");
     Utils.log("Requested post directory is '"       + pstDir      + "'");
+    Utils.log("Requested tag directory is '"        + tagDir      + "'");
     Utils.log("Requested user directory is '"       + usrDir      + "'");
     /* Setup server socket */
     try{
@@ -165,6 +169,7 @@ public class Server extends Thread{
                 authDelay,
                 auth,
                 pstDir,
+                tagDir,
                 usrDir
               )
             );

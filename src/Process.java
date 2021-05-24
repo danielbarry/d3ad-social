@@ -30,6 +30,7 @@ public class Process implements Runnable{
   private int authDelay;
   private Auth auth;
   private String pstDir;
+  private String tagDir;
   private String usrDir;
 
   /**
@@ -45,6 +46,7 @@ public class Process implements Runnable{
    * @param authDelay Artificial delay for authentication.
    * @param auth Access to the authentication mechanism.
    * @param pstDir The post directory.
+   * @param tagDir The tag directory.
    * @param usrDir The user directory.
    **/
   public Process(
@@ -56,6 +58,7 @@ public class Process implements Runnable{
     int authDelay,
     Auth auth,
     String pstDir,
+    String tagDir,
     String usrDir
   ){
     this.s = socket;
@@ -66,6 +69,7 @@ public class Process implements Runnable{
     this.authDelay = authDelay;
     this.auth = auth;
     this.pstDir = pstDir;
+    this.tagDir = tagDir;
     this.usrDir = usrDir;
   }
 
@@ -88,7 +92,7 @@ public class Process implements Runnable{
     /* Authenticate (if required) */
     Auth.User user = parseAuth(kv, auth, authDelay);
     /* Handle user POST */
-    if(!parsePost(kv, user, pstDir, usrDir, inputMaxLen)){
+    if(!parsePost(kv, user, pstDir, tagDir, usrDir, inputMaxLen)){
       /* Delete location to force a bad message */
       kv.remove("location");
     }
@@ -359,6 +363,7 @@ public class Process implements Runnable{
    * @param kv The key value mappings from the header.
    * @param user The authenticated user, otherwise NULL.
    * @param pstDir The post directory.
+   * @param tagDir The tag directory.
    * @param usrDir The user directory.
    * @param inputMaxLen The maximum input length.
    * @return True if there are no errors to be reported, otherwise false.
@@ -367,6 +372,7 @@ public class Process implements Runnable{
     HashMap<String, String> kv,
     Auth.User user,
     String pstDir,
+    String tagDir,
     String usrDir,
     int inputMaxLen
   ){
@@ -427,8 +433,7 @@ public class Process implements Runnable{
           String tag = Tag.sanitize(parts[x].substring(1));
           /* Make sure the tag is valid */
           if(tag != null){
-            /* TODO: Grab value from configuration file. */
-            Tag.writeTag("dat/tag", tag, post);
+            Tag.writeTag(tagDir, tag, post);
             ++tagCount;
           }
         }
