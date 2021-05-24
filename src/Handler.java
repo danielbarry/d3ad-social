@@ -380,6 +380,21 @@ public abstract class Handler{
               res.append(p[x]);
             }
             break;
+          case '#' :
+            String tag = Tag.sanitize(p[x].substring(1));
+            if(tag != null){
+              res
+                .append("<a href=\"")
+                .append(sub)
+                .append(TAG_SUB)
+                .append(tag)
+                .append("\">#")
+                .append(tag)
+                .append("</a>");
+            }else{
+              res.append(p[x]);
+            }
+            break;
           case '*' :
             if(b % 2 == 0){
               res.append("<b>");
