@@ -12,6 +12,7 @@ import java.util.Date;
  * A basic interface for a specific page or function.
  **/
 public abstract class Handler{
+  public static final String LOGIN_SUB = "login/";
   public static final String USER_SUB = "user/";
   public static final String EMBED_SUB = "embed/";
   public static final String REPLY_SUB = "reply/";
@@ -152,7 +153,9 @@ public abstract class Handler{
       .append("<a href=\"")
       .append(sub);
     if(user == null){
-      res.append("login\">login");
+      res
+        .append(LOGIN_SUB)
+        .append("\">login");
     }else{
       res
         .append(USER_SUB)
