@@ -225,6 +225,12 @@ public abstract class Handler{
           .append("\">");
       }
       res.append(form);
+    }else{
+      res
+        .append("<div>please <a href=\"")
+        .append(sub)
+        .append(LOGIN_SUB)
+        .append("\">login</a> to post</div>");
     }
     return res;
   }
