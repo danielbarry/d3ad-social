@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Process.java
@@ -430,16 +431,15 @@ public class Process implements Runnable{
       }
       /* Find tags in post */
       String[] parts = post.message.split(" ");
-      int tagCount = 0;
-      for(int x = 0; x < parts.length && tagCount < tagMaxCount; x++){
+      HashSet<String> tags = new HashSet<String>(tagMaxCount);
+      for(int x = 0; x < parts.length && tags.size() < tagMaxCount; x++){
         /* Test whether it could possibly be a valid tag */
         if(parts[x] != null && parts[x].length() >= 2 && parts[x].charAt(0) == '#'){
           /* Grab tag and sanitize */
           String tag = Tag.sanitize(parts[x].substring(1));
           /* Make sure the tag is valid */
           if(tag != null){
-            Tag.writeTag(tagDir, tag, post);
-            ++tagCount;
+            tags.add(tag);
           }
         }
       }
@@ -447,6 +447,10 @@ public class Process implements Runnable{
       if(Post.writePost(pstDir, post.id.toString(), post) != post){
         Utils.warn("Unable to save new post");
         return false;
+      }
+      /* Save tags for post */
+      for(String tag : tags){
+        Tag.writeTag(tagDir, tag, post);
       }
       /* Update user data */
       user.latest = post.id;
