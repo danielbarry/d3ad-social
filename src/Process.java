@@ -339,6 +339,7 @@ public class Process implements Runnable{
     Auth.User user = null;
     /* Check if login or registration */
     if(kv.containsKey("username")){
+      /* TODO: This doesn't prevent multi-process attacks. */
       /* Do authentication delay to prevent brute force */
       try{
         Thread.sleep(authDelay);
