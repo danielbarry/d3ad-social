@@ -22,6 +22,7 @@ public class Server extends Thread{
   private int inputMaxLen;
   private int tagMaxCount;
   private int authDelay;
+  private int postDelay;
   private String pstDir;
   private String tagDir;
   private String usrDir;
@@ -42,6 +43,7 @@ public class Server extends Thread{
     inputMaxLen = 512;
     tagMaxCount = 4;
     authDelay = 1000;
+    postDelay = 1000;
     subDirLen = 1;
     pstDir = "dat/pst";
     tagDir = "dat/tag";
@@ -80,6 +82,11 @@ public class Server extends Thread{
       Utils.warn("Unable to find authentication delay value");
     }
     try{
+      postDelay = Integer.parseInt(config.get("post").get("delay-ms").value(postDelay + ""));
+    }catch(NumberFormatException e){
+      Utils.warn("Unable to find post delay value");
+    }
+    try{
       timeout = Integer.parseInt(config.get("timeout-ms").value(timeout + ""));
     }catch(NumberFormatException e){
       Utils.warn("Unable to find timeout value");
@@ -97,6 +104,7 @@ public class Server extends Thread{
     Utils.log("Requested input maximum length is '" + inputMaxLen + "'");
     Utils.log("Requested tag maximum count is '"    + tagMaxCount + "'");
     Utils.log("Requested authentication delay is '" + authDelay   + "'");
+    Utils.log("Requested post delay is '"           + postDelay   + "'");
     Utils.log("Requested timeout is '"              + timeout     + "'");
     Utils.log("Requested sub directory is '"        + subDir      + "'");
     Utils.log("Requested post directory is '"       + pstDir      + "'");
@@ -177,6 +185,7 @@ public class Server extends Thread{
                 inputMaxLen,
                 tagMaxCount,
                 authDelay,
+                postDelay,
                 auth,
                 pstDir,
                 tagDir,

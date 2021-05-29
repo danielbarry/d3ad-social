@@ -32,6 +32,9 @@
   "name": "d3ad",
   "pool-size": "8",
   "port": "8080",
+  "post": {
+    "delay-ms": "5000"
+  },
   "rec-buff-size": "4096",
   "reuse-addr": "false",
   "rss": {

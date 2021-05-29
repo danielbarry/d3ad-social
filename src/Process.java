@@ -30,6 +30,7 @@ public class Process implements Runnable{
   private int inputMaxLen;
   private int tagMaxCount;
   private int authDelay;
+  private int postDelay;
   private Auth auth;
   private String pstDir;
   private String tagDir;
@@ -47,6 +48,7 @@ public class Process implements Runnable{
    * @param inputMaxLen The maximum post input length.
    * @param tagMaxCount The maximum number of tags to be counted.
    * @param authDelay Artificial delay for authentication.
+   * @param postDelay Artificial delay for posting.
    * @param auth Access to the authentication mechanism.
    * @param pstDir The post directory.
    * @param tagDir The tag directory.
@@ -60,6 +62,7 @@ public class Process implements Runnable{
     int inputMaxLen,
     int tagMaxCount,
     int authDelay,
+    int postDelay,
     Auth auth,
     String pstDir,
     String tagDir,
@@ -72,6 +75,7 @@ public class Process implements Runnable{
     this.inputMaxLen = inputMaxLen;
     this.tagMaxCount = tagMaxCount;
     this.authDelay = authDelay;
+    this.postDelay = postDelay;
     this.auth = auth;
     this.pstDir = pstDir;
     this.tagDir = tagDir;
@@ -97,7 +101,7 @@ public class Process implements Runnable{
     /* Authenticate (if required) */
     Auth.User user = parseAuth(kv, auth, authDelay);
     /* Handle user POST */
-    if(!parsePost(kv, user, pstDir, tagDir, usrDir, inputMaxLen, tagMaxCount)){
+    if(!parsePost(kv, user, pstDir, tagDir, usrDir, postDelay, inputMaxLen, tagMaxCount)){
       /* Delete location to force a bad message */
       kv.remove("location");
     }
@@ -370,6 +374,7 @@ public class Process implements Runnable{
    * @param pstDir The post directory.
    * @param tagDir The tag directory.
    * @param usrDir The user directory.
+   * @param postDelay Artificial post delay to prevent brute force attacks.
    * @param inputMaxLen The maximum input length.
    * @param tagMaxCount The maximum number of tags that can be in a post.
    * @return True if there are no errors to be reported, otherwise false.
@@ -380,6 +385,7 @@ public class Process implements Runnable{
     String pstDir,
     String tagDir,
     String usrDir,
+    int postDelay,
     int inputMaxLen,
     int tagMaxCount
   ){
@@ -389,6 +395,17 @@ public class Process implements Runnable{
     }
     /* Check if a post request was made */
     if(kv.containsKey("post")){
+      /* Check time since last post */
+      if(user.latest != null){
+        Post postLatest = Post.readPost(pstDir, user.latest.toString());
+        /* If the user tries to post too regularly, fail */
+        if(
+          postLatest != null &&
+          System.currentTimeMillis() < postLatest.creation + postDelay
+        ){
+          return false;
+        }
+      }
       /* Create a post object */
       Post post = new Post();
       while(Data.exists(pstDir + "/" + (post.id = Utils.genRandHash())));
