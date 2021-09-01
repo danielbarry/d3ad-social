@@ -23,7 +23,7 @@
  * questions.
  */
 
-package java.util;
+package javah.utility;
 
 import java.io.FilterOutputStream;
 import java.io.InputStream;
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * This class consists exclusively of static methods for obtaining
