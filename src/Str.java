@@ -24,20 +24,20 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     }
     stringField.setAccessible(true);
     try{
-      byte[] d = (byte[])(stringField.get("#"));
+      char[] d = (char[])(stringField.get("#"));
       padSkip = d.length;
     }catch(IllegalAccessException e){
       e.printStackTrace();
     }
   }
 
-  private byte[][] data;
+  private char[][] data;
   private int cap;
   private int idx;
   private int len;
 
   public Str(int capacity){
-    data = new byte[capacity][];
+    data = new char[capacity][];
     cap = capacity;
     idx = 0;
     len = 0;
@@ -46,7 +46,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   public Str(String s){
     this(1);
     try{
-      data[idx] = (byte[])(stringField.get(s));
+      data[idx] = (char[])(stringField.get(s));
     }catch(IllegalAccessException e){
       e.printStackTrace();
     }
@@ -54,17 +54,17 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     ++idx;
   }
 
-  public Str(byte[] data){
+  public Str(char[] data){
     this(1);
     this.data[idx] = data;
     len = this.data[idx].length;
     ++idx;
   }
 
-  public Str(byte[] data, int beginIndex, int endIndex){
+  public Str(char[] data, int beginIndex, int endIndex){
     this(1);
     len = endIndex - beginIndex;
-    this.data[idx] = new byte[len];
+    this.data[idx] = new char[len];
     System.arraycopy(data, beginIndex, this.data[idx], 0, len);
     ++idx;
   }
@@ -77,7 +77,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     }
     /* Add the array */
     try{
-      data[idx] = (byte[])(stringField.get(s));
+      data[idx] = (char[])(stringField.get(s));
     }catch(IllegalAccessException e){
       e.printStackTrace();
     }
@@ -86,7 +86,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
     return this;
   }
 
-  public Str append(byte[] s){
+  public Str append(char[] s){
     /* Check capacity */
     if(idx >= cap){
       Utils.warn("Out of capacity, generating more");
@@ -135,9 +135,9 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
   }
 
   public Str substring(int beginIndex, int endIndex){
-    byte[] val = new byte[endIndex - beginIndex];
+    char[] val = new char[endIndex - beginIndex];
     for(int i = 0; i < endIndex - beginIndex; i++){
-      val[i] = (byte)(charAt(i));
+      val[i] = (char)(charAt(i));
     }
     return new Str(val, beginIndex, endIndex);
   }
@@ -167,7 +167,7 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
       return;
     }
     /* Perform expansion */
-    byte [][] d = new byte[capacity][];
+    char [][] d = new char[capacity][];
     System.arraycopy(data, 0, d, 0, idx);
     data = d;
     cap = capacity;
@@ -212,14 +212,14 @@ public final class Str implements java.io.Serializable, Comparable<Str>, CharSeq
    * Encodes the string as 7 bit ASCII. This ignores all encoding, so be
    * CAREFUL.
    *
-   * @return The convert byte array.
+   * @return The convert char array.
    **/
   public byte[] toByteArray(){
     int z = 0;
     byte[] r = new byte[len / padSkip];
     for(int i = 0; i < idx; i++){
       for(int x = 0; x < data[i].length; x += padSkip){
-        r[z++] = data[i][x];
+        r[z++] = (byte)(data[i][x]);
       }
     }
     return r;
