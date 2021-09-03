@@ -21,6 +21,12 @@ You'll need:
 
 To build you should then be able to run `ant` in the root directory.
 
+**NOTE:** To switch JVM in Linux, it should be possible to do something like:
+
+```bash
+sudo update-alternatives --config java
+```
+
 ## Running
 
 This can be achieved by simply running:
