@@ -16,8 +16,8 @@ Functionality and features include:
 You'll need:
 
 * Ant (build script)
-* Java JRE (runtime - currently tested with Java 11)
-* Java JDK (development kit - currently tested with Java 11)
+* Java JRE (runtime - currently tested with Java 7)
+* Java JDK (development kit - currently tested with Java 7)
 
 To build you should then be able to run `ant` in the root directory.
 
