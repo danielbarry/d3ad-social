@@ -16,6 +16,9 @@
   <target name="compile" depends="clean" description="Compile Java Code">
     <mkdir dir="${build.dir}" />
     <javac
+      taskname="javac"
+      target="1.7"
+      source="1.7"
       srcdir="${source.dir}"
       destdir="${build.dir}"
       debug="true"
