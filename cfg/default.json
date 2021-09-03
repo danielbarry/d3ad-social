@@ -21,7 +21,8 @@
       "h1,h2{text-align:center;}",
       "a{color:#888;}a:before{content:\"[\";}a:after{content:\"]\";}",
       "form,div{background-color:#CCC;margin:auto;max-width:640px;padding:4px;}",
-      "quote{background-color:#FFF;color:#222;display:block;padding:4px;}"
+      "quote{background-color:#FFF;color:#222;display:block;padding:4px;}",
+      "@media(prefers-color-scheme:dark){html{background-color:#222;color:#FFF;}}"
     ],
     "length": "16",
     "max-word-length": "40"
