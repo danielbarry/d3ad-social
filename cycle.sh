@@ -41,8 +41,8 @@ do
   # Check if process is running
   res="$(ps ax | grep $PROC | grep -v grep)"
   if [ "${res:-null}" = null ]; then
-    # As it's not running, restart it
-    restart_process
+    # As it's not running, rebuild and restart it
+    ant && restart_process
     # Do another loop shortly
     sleep 30
   else
