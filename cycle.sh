@@ -28,7 +28,7 @@ do
   # Fetch the latest changes
   git fetch
   # Check whether pull required
-  if ! git diff --quiet remotes/origin/HEAD; then
+  if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
     # Pull the latest changes
     git pull
     # Rebuild the files
