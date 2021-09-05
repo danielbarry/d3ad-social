@@ -15,8 +15,8 @@ function restart_process {
     kill $pid
   fi
   echo "Trying to start process"
-#  java --illegal-access=permit -jar dist/d3ad.jar -c cfg/custom.json &
-  java -jar dist/d3ad.jar -c cfg/custom.json &
+#  java -Xmx64M --illegal-access=permit -jar dist/d3ad.jar -c cfg/custom.json &
+  java -Xmx64M -jar dist/d3ad.jar -c cfg/custom.json &
 }
 
 # Restart process by default

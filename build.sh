@@ -56,7 +56,7 @@ your build environment if not correctly understood.
   ant
   # Run program
   echo "[>>] Running"
-  java -jar dist/d3ad.jar -c cfg/default.json
+  java -Xmx64M -jar dist/d3ad.jar -c cfg/default.json
 
   # Let the user know what we are doing
   echo "[>>] Resetting JRE to 'auto'"
