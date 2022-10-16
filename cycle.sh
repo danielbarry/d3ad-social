@@ -32,7 +32,8 @@ do
     # Pull the latest changes
     git pull
     # Rebuild the files
-    ant
+#    ant
+    bash package.sh
     # Restart the process
     restart_process
   else
@@ -42,7 +43,8 @@ do
   res="$(ps ax | grep $PROC | grep -v grep)"
   if [ "${res:-null}" = null ]; then
     # As it's not running, rebuild and restart it
-    ant && restart_process
+#    ant && restart_process
+    bash package.sh && restart_process
     # Do another loop shortly
     sleep 30
   else
