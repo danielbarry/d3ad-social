@@ -7,7 +7,7 @@ rm -rf dist
 mkdir dist
 
 # Compile Java classes
-javac -Xlint:unchecked -source 1.7 -target 1.7 -d dist src/*.java
+javac -J-Xmx16m -Xlint:unchecked -source 1.7 -target 1.7 -d dist src/*.java
 
 # Build the Jar executable
 cd dist
