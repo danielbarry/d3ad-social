@@ -177,7 +177,7 @@ public class Auth{
     I512 t = null;
     try{
       t = new I512(token);
-    }catch(NumberFormatException e){
+    }catch(Exception e){
       Utils.warn("Badly formatted token " + token);
     }
     /* Check that we do have a token */
